@@ -1,0 +1,229 @@
+{
+  "entities": {
+    "settings": {
+      "title": "WebsiteSettings",
+      "description": "Global website settings, branding, contact info, and controls",
+      "type": "object",
+      "properties": {
+        "academyName": { "type": "string", "maxLength": 100 },
+        "subtitle": { "type": "string", "maxLength": 150 },
+        "tagline": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "whatsapp": { "type": "string", "maxLength": 20 },
+        "email": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 250 },
+        "googleMapsUrl": { "type": "string", "maxLength": 500 },
+        "logoUrl": { "type": "string", "maxLength": 1000 },
+        "heroImageUrl": { "type": "string", "maxLength": 1000 },
+        "heroTitle": { "type": "string", "maxLength": 150 },
+        "heroSubtitle": { "type": "string", "maxLength": 200 },
+        "heroDescription": { "type": "string", "maxLength": 500 },
+        "admissionOpen": { "type": "boolean" },
+        "admissionButtonText": { "type": "string", "maxLength": 50 },
+        "announcement": { "type": "string", "maxLength": 300 },
+        "footerText": { "type": "string", "maxLength": 300 },
+        "socialFacebook": { "type": "string", "maxLength": 300 },
+        "socialInstagram": { "type": "string", "maxLength": 300 },
+        "socialYoutube": { "type": "string", "maxLength": 300 },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "program": {
+      "title": "Program",
+      "description": "Educational program offering (Residential, Full-Time, Short-Time)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "code": { "type": "string", "maxLength": 50 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "classes": { "type": "string", "maxLength": 100 },
+        "feeNote": { "type": "string", "maxLength": 150 },
+        "features": { "type": "array" },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "icon": { "type": "string", "maxLength": 50 },
+        "order": { "type": "number" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["name", "code", "description"]
+    },
+    "schoolClass": {
+      "title": "SchoolClass",
+      "description": "Information for Classes 1 through 8",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 50 },
+        "gradeNumber": { "type": "number" },
+        "description": { "type": "string", "maxLength": 1000 },
+        "islamicCurriculum": { "type": "string", "maxLength": 1000 },
+        "modernCurriculum": { "type": "string", "maxLength": 1000 },
+        "subjects": { "type": "array" },
+        "activities": { "type": "array" },
+        "feeResidential": { "type": "number" },
+        "feeFullTime": { "type": "number" },
+        "feeShortTime": { "type": "number" },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "active": { "type": "boolean" }
+      },
+      "required": ["name", "gradeNumber"]
+    },
+    "admissionFeeConfig": {
+      "title": "AdmissionFeeConfig",
+      "description": "One-time initial admission fee breakdown configuration",
+      "type": "object",
+      "properties": {
+        "admissionFee": { "type": "number" },
+        "monthlyFee": { "type": "number" },
+        "dressFee": { "type": "number" },
+        "booksFee": { "type": "number" },
+        "additionalItems": { "type": "array" },
+        "note": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["admissionFee", "monthlyFee", "dressFee", "booksFee"]
+    },
+    "subject": {
+      "title": "Subject",
+      "description": "Curricular subject (Islamic or Modern)",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 100 },
+        "type": { "type": "string", "enum": ["islamic", "modern"] },
+        "description": { "type": "string", "maxLength": 1000 },
+        "icon": { "type": "string", "maxLength": 50 },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "type"]
+    },
+    "curriculum": {
+      "title": "Curriculum",
+      "description": "Curriculum topic and details",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "enum": ["islamic", "modern", "character", "activity", "development"] },
+        "description": { "type": "string", "maxLength": 1000 },
+        "topics": { "type": "array" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "category"]
+    },
+    "facility": {
+      "title": "Facility",
+      "description": "Campus facilities and student amenities",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "icon": { "type": "string", "maxLength": 50 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "description"]
+    },
+    "gallery": {
+      "title": "GalleryItem",
+      "description": "Photo gallery media item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 50 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "caption": { "type": "string", "maxLength": 500 },
+        "isFeatured": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "imageUrl"]
+    },
+    "video": {
+      "title": "VideoItem",
+      "description": "Academy video (YouTube, YouTube Shorts, or Instagram)",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "type": { "type": "string", "enum": ["youtube", "shorts", "instagram"] },
+        "url": { "type": "string", "maxLength": 1000 },
+        "videoId": { "type": "string", "maxLength": 100 },
+        "thumbnail": { "type": "string", "maxLength": 1000 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "category": { "type": "string", "maxLength": 50 },
+        "isFeatured": { "type": "boolean" },
+        "active": { "type": "boolean" },
+        "order": { "type": "number" }
+      },
+      "required": ["title", "type", "url"]
+    },
+    "admissionEnquiry": {
+      "title": "AdmissionEnquiry",
+      "description": "Public admission enquiry submission from parents",
+      "type": "object",
+      "properties": {
+        "parentName": { "type": "string", "maxLength": 100 },
+        "studentName": { "type": "string", "maxLength": 100 },
+        "mobileNumber": { "type": "string", "maxLength": 20 },
+        "whatsappNumber": { "type": "string", "maxLength": 20 },
+        "studentClass": { "type": "string", "maxLength": 50 },
+        "program": { "type": "string", "maxLength": 50 },
+        "message": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["new", "contacted", "interested", "completed", "cancelled"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["parentName", "studentName", "mobileNumber", "studentClass", "program"]
+    },
+    "admin": {
+      "title": "AdminUser",
+      "description": "Authorized admin credential document",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["admin", "superadmin"] },
+        "displayName": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/settings/{settingId}": {
+      "schema": "settings",
+      "description": "Website configurations"
+    },
+    "/programs/{programId}": {
+      "schema": "program",
+      "description": "Academy programs"
+    },
+    "/classes/{classId}": {
+      "schema": "schoolClass",
+      "description": "Classes 1 through 8"
+    },
+    "/feeConfig/{configId}": {
+      "schema": "admissionFeeConfig",
+      "description": "Admission fee configuration"
+    },
+    "/subjects/{subjectId}": {
+      "schema": "subject",
+      "description": "Subjects"
+    },
+    "/curriculum/{curriculumId}": {
+      "schema": "curriculum",
+      "description": "Curriculum topics"
+    },
+    "/facilities/{facilityId}": {
+      "schema": "facility",
+      "description": "Campus facilities"
+    },
+    "/gallery/{galleryId}": {
+      "schema": "gallery",
+      "description": "Gallery media"
+    },
+    "/videos/{videoId}": {
+      "schema": "video",
+      "description": "Videos and shorts"
+    },
+    "/enquiries/{enquiryId}": {
+      "schema": "admissionEnquiry",
+      "description": "Admission enquiry leads"
+    },
+    "/admins/{adminId}": {
+      "schema": "admin",
+      "description": "Authorized administrators"
+    }
+  }
+}

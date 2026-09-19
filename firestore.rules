@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'shahbazdawateislami@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Website Settings
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Programs (Residential, Full-Time, Short-Time)
+    match /programs/{programId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Classes (Class 1 to 8)
+    match /classes/{classId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admission & Monthly Fee configuration
+    match /feeConfig/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Curricular Subjects
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Curriculum details
+    match /curriculum/{curriculumId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Facilities
+    match /facilities/{facilityId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Photo Gallery
+    match /gallery/{galleryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Videos, Shorts, Instagram
+    match /videos/{videoId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admin Users Directory
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Admission Enquiries (Public submissions + Admin view/edit)
+    match /enquiries/{enquiryId} {
+      allow create: if request.resource.data.parentName is string &&
+                       request.resource.data.parentName.size() > 0 &&
+                       request.resource.data.parentName.size() <= 150 &&
+                       request.resource.data.studentName is string &&
+                       request.resource.data.studentName.size() > 0 &&
+                       request.resource.data.studentName.size() <= 150 &&
+                       request.resource.data.mobileNumber is string &&
+                       request.resource.data.mobileNumber.size() >= 8 &&
+                       request.resource.data.mobileNumber.size() <= 20;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Al-Dahr Academy",
+  "description": "Residential Islamic & Modern Education Institute in Phulwari Sharif, Patna, Bihar. Deen • Duniya • A Brighter Future.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
