@@ -57,15 +57,15 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 w-full shadow-md">
       {/* Main Navigation Bar */}
-      <nav className="bg-[#071330] text-white border-b border-blue-900/60 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+      <nav className="bg-[#071330] text-white border-b border-blue-900/60 shadow-lg w-full">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20">
             {/* Logo and Brand Title */}
             <div
               onClick={() => navigateTo('home')}
-              className="flex items-center gap-3 cursor-pointer select-none group"
+              className="flex items-center gap-2 sm:gap-3 cursor-pointer select-none group min-w-0"
             >
-              <div className="w-13 h-13 rounded-full bg-gradient-to-br from-sky-400 via-blue-600 to-indigo-900 p-0.5 shadow-lg shadow-blue-950/60 flex items-center justify-center shrink-0 ring-2 ring-sky-400/30 group-hover:ring-sky-400 transition duration-300">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 rounded-full bg-gradient-to-br from-sky-400 via-blue-600 to-indigo-900 p-0.5 shadow-lg shadow-blue-950/60 flex items-center justify-center shrink-0 ring-2 ring-sky-400/30 group-hover:ring-sky-400 transition duration-300">
                 <div className="w-full h-full bg-[#050e26] rounded-full flex items-center justify-center overflow-hidden">
                   {settings.logoUrl ? (
                     <img
@@ -82,16 +82,16 @@ export const Navbar: React.FC = () => {
                   )}
                 </div>
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xl sm:text-2xl font-bold tracking-tight text-white font-['Cinzel',serif]">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-white font-['Cinzel',serif] truncate">
                     {settings.academyName}
                   </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-300 border border-sky-400/30 px-2 py-0.5 rounded-full">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-300 border border-sky-400/30 px-1.5 py-0.5 rounded-full shrink-0">
                     Phulwari
                   </span>
                 </div>
-                <p className="text-[11px] sm:text-xs text-sky-200/80 font-medium tracking-wide">
+                <p className="text-[10px] sm:text-xs text-sky-200/80 font-medium tracking-wide truncate max-w-[180px] sm:max-w-none">
                   {settings.subtitle}
                 </p>
               </div>

@@ -95,7 +95,7 @@ export const HeroCarousel: React.FC = () => {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Main Carousel Viewport - flex items-end to position text at bottom-left corner */}
-      <div className="relative min-h-[520px] sm:min-h-[600px] lg:min-h-[660px] overflow-hidden flex items-end">
+      <div className="relative min-h-[400px] sm:min-h-[480px] lg:min-h-[540px] overflow-hidden flex items-end">
         {/* Background Image Carousel Slides */}
         {activeSlides.map((slide, idx) => {
           const isActive = idx === currentIndex;
@@ -122,47 +122,47 @@ export const HeroCarousel: React.FC = () => {
         })}
 
         {/* Carousel Content Container - Positioned at bottom-left corner */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 lg:pb-20 pt-28 sm:pt-36 w-full">
-          <div className="max-w-3xl space-y-4 sm:space-y-5 text-left">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 lg:pb-14 pt-16 sm:pt-24 lg:pt-28 w-full">
+          <div className="max-w-3xl space-y-3 sm:space-y-4 text-left">
             {/* Top Welcome Badge (Like the Eduka / Academy Welcome in screenshot) */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-xs sm:text-sm font-bold tracking-wider uppercase shadow-lg backdrop-blur-md animate-in fade-in">
-              <Sparkles className="w-4 h-4 text-amber-400" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-[10px] sm:text-xs font-bold tracking-wider uppercase shadow-lg backdrop-blur-md animate-in fade-in">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>
                 {currentSlide.badge || 'WELCOME TO AL-DAHR ACADEMY'}
               </span>
             </div>
 
-            {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-tight drop-shadow-md">
+            {/* Main Headline - Refined proportional size for mobile and laptop */}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-tight drop-shadow-md">
               {currentSlide.title}
             </h1>
 
             {/* Subtitle / Paragraph */}
-            <p className="text-xs sm:text-base lg:text-lg text-slate-200 leading-relaxed font-medium max-w-2xl drop-shadow">
+            <p className="text-xs sm:text-sm lg:text-base text-slate-200 leading-relaxed font-medium max-w-2xl drop-shadow line-clamp-3 sm:line-clamp-none">
               {currentSlide.subtitle}
             </p>
 
             {/* Action Buttons */}
-            <div className="pt-2 flex flex-wrap items-center gap-3.5">
+            <div className="pt-1.5 sm:pt-2 flex flex-wrap items-center gap-2.5 sm:gap-3.5">
               <button
                 onClick={() => handleAction(currentSlide.primaryBtnAction || 'admission')}
-                className="px-6 sm:px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs sm:text-sm shadow-xl shadow-amber-950/40 transition active:scale-98 flex items-center gap-2.5 uppercase tracking-wider"
+                className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs sm:text-sm shadow-xl shadow-amber-950/40 transition active:scale-98 flex items-center gap-2 uppercase tracking-wider"
               >
                 <span>{currentSlide.primaryBtnText || t('btn_apply_now', 'Admission 2025–26')}</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
               <button
                 onClick={() => handleAction(currentSlide.secondaryBtnAction || 'programs')}
-                className="px-6 sm:px-8 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm border border-slate-700/80 hover:border-sky-400/50 shadow-lg backdrop-blur-md transition active:scale-98 flex items-center gap-2 uppercase tracking-wider"
+                className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm border border-slate-700/80 hover:border-sky-400/50 shadow-lg backdrop-blur-md transition active:scale-98 flex items-center gap-2 uppercase tracking-wider"
               >
                 <span>{currentSlide.secondaryBtnText || t('nav_programs', 'Explore Programs')}</span>
-                <ArrowRight className="w-4 h-4 text-sky-400" />
+                <ArrowRight className="w-3.5 h-3.5 text-sky-400" />
               </button>
 
               <button
                 onClick={() => setIsFeeCalculatorOpen(true)}
-                className="px-4 py-3.5 rounded-xl bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 font-semibold text-xs border border-sky-800/60 shadow-lg transition flex items-center gap-1.5"
+                className="px-3.5 py-2.5 sm:py-3 rounded-xl bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 font-semibold text-xs border border-sky-800/60 shadow-lg transition flex items-center gap-1.5"
                 title="Calculate School & Residential Fees"
               >
                 <Calculator className="w-4 h-4 text-sky-400" />

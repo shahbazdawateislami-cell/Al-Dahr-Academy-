@@ -81,13 +81,13 @@ const MainContent: React.FC = () => {
   return (
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-amber-500 selection:text-slate-950 font-['Plus_Jakarta_Sans',sans-serif]"
+      className="min-h-screen flex flex-col bg-[#020617] text-slate-100 selection:bg-amber-500 selection:text-slate-950 font-['Plus_Jakarta_Sans',sans-serif] w-full max-w-full overflow-x-hidden"
     >
       {/* Global Navigation */}
       <Navbar />
 
       {/* Main Page Area */}
-      <main className="flex-1 pb-20 md:pb-8">
+      <main className="flex-1 pb-20 md:pb-8 w-full max-w-full overflow-x-hidden">
         {renderCurrentView()}
       </main>
 
