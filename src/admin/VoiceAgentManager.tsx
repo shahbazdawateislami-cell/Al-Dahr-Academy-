@@ -172,8 +172,8 @@ export const VoiceAgentManager: React.FC<{ showToast: (msg: string) => void }> =
             onClick={() => setIsVoiceAgentOpen(true)}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold rounded-xl text-xs flex items-center gap-1.5 transition"
           >
-            <Mic className="w-4 h-4 text-amber-400" />
-            <span>Open Voice Assistant</span>
+            <Mic className="w-4 h-4 text-emerald-400" />
+            <span>Test Voice Receptionist</span>
           </button>
           {!isAddingNew && !editingItem && (
             <button

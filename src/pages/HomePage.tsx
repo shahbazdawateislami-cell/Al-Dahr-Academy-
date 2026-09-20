@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAcademy } from '../context/AcademyContext';
 import { useLanguage } from '../context/LanguageContext';
 import { PageRoute } from '../types';
@@ -11,6 +11,7 @@ import {
   GraduationCap,
   BookOpen,
   ArrowRight,
+  ChevronDown,
   CheckCircle2,
   ShieldCheck,
   Award,
@@ -38,8 +39,19 @@ export const HomePage: React.FC = () => {
     setIsAdmissionModalOpen,
     setIsFeeCalculatorOpen,
     setSelectedClassForModal,
+    setEnquiryPrefill,
   } = useAcademy();
   const { t, language } = useLanguage();
+
+  // Fold / Unfold state for classes (Default folded: only class name + arrow visible)
+  const [unfoldedClassIds, setUnfoldedClassIds] = useState<Record<string, boolean>>({});
+
+  const toggleClassFold = (id: string) => {
+    setUnfoldedClassIds((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   const localizedPrograms = programs.map((p) => getLocalizedProgram(p, language));
   const localizedClasses = classes.map((c) => getLocalizedClass(c, language));
@@ -173,50 +185,132 @@ export const HomePage: React.FC = () => {
               {t('home_classes_desc', 'Click any class to view subjects, Islamic syllabus, modern syllabus, activities, and exact fees.')}
             </p>
           </div>
-          <button
-            onClick={() => navigateTo('classes')}
-            className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0"
-          >
-            <span>{t('home_view_all_classes', 'View All Class Syllabi')}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                const allUnfolded = localizedClasses.every((c) => unfoldedClassIds[c.id]);
+                if (allUnfolded) {
+                  setUnfoldedClassIds({});
+                } else {
+                  const all: Record<string, boolean> = {};
+                  localizedClasses.forEach((c) => {
+                    all[c.id] = true;
+                  });
+                  setUnfoldedClassIds(all);
+                }
+              }}
+              className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-blue-950/70 border border-blue-800 text-sky-300 hover:text-white hover:border-sky-500/50 transition flex items-center gap-1.5"
+            >
+              <span>{localizedClasses.every((c) => unfoldedClassIds[c.id]) ? 'Fold All' : 'Unfold All'}</span>
+            </button>
+            <button
+              onClick={() => navigateTo('classes')}
+              className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0"
+            >
+              <span>{t('home_view_all_classes', 'View All Class Syllabi')}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {localizedClasses.map((cls) => (
-            <div
-              key={cls.id}
-              onClick={() => setSelectedClassForModal(cls)}
-              className="p-5 rounded-2xl bg-[#071330] border border-blue-900/60 hover:border-sky-400/60 cursor-pointer group transition duration-200 hover:-translate-y-1 space-y-3 shadow-lg"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-white font-['Cinzel',serif] group-hover:text-sky-300 transition">
-                  {cls.name}
-                </span>
-                <span className="text-xs font-bold text-sky-300 bg-sky-500/15 px-2 py-0.5 rounded-full border border-sky-400/30">
-                  Grade {cls.gradeNumber}
-                </span>
-              </div>
+        {/* Classes Fold / Unfold Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-start">
+          {localizedClasses.map((cls) => {
+            const isUnfolded = !!unfoldedClassIds[cls.id];
+            return (
+              <div
+                key={cls.id}
+                className={`rounded-2xl border transition-all duration-200 shadow-md overflow-hidden ${
+                  isUnfolded
+                    ? 'bg-[#071330] border-sky-400/80 shadow-sky-950/40 ring-1 ring-sky-400/20'
+                    : 'bg-[#071330]/90 border-blue-900/60 hover:border-sky-500/50 hover:bg-[#0a1945]'
+                }`}
+              >
+                {/* Folded Header (In fold state: ONLY class name and an arrow) */}
+                <button
+                  type="button"
+                  onClick={() => toggleClassFold(cls.id)}
+                  aria-expanded={isUnfolded}
+                  className="w-full p-4 flex items-center justify-between gap-3 text-left transition cursor-pointer select-none group"
+                >
+                  <span className="text-base sm:text-lg font-bold text-white font-['Cinzel',serif] tracking-wide group-hover:text-sky-300 transition">
+                    {cls.name}
+                  </span>
+                  <div
+                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isUnfolded
+                        ? 'bg-sky-500/20 text-sky-300 rotate-180'
+                        : 'bg-blue-900/50 text-slate-300 group-hover:bg-sky-500/20 group-hover:text-sky-300'
+                    }`}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </button>
 
-              <p className="text-xs text-slate-300 line-clamp-2">
-                {cls.description}
-              </p>
+                {/* Unfolded Details (Visible ONLY when unfolded) */}
+                {isUnfolded && (
+                  <div className="px-4 pb-4 pt-1 space-y-3.5 border-t border-blue-900/50 animate-in fade-in duration-200">
+                    <div className="flex items-center justify-between text-xs pt-1">
+                      <span className="text-xs font-bold text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded-full border border-sky-400/30">
+                        Grade {cls.gradeNumber}
+                      </span>
+                      <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
+                        Admissions Open
+                      </span>
+                    </div>
 
-              <div className="pt-2 border-t border-blue-900/60 flex items-center justify-between text-xs">
-                <div>
-                  <span className="text-sky-200/60 block text-[10px]">{t('home_residential_fee', 'Residential Fee')}:</span>
-                  <span className="font-bold text-white">₹{cls.feeResidential}/mo</span>
-                </div>
-                <div>
-                  <span className="text-sky-200/60 block text-[10px]">{t('home_fulltime_fee', 'Full-Time')}:</span>
-                  <span className="font-bold text-sky-400">₹{cls.feeFullTime}/mo</span>
-                </div>
-                <div className="text-sky-400 group-hover:translate-x-1 transition font-bold">
-                  →
-                </div>
+                    <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
+                      {cls.description}
+                    </p>
+
+                    <div className="pt-1.5 border-t border-blue-900/60 grid grid-cols-2 gap-2 text-xs">
+                      <div className="p-2 rounded-lg bg-blue-950/60 border border-blue-900/50">
+                        <span className="text-sky-200/60 block text-[10px]">
+                          {t('home_residential_fee', 'Residential')}:
+                        </span>
+                        <span className="font-bold text-white text-xs">
+                          ₹{cls.feeResidential}/mo
+                        </span>
+                      </div>
+                      <div className="p-2 rounded-lg bg-blue-950/60 border border-blue-900/50">
+                        <span className="text-sky-200/60 block text-[10px]">
+                          {t('home_fulltime_fee', 'Full-Time')}:
+                        </span>
+                        <span className="font-bold text-sky-400 text-xs">
+                          ₹{cls.feeFullTime}/mo
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="pt-1 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedClassForModal(cls);
+                        }}
+                        className="flex-1 py-2 px-2.5 rounded-xl bg-blue-900/50 hover:bg-blue-800 text-sky-200 text-xs font-semibold transition text-center"
+                      >
+                        {t('btn_view_details', 'Full Syllabus')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEnquiryPrefill({ class: cls.name });
+                          setIsAdmissionModalOpen(true);
+                        }}
+                        className="py-2 px-3.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 text-xs font-bold transition shadow"
+                      >
+                        {t('btn_apply_now', 'Apply')}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
