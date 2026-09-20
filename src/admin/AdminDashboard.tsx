@@ -46,7 +46,10 @@ import {
   Upload,
   X,
   Edit2,
+  Bot,
 } from 'lucide-react';
+import { HeroSlidesManager } from './HeroSlidesManager';
+import { VoiceAgentManager } from './VoiceAgentManager';
 
 export const AdminDashboard: React.FC = () => {
   const {
@@ -75,6 +78,8 @@ export const AdminDashboard: React.FC = () => {
     videos,
     saveVideoItem,
     deleteVideoItem,
+    heroSlides,
+    voiceKnowledge,
     enquiries,
     updateEnquiryStatus,
     deleteEnquiry,
@@ -92,6 +97,8 @@ export const AdminDashboard: React.FC = () => {
     | 'dashboard'
     | 'enquiries'
     | 'settings'
+    | 'slides'
+    | 'voice'
     | 'programs'
     | 'classes'
     | 'fees'
@@ -392,6 +399,26 @@ export const AdminDashboard: React.FC = () => {
         >
           <Settings className="w-4 h-4" />
           <span>Settings & Branding</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('slides')}
+          className={`px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+            activeTab === 'slides' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <ImageIcon className="w-4 h-4" />
+          <span>Hero Carousel ({heroSlides.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('voice')}
+          className={`px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+            activeTab === 'voice' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Bot className="w-4 h-4" />
+          <span>Voice AI Agent ({voiceKnowledge.length})</span>
         </button>
 
         <button
@@ -2191,6 +2218,16 @@ export const AdminDashboard: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* TAB CONTENT: HERO CAROUSEL SLIDES */}
+      {activeTab === 'slides' && (
+        <HeroSlidesManager showToast={showToast} />
+      )}
+
+      {/* TAB CONTENT: VOICE AI AGENT KNOWLEDGE BASE */}
+      {activeTab === 'voice' && (
+        <VoiceAgentManager showToast={showToast} />
       )}
 
       {/* TAB CONTENT: GOOGLE WORKSPACE */}

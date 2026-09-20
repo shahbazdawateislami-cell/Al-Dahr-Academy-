@@ -7,6 +7,7 @@ import { MobileQuickBar } from './components/MobileQuickBar';
 import { AdmissionModal } from './components/AdmissionModal';
 import { FeeCalculatorModal } from './components/FeeCalculatorModal';
 import { ClassDetailsModal } from './components/ClassDetailsModal';
+import { FloatingVoiceAgent } from './components/FloatingVoiceAgent';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -94,6 +95,9 @@ const MainContent: React.FC = () => {
       <AdmissionModal />
       <FeeCalculatorModal />
       <ClassDetailsModal />
+
+      {/* Persistent Draggable Voice AI Agent across whole website */}
+      <FloatingVoiceAgent />
 
       {/* Sticky Mobile Quick Contact & Action Bar */}
       <MobileQuickBar />

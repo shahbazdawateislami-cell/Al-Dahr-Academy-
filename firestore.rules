@@ -76,6 +76,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Voice Agent Knowledge Base
+    match /voiceAgentKnowledge/{knowledgeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Hero Carousel Slides
+    match /heroSlides/{slideId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Admin Users Directory
     match /admins/{adminId} {
       allow read: if isSignedIn();

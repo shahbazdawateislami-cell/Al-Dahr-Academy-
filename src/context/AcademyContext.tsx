@@ -5,11 +5,13 @@ import {
   CurriculumItem,
   FacilityItem,
   GalleryMediaItem,
+  HeroSlideItem,
   PageRoute,
   ProgramItem,
   SchoolClassItem,
   SubjectItem,
   VideoMediaItem,
+  VoiceKnowledgeItem,
   WebsiteSettings,
 } from '../types';
 import {
@@ -22,6 +24,8 @@ import {
   initialFacilities,
   initialGallery,
   initialVideos,
+  initialHeroSlides,
+  initialVoiceKnowledge,
 } from '../data/initialData';
 import {
   db,
@@ -50,6 +54,8 @@ interface AcademyContextType {
   facilities: FacilityItem[];
   gallery: GalleryMediaItem[];
   videos: VideoMediaItem[];
+  heroSlides: HeroSlideItem[];
+  voiceKnowledge: VoiceKnowledgeItem[];
   enquiries: AdmissionEnquiry[];
   
   // Navigation
@@ -61,6 +67,8 @@ interface AcademyContextType {
   setIsAdmissionModalOpen: (open: boolean) => void;
   isFeeCalculatorOpen: boolean;
   setIsFeeCalculatorOpen: (open: boolean) => void;
+  isVoiceAgentOpen: boolean;
+  setIsVoiceAgentOpen: (open: boolean) => void;
   enquiryPrefill: { class?: string; program?: string } | null;
   setEnquiryPrefill: (prefill: { class?: string; program?: string } | null) => void;
 
@@ -90,6 +98,10 @@ interface AcademyContextType {
   deleteGalleryItem: (id: string) => Promise<void>;
   saveVideoItem: (item: VideoMediaItem) => Promise<void>;
   deleteVideoItem: (id: string) => Promise<void>;
+  saveHeroSlide: (slide: HeroSlideItem) => Promise<void>;
+  deleteHeroSlide: (id: string) => Promise<void>;
+  saveVoiceKnowledge: (item: VoiceKnowledgeItem) => Promise<void>;
+  deleteVoiceKnowledge: (id: string) => Promise<void>;
   submitEnquiry: (enquiry: Omit<AdmissionEnquiry, 'id' | 'createdAt' | 'status'>) => Promise<boolean>;
   updateEnquiryStatus: (id: string, status: AdmissionEnquiry['status']) => Promise<void>;
   deleteEnquiry: (id: string) => Promise<void>;
@@ -104,6 +116,7 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [selectedClassForModal, setSelectedClassForModal] = useState<SchoolClassItem | null>(null);
   const [isAdmissionModalOpen, setIsAdmissionModalOpen] = useState(false);
   const [isFeeCalculatorOpen, setIsFeeCalculatorOpen] = useState(false);
+  const [isVoiceAgentOpen, setIsVoiceAgentOpen] = useState(false);
   const [enquiryPrefill, setEnquiryPrefill] = useState<{ class?: string; program?: string } | null>(null);
 
   // Data state with localStorage initial fallback
@@ -165,6 +178,16 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [videos, setVideos] = useState<VideoMediaItem[]>(() => {
     const cached = localStorage.getItem('aldahr_videos');
     return cached ? JSON.parse(cached) : initialVideos;
+  });
+
+  const [heroSlides, setHeroSlides] = useState<HeroSlideItem[]>(() => {
+    const cached = localStorage.getItem('aldahr_hero_slides');
+    return cached ? JSON.parse(cached) : initialHeroSlides;
+  });
+
+  const [voiceKnowledge, setVoiceKnowledge] = useState<VoiceKnowledgeItem[]>(() => {
+    const cached = localStorage.getItem('aldahr_voice_knowledge');
+    return cached ? JSON.parse(cached) : initialVoiceKnowledge;
   });
 
   const [enquiries, setEnquiries] = useState<AdmissionEnquiry[]>(() => {
@@ -302,6 +325,43 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       unsubs.push(unsub);
     } catch (e) {
       console.warn('Could not attach videos listener', e);
+    }
+
+    // Hero Slides listener
+    try {
+      const unsub = onSnapshot(
+        collection(db, 'heroSlides'),
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HeroSlideItem));
+            items.sort((a, b) => (a.order || 0) - (b.order || 0));
+            setHeroSlides(items);
+            localStorage.setItem('aldahr_hero_slides', JSON.stringify(items));
+          }
+        },
+        (err) => handleFirestoreError(err, OperationType.LIST, 'heroSlides')
+      );
+      unsubs.push(unsub);
+    } catch (e) {
+      console.warn('Could not attach heroSlides listener', e);
+    }
+
+    // Voice Agent Knowledge listener
+    try {
+      const unsub = onSnapshot(
+        collection(db, 'voiceAgentKnowledge'),
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as VoiceKnowledgeItem));
+            setVoiceKnowledge(items);
+            localStorage.setItem('aldahr_voice_knowledge', JSON.stringify(items));
+          }
+        },
+        (err) => handleFirestoreError(err, OperationType.LIST, 'voiceAgentKnowledge')
+      );
+      unsubs.push(unsub);
+    } catch (e) {
+      console.warn('Could not attach voiceAgentKnowledge listener', e);
     }
 
     return () => {
@@ -584,6 +644,57 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const saveHeroSlide = async (slide: HeroSlideItem) => {
+    const exists = heroSlides.some((s) => s.id === slide.id);
+    const updated = exists
+      ? heroSlides.map((s) => (s.id === slide.id ? slide : s))
+      : [...heroSlides, slide];
+    updated.sort((a, b) => (a.order || 0) - (b.order || 0));
+    setHeroSlides(updated);
+    localStorage.setItem('aldahr_hero_slides', JSON.stringify(updated));
+    try {
+      await setDoc(doc(db, 'heroSlides', slide.id), slide);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.WRITE, `heroSlides/${slide.id}`);
+    }
+  };
+
+  const deleteHeroSlide = async (id: string) => {
+    const updated = heroSlides.filter((s) => s.id !== id);
+    setHeroSlides(updated);
+    localStorage.setItem('aldahr_hero_slides', JSON.stringify(updated));
+    try {
+      await deleteDoc(doc(db, 'heroSlides', id));
+    } catch (e) {
+      handleFirestoreError(e, OperationType.DELETE, `heroSlides/${id}`);
+    }
+  };
+
+  const saveVoiceKnowledge = async (item: VoiceKnowledgeItem) => {
+    const exists = voiceKnowledge.some((vk) => vk.id === item.id);
+    const updated = exists
+      ? voiceKnowledge.map((vk) => (vk.id === item.id ? item : vk))
+      : [item, ...voiceKnowledge];
+    setVoiceKnowledge(updated);
+    localStorage.setItem('aldahr_voice_knowledge', JSON.stringify(updated));
+    try {
+      await setDoc(doc(db, 'voiceAgentKnowledge', item.id), item);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.WRITE, `voiceAgentKnowledge/${item.id}`);
+    }
+  };
+
+  const deleteVoiceKnowledge = async (id: string) => {
+    const updated = voiceKnowledge.filter((vk) => vk.id !== id);
+    setVoiceKnowledge(updated);
+    localStorage.setItem('aldahr_voice_knowledge', JSON.stringify(updated));
+    try {
+      await deleteDoc(doc(db, 'voiceAgentKnowledge', id));
+    } catch (e) {
+      handleFirestoreError(e, OperationType.DELETE, `voiceAgentKnowledge/${id}`);
+    }
+  };
+
   const submitEnquiry = async (
     data: Omit<AdmissionEnquiry, 'id' | 'createdAt' | 'status'>
   ): Promise<boolean> => {
@@ -669,6 +780,8 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         facilities,
         gallery,
         videos,
+        heroSlides,
+        voiceKnowledge,
         enquiries,
         currentPage,
         setCurrentPage,
@@ -678,6 +791,8 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setIsAdmissionModalOpen,
         isFeeCalculatorOpen,
         setIsFeeCalculatorOpen,
+        isVoiceAgentOpen,
+        setIsVoiceAgentOpen,
         enquiryPrefill,
         setEnquiryPrefill,
         currentUser,
@@ -703,6 +818,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         deleteGalleryItem,
         saveVideoItem,
         deleteVideoItem,
+        saveHeroSlide,
+        deleteHeroSlide,
+        saveVoiceKnowledge,
+        deleteVoiceKnowledge,
         submitEnquiry,
         updateEnquiryStatus,
         deleteEnquiry,

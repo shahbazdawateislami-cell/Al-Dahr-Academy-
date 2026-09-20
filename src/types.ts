@@ -101,6 +101,30 @@ export interface VideoMediaItem {
   date?: string;
 }
 
+export interface HeroSlideItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  badge?: string;
+  imageUrl: string;
+  primaryBtnText?: string;
+  primaryBtnAction?: 'admission' | 'calculator' | 'contact' | 'classes' | 'programs';
+  secondaryBtnText?: string;
+  secondaryBtnAction?: 'about' | 'facilities' | 'programs' | 'contact' | 'calculator';
+  active: boolean;
+  order: number;
+}
+
+export interface VoiceKnowledgeItem {
+  id: string;
+  question: string;
+  answer: string;
+  keywords: string[];
+  category: 'general' | 'admissions' | 'fees' | 'hostel' | 'syllabus' | 'contacts' | 'notice';
+  active: boolean;
+  createdAt?: string;
+}
+
 export interface AdmissionEnquiry {
   id: string;
   parentName: string;

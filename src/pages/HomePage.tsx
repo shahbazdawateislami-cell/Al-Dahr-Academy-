@@ -25,6 +25,7 @@ import {
   getLocalizedClass,
   getLocalizedFacility,
 } from '../data/localizedData';
+import { HeroCarousel } from '../components/HeroCarousel';
 
 export const HomePage: React.FC = () => {
   const {
@@ -57,101 +58,8 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="space-y-16 sm:space-y-24">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#050e26] via-[#091a45] to-[#060f29] text-white py-16 sm:py-24 lg:py-28 border-b border-blue-900/60 shadow-2xl">
-        {/* Subtle background image overlay */}
-        <div className="absolute inset-0 z-0 opacity-15">
-          <img
-            src={settings.heroImageUrl}
-            alt={settings.academyName}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050e26] via-[#050e26]/90 to-[#091a45]/80 z-0" />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl space-y-6">
-            {/* Tagline & Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs sm:text-sm font-bold tracking-wide">
-              <Sparkles className="w-4 h-4 text-sky-400 shrink-0" />
-              <span>{t('hero_badge', `${settings.admissionButtonText} • Classes 1 to 8`)}</span>
-            </div>
-
-            {/* Title & Tagline */}
-            <div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-tight">
-                {language === 'en' ? settings.heroTitle : (
-                  <span>
-                    {t('hero_title_prefix')}{' '}
-                    <span className="text-sky-400">{t('hero_title_highlight')}</span>
-                  </span>
-                )}
-              </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-sky-300/95 font-semibold tracking-wider uppercase mt-2">
-                {t('sec_modern_subtitle', settings.heroSubtitle)}
-              </p>
-            </div>
-
-            {/* Tagline Box */}
-            <div className="inline-block px-4 py-2 rounded-xl bg-blue-950/80 border border-blue-800/80 text-sky-200 font-bold font-['Amiri',serif] text-lg sm:text-xl shadow-lg">
-              “{settings.tagline}”
-            </div>
-
-            <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl">
-              {t('hero_desc', settings.heroDescription)}
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-3.5 pt-2">
-              <button
-                onClick={() => setIsAdmissionModalOpen(true)}
-                className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-sky-500/25 transition transform active:scale-95 flex items-center gap-2"
-              >
-                <Sparkles className="w-4 h-4 shrink-0" />
-                <span>{t('hero_btn_apply', 'Apply for Admission')}</span>
-              </button>
-
-              <button
-                onClick={() => setIsFeeCalculatorOpen(true)}
-                className="px-6 py-3.5 rounded-xl bg-blue-950/90 hover:bg-blue-900 border border-sky-400/40 text-sky-200 font-bold text-sm sm:text-base transition flex items-center gap-2"
-              >
-                <Calculator className="w-4 h-4 text-sky-400 shrink-0" />
-                <span>{t('hero_btn_fee', 'Calculate Fee')}</span>
-              </button>
-
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-3.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-600 text-white font-bold text-sm sm:text-base transition flex items-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4 shrink-0" />
-                <span>{t('btn_whatsapp', 'WhatsApp')}</span>
-              </a>
-            </div>
-
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-blue-900/60">
-              <div className="p-3 bg-blue-950/60 rounded-xl border border-blue-900/60 text-center">
-                <span className="block text-xl sm:text-2xl font-black text-sky-400">1 – 8</span>
-                <span className="text-[11px] text-slate-300 font-medium">{t('hero_stat_classes', 'Classes 1 to 8')}</span>
-              </div>
-              <div className="p-3 bg-blue-950/60 rounded-xl border border-blue-900/60 text-center">
-                <span className="block text-xl sm:text-2xl font-black text-sky-400">24/7</span>
-                <span className="text-[11px] text-slate-300 font-medium">{t('hero_stat_boarding', 'Residential Boarding')}</span>
-              </div>
-              <div className="p-3 bg-blue-950/60 rounded-xl border border-blue-900/60 text-center">
-                <span className="block text-xl sm:text-2xl font-black text-sky-400">حفظ</span>
-                <span className="text-[11px] text-slate-300 font-medium">{t('hero_stat_hifz', 'Quran & Tajweed')}</span>
-              </div>
-              <div className="p-3 bg-blue-950/60 rounded-xl border border-blue-900/60 text-center">
-                <span className="block text-xl sm:text-2xl font-black text-sky-400">Patna</span>
-                <span className="text-[11px] text-slate-300 font-medium">{t('hero_stat_location', 'Phulwari Sharif')}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Dynamic Hero Carousel matching user screenshot */}
+      <HeroCarousel />
 
       {/* 3 Core Academic Pathways */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
