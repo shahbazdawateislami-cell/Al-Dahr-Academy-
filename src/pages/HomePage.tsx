@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import { PageRoute } from '../types';
 import {
   Sparkles,
@@ -32,6 +33,7 @@ export const HomePage: React.FC = () => {
     setIsFeeCalculatorOpen,
     setSelectedClassForModal,
   } = useAcademy();
+  const { t, language } = useLanguage();
 
   const navigateTo = (page: PageRoute) => {
     setCurrentPage(page);
@@ -47,7 +49,7 @@ export const HomePage: React.FC = () => {
   return (
     <div className="space-y-16 sm:space-y-24">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white py-16 sm:py-24 lg:py-28 border-b border-slate-800">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#050e26] via-[#091a45] to-[#060f29] text-white py-16 sm:py-24 lg:py-28 border-b border-blue-900/60 shadow-2xl">
         {/* Subtle background image overlay */}
         <div className="absolute inset-0 z-0 opacity-15">
           <img
@@ -56,80 +58,57 @@ export const HomePage: React.FC = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-900/80 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#050e26] via-[#050e26]/90 to-[#091a45]/80 z-0" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl space-y-6">
             {/* Tagline & Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs sm:text-sm font-bold tracking-wide">
-              <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>{settings.admissionButtonText} • Classes 1 to 8</span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs sm:text-sm font-bold tracking-wide">
+              <Sparkles className="w-4 h-4 text-sky-400 shrink-0" />
+              <span>{t('hero_badge', `${settings.admissionButtonText} • Classes 1 to 8`)}</span>
             </div>
 
             {/* Title & Tagline */}
             <div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-tight">
-                {settings.heroTitle}
+                {language === 'en' ? settings.heroTitle : (
+                  <span>
+                    {t('hero_title_prefix')}{' '}
+                    <span className="text-sky-400">{t('hero_title_highlight')}</span>
+                  </span>
+                )}
               </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-amber-400/95 font-semibold tracking-wider uppercase mt-2">
-                {settings.heroSubtitle}
+              <p className="text-sm sm:text-base lg:text-lg text-sky-300/95 font-semibold tracking-wider uppercase mt-2">
+                {t('hero_subtitle', settings.heroSubtitle)}
               </p>
             </div>
 
             {/* Tagline Box */}
-            <div className="inline-block px-4 py-2 rounded-xl bg-slate-900/90 border border-slate-800 text-amber-300 font-bold font-['Amiri',serif] text-lg sm:text-xl">
-              “{settings.tagline}”
+            <div className="inline-block px-4 py-2 rounded-xl bg-blue-950/80 border border-blue-800/80 text-sky-200 font-bold font-['Amiri',serif] text-lg sm:text-xl shadow-lg">
+              “{t('academy_tagline', settings.tagline)}”
             </div>
 
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
-              {settings.heroDescription}
+            <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl">
+              {t('hero_desc', settings.heroDescription)}
             </p>
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-3.5 pt-2">
               <button
                 onClick={() => setIsAdmissionModalOpen(true)}
-                className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-sm sm:text-base shadow-xl shadow-amber-500/20 transition transform active:scale-95 flex items-center gap-2"
+                className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-sky-500/25 transition transform active:scale-95 flex items-center gap-2"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Apply for Admission</span>
+                <Sparkles className="w-4 h-4 text-slate-950" />
+                <span>{t('hero_btn_apply', 'Apply for Admission')}</span>
               </button>
 
               <button
                 onClick={() => setIsFeeCalculatorOpen(true)}
-                className="px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-amber-500/40 font-bold text-sm sm:text-base shadow-md transition flex items-center gap-2"
+                className="px-6 py-3.5 rounded-xl bg-blue-950/90 hover:bg-blue-900/90 text-sky-300 border border-sky-400/40 font-bold text-sm sm:text-base shadow-md transition flex items-center gap-2"
               >
-                <Calculator className="w-4 h-4" />
-                <span>Calculate Fee</span>
+                <Calculator className="w-4 h-4 text-sky-400" />
+                <span>{t('hero_btn_fee', 'Calculate Fee')}</span>
               </button>
-
-              <a
-                href={`tel:+91${settings.phone}`}
-                className="px-5 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-sm border border-slate-700 transition flex items-center gap-2"
-              >
-                <Phone className="w-4 h-4 text-amber-400" />
-                <span>Call: {settings.phone}</span>
-              </a>
-            </div>
-
-            {/* Key trust bullets */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-800/80">
-              <div className="flex items-center gap-2 text-xs text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Classes 1 to 8</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                <span>Residential Boarding</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Quran & Tajweed Hifz</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Phulwari Sharif, Patna</span>
-              </div>
             </div>
           </div>
         </div>
@@ -139,13 +118,13 @@ export const HomePage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-bold uppercase tracking-wider">
-            Academic Pathways
+            {t('nav_programs', 'Academic Pathways')}
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white font-['Cinzel',serif]">
-            Choose the Right Program for Your Child
+            {t('sec_programs_title', 'Choose the Right Program for Your Child')}
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
-            Tailored education balancing Islamic spirituality, academic distinction, and flexible daily or residential structures.
+            {t('sec_programs_subtitle', 'Tailored education balancing Islamic spirituality, academic distinction, and flexible daily or residential structures.')}
           </p>
         </div>
 
@@ -157,12 +136,12 @@ export const HomePage: React.FC = () => {
             return (
               <div
                 key={prog.id}
-                className={`relative rounded-2xl bg-slate-900 border ${
+                className={`relative rounded-2xl bg-[#071330] border ${
                   isResidential
-                    ? 'border-amber-500/50 shadow-xl shadow-amber-950/20'
+                    ? 'border-sky-500/70 shadow-2xl shadow-blue-950/70'
                     : isFullTime
-                    ? 'border-sky-500/40'
-                    : 'border-emerald-500/40'
+                    ? 'border-blue-700/60'
+                    : 'border-teal-600/60'
                 } overflow-hidden flex flex-col justify-between group hover:-translate-y-1 transition duration-300`}
               >
                 {/* Image & Overlay */}
@@ -172,8 +151,8 @@ export const HomePage: React.FC = () => {
                     alt={prog.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-950/80 text-white border border-slate-700">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#071330] via-[#071330]/40 to-transparent" />
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#050e26]/90 text-sky-200 border border-blue-800">
                     {prog.classes}
                   </div>
                   <div className="absolute bottom-3 left-4">
@@ -190,19 +169,19 @@ export const HomePage: React.FC = () => {
                       {prog.description}
                     </p>
 
-                    <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                      <p className="text-[11px] text-slate-400">Tuition & Boarding:</p>
-                      <p className="text-sm font-bold text-amber-400">{prog.feeNote}</p>
+                    <div className="p-3 bg-[#050e26] rounded-xl border border-blue-900/60">
+                      <p className="text-[11px] text-sky-200/70">Tuition & Boarding:</p>
+                      <p className="text-sm font-bold text-sky-300">{prog.feeNote}</p>
                     </div>
 
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                      <p className="text-xs font-semibold text-sky-200 uppercase tracking-wider">
                         Key Features:
                       </p>
-                      <ul className="space-y-1.5 text-xs text-slate-400">
+                      <ul className="space-y-1.5 text-xs text-slate-300">
                         {prog.features.slice(0, 4).map((f, i) => (
                           <li key={i} className="flex items-start gap-2">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
                             <span>{f}</span>
                           </li>
                         ))}
@@ -210,16 +189,16 @@ export const HomePage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-slate-800 flex items-center gap-2">
+                  <div className="pt-4 border-t border-blue-900/60 flex items-center gap-2">
                     <button
                       onClick={() => navigateTo(`${prog.code}-program` as PageRoute)}
-                      className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition text-center"
+                      className="flex-1 py-2.5 rounded-xl bg-blue-950/80 hover:bg-blue-900/80 text-white font-semibold text-xs transition text-center border border-blue-800/60"
                     >
                       View Details
                     </button>
                     <button
                       onClick={() => setIsAdmissionModalOpen(true)}
-                      className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition"
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-bold text-xs transition shadow"
                     >
                       Apply
                     </button>
@@ -235,19 +214,19 @@ export const HomePage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider mb-2">
               Grades Offered
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
               Classes 1 to 8 Curriculum & Progression
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-300 mt-1">
               Click any class to view subjects, Islamic syllabus, modern syllabus, activities, and exact fees.
             </p>
           </div>
           <button
             onClick={() => navigateTo('classes')}
-            className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1 shrink-0"
+            className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0"
           >
             <span>View All Class Syllabi</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -259,31 +238,31 @@ export const HomePage: React.FC = () => {
             <div
               key={cls.id}
               onClick={() => setSelectedClassForModal(cls)}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 cursor-pointer group transition duration-200 hover:-translate-y-1 space-y-3"
+              className="p-5 rounded-2xl bg-[#071330] border border-blue-900/60 hover:border-sky-400/60 cursor-pointer group transition duration-200 hover:-translate-y-1 space-y-3 shadow-lg"
             >
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-white font-['Cinzel',serif] group-hover:text-amber-400 transition">
+                <span className="text-lg font-bold text-white font-['Cinzel',serif] group-hover:text-sky-300 transition">
                   {cls.name}
                 </span>
-                <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                <span className="text-xs font-bold text-sky-300 bg-sky-500/15 px-2 py-0.5 rounded-full border border-sky-400/30">
                   Grade {cls.gradeNumber}
                 </span>
               </div>
 
-              <p className="text-xs text-slate-400 line-clamp-2">
+              <p className="text-xs text-slate-300 line-clamp-2">
                 {cls.description}
               </p>
 
-              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <div className="pt-2 border-t border-blue-900/60 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-slate-500 block text-[10px]">Residential Fee:</span>
+                  <span className="text-sky-200/60 block text-[10px]">Residential Fee:</span>
                   <span className="font-bold text-white">₹{cls.feeResidential}/mo</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">Full-Time:</span>
+                  <span className="text-sky-200/60 block text-[10px]">Full-Time:</span>
                   <span className="font-bold text-sky-400">₹{cls.feeFullTime}/mo</span>
                 </div>
-                <div className="text-amber-400 group-hover:translate-x-1 transition">
+                <div className="text-sky-400 group-hover:translate-x-1 transition font-bold">
                   →
                 </div>
               </div>
@@ -293,32 +272,32 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* Balanced Education: Islamic & Modern Split */}
-      <section className="bg-slate-900 border-y border-slate-800 py-16">
+      <section className="bg-[#050e26] border-y border-blue-900/60 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider">
               Holistic Philosophy
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white font-['Cinzel',serif]">
               The Harmonious Synthesis of Deen and Modernity
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400">
+            <p className="text-xs sm:text-sm text-slate-300">
               We eliminate the false divide between worldly competence and spiritual uprightness.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Islamic Column */}
-            <div className="p-8 rounded-2xl bg-slate-950 border border-amber-500/30 space-y-6">
+            <div className="p-8 rounded-2xl bg-[#071330] border border-sky-500/40 space-y-6 shadow-xl">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white font-['Cinzel',serif]">
                     Islamic Education
                   </h3>
-                  <p className="text-xs text-amber-400 font-semibold">
+                  <p className="text-xs text-sky-300 font-semibold">
                     Faith, Character, and Sacred Knowledge
                   </p>
                 </div>
@@ -330,26 +309,26 @@ export const HomePage: React.FC = () => {
 
               <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
                 <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
                   <span>Qur'an & Tajweed from Noorani Qaida to fluent recitation</span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
                   <span>Hifz-e-Qur'an track with certified Hafiz supervision</span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
                   <span>Hadith, Sunnah, and 6 Kalimas memorization</span>
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
                   <span>Daily Masnoon Duas and Islamic Manners (Adab & Akhlaq)</span>
                 </li>
               </ul>
 
               <button
                 onClick={() => navigateTo('islamic-education')}
-                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-850 text-amber-400 font-bold text-xs border border-amber-500/30 transition flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-blue-950 hover:bg-blue-900 text-sky-300 font-bold text-xs border border-sky-500/30 transition flex items-center justify-center gap-2"
               >
                 <span>Read Islamic Education Details</span>
                 <ArrowRight className="w-4 h-4" />
@@ -357,16 +336,16 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Modern Academic Column */}
-            <div className="p-8 rounded-2xl bg-slate-950 border border-sky-500/30 space-y-6">
+            <div className="p-8 rounded-2xl bg-[#071330] border border-blue-700/50 space-y-6 shadow-xl">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-blue-600/20 text-sky-400 flex items-center justify-center">
                   <GraduationCap className="w-6 h-6" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white font-['Cinzel',serif]">
                     Modern Education
                   </h3>
-                  <p className="text-xs text-sky-400 font-semibold">
+                  <p className="text-xs text-sky-300 font-semibold">
                     Scientific Temper, Literacy, and Digital Skills
                   </p>
                 </div>
@@ -397,7 +376,7 @@ export const HomePage: React.FC = () => {
 
               <button
                 onClick={() => navigateTo('modern-education')}
-                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-850 text-sky-400 font-bold text-xs border border-sky-500/30 transition flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-blue-950 hover:bg-blue-900 text-sky-300 font-bold text-xs border border-sky-500/30 transition flex items-center justify-center gap-2"
               >
                 <span>Read Modern Education Details</span>
                 <ArrowRight className="w-4 h-4" />
@@ -411,19 +390,19 @@ export const HomePage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider mb-2">
               Campus Environment
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
               World-Class Residential & Academic Facilities
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-300 mt-1">
               A serene, secure environment designed for high academic focus and student wellness.
             </p>
           </div>
           <button
             onClick={() => navigateTo('facilities')}
-            className="text-xs font-bold text-amber-400 hover:underline flex items-center gap-1 shrink-0"
+            className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0"
           >
             <span>Explore All Facilities</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -434,7 +413,7 @@ export const HomePage: React.FC = () => {
           {facilities.slice(0, 4).map((fac) => (
             <div
               key={fac.id}
-              className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden group hover:border-amber-500/50 transition duration-300"
+              className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden group hover:border-sky-400/60 transition duration-300 shadow-lg"
             >
               <div className="h-40 overflow-hidden bg-slate-950">
                 <img
@@ -444,10 +423,10 @@ export const HomePage: React.FC = () => {
                 />
               </div>
               <div className="p-4 space-y-2">
-                <h3 className="text-base font-bold text-white font-['Cinzel',serif] group-hover:text-amber-400 transition">
+                <h3 className="text-base font-bold text-white font-['Cinzel',serif] group-hover:text-sky-300 transition">
                   {fac.title}
                 </h3>
-                <p className="text-xs text-slate-400 line-clamp-3">
+                <p className="text-xs text-slate-300 line-clamp-3">
                   {fac.description}
                 </p>
               </div>
@@ -461,34 +440,34 @@ export const HomePage: React.FC = () => {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider mb-2">
                 Watch & Discover
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
                 Campus Life in Motion: Videos & Shorts
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-300 mt-1">
                 Experience the recitations, classroom dynamics, and student interviews.
               </p>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => navigateTo('videos')}
-                className="text-xs font-bold text-amber-400 hover:underline"
+                className="text-xs font-bold text-sky-400 hover:underline"
               >
                 All Videos
               </button>
               <span className="text-slate-600">•</span>
               <button
                 onClick={() => navigateTo('youtube-shorts')}
-                className="text-xs font-bold text-red-400 hover:underline"
+                className="text-xs font-bold text-blue-400 hover:underline"
               >
                 YouTube Shorts
               </button>
               <span className="text-slate-600">•</span>
               <button
                 onClick={() => navigateTo('instagram-videos')}
-                className="text-xs font-bold text-pink-400 hover:underline"
+                className="text-xs font-bold text-teal-400 hover:underline"
               >
                 Instagram Reels
               </button>
@@ -499,7 +478,7 @@ export const HomePage: React.FC = () => {
             {featuredVideos.map((vid) => (
               <div
                 key={vid.id}
-                className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden flex flex-col justify-between group hover:border-red-500/50 transition"
+                className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-sky-400/60 transition shadow-lg"
               >
                 <div className="relative h-48 bg-slate-950">
                   {vid.thumbnail ? (
@@ -514,7 +493,7 @@ export const HomePage: React.FC = () => {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover:bg-slate-950/20 transition">
-                    <div className="w-12 h-12 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl group-hover:scale-110 transition">
+                    <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xl group-hover:scale-110 transition">
                       <Play className="w-5 h-5 ml-0.5" />
                     </div>
                   </div>
@@ -525,10 +504,10 @@ export const HomePage: React.FC = () => {
 
                 <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-white line-clamp-2 group-hover:text-amber-400 transition">
+                    <h3 className="text-sm font-bold text-white line-clamp-2 group-hover:text-sky-300 transition">
                       {vid.title}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                    <p className="text-xs text-slate-300 mt-1 line-clamp-2">
                       {vid.description}
                     </p>
                   </div>
@@ -551,40 +530,36 @@ export const HomePage: React.FC = () => {
 
       {/* Location & Quick Contact Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 p-8 sm:p-12">
+        <div className="rounded-3xl bg-gradient-to-r from-[#071330] via-[#0b1e4f] to-[#071330] border border-blue-800/70 p-8 sm:p-12 shadow-2xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="space-y-5">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider">
-                Visit Our Campus
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider">
+                {t('sec_location_title', 'Campus Location')}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white font-['Cinzel',serif]">
-                Located in Phulwari Sharif, Patna
+                {t('sec_location_subtitle', 'Located in Phulwari Sharif, Patna')}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
                 Parents are welcome to visit our premises, inspect the residential hostel, interact with Asatizah, and experience our peaceful academic environment firsthand.
               </p>
 
-              <div className="space-y-3 text-xs sm:text-sm text-slate-300">
+              <div className="space-y-3 text-xs sm:text-sm text-slate-200">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-sky-400 shrink-0 mt-0.5" />
                   <span>{settings.address}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-amber-400 shrink-0" />
-                  <span>Admission Hotline: +91 {settings.phone}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-amber-400 shrink-0" />
-                  <span>Visiting Hours: 8:00 AM – 5:00 PM (Monday to Saturday)</span>
+                  <Clock className="w-5 h-5 text-sky-400 shrink-0" />
+                  <span>{t('sec_visiting_hours', 'Visiting Hours: 8:00 AM – 5:00 PM (Monday to Saturday)')}</span>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <button
                   onClick={() => setIsAdmissionModalOpen(true)}
-                  className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm transition"
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-bold text-xs sm:text-sm transition shadow-lg"
                 >
-                  Schedule Campus Visit
+                  {t('sec_schedule_visit', 'Schedule Campus Visit')}
                 </button>
                 <a
                   href={whatsappHref}
@@ -593,13 +568,13 @@ export const HomePage: React.FC = () => {
                   className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition flex items-center gap-2"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>Chat on WhatsApp</span>
+                  <span>{t('sec_whatsapp_chat', 'Chat on WhatsApp')}</span>
                 </a>
               </div>
             </div>
 
             {/* Embedded Interactive Map */}
-            <div className="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl h-72 sm:h-80 bg-slate-950">
+            <div className="rounded-2xl overflow-hidden border border-blue-700/60 shadow-2xl h-72 sm:h-80 bg-slate-950">
               <iframe
                 title="Al-Dahr Academy Location"
                 src={settings.googleMapsUrl}

@@ -68,7 +68,8 @@ interface AcademyContextType {
   currentUser: User | null;
   isAdminLoggedIn: boolean;
   adminLoginError: string | null;
-  handleAdminLoginWithGoogle: () => Promise<void>;
+  setAdminLoginError: (err: string | null) => void;
+  handleAdminLoginWithGoogle: () => Promise<boolean>;
   handleAdminLoginWithPassword: (pass: string) => boolean;
   handleAdminLogout: () => Promise<void>;
 
@@ -108,7 +109,22 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Data state with localStorage initial fallback
   const [settings, setSettings] = useState<WebsiteSettings>(() => {
     const cached = localStorage.getItem('aldahr_settings');
-    return cached ? JSON.parse(cached) : initialSettings;
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        // Ensure new logo and royal blue theme are applied if previously unsplash placeholder or default amber
+        if (!parsed.logoUrl || parsed.logoUrl.includes('unsplash.com')) {
+          parsed.logoUrl = '/logo.jpg';
+        }
+        if (parsed.secondaryColorHex === '#D97706') {
+          parsed.secondaryColorHex = '#0EA5E9';
+        }
+        return { ...initialSettings, ...parsed };
+      } catch (e) {
+        return initialSettings;
+      }
+    }
+    return initialSettings;
   });
 
   const [programs, setPrograms] = useState<ProgramItem[]>(() => {
@@ -317,22 +333,33 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const handleAdminLoginWithGoogle = async () => {
     setAdminLoginError(null);
     try {
-      await signInAdminWithGoogle();
+      const user = await signInAdminWithGoogle();
+      if (!user) {
+        // User closed or dismissed popup without completing sign-in
+        return false;
+      }
+      return true;
     } catch (err: any) {
-      setAdminLoginError(err?.message || 'Google sign-in failed.');
-      throw err;
+      setAdminLoginError(err?.message || 'Google sign-in failed. Please try again or use the passcode.');
+      return false;
     }
   };
 
   const handleAdminLoginWithPassword = (pass: string) => {
     setAdminLoginError(null);
-    // Secure authorized administrative passcode for one-person management
-    if (pass === 'aldahr2025' || pass === 'admin123' || pass === '7079988808') {
+    const cleaned = (pass || '').trim().toLowerCase();
+    // Support aldahracademy@gmail.com as administrative passcode / login as requested
+    if (
+      cleaned === 'aldahracademy@gmail.com' ||
+      cleaned === 'aldahr2025' ||
+      cleaned === 'admin123' ||
+      cleaned === '7079988808'
+    ) {
       setIsPasswordAdmin(true);
       sessionStorage.setItem('aldahr_admin_session', 'active');
       return true;
     }
-    setAdminLoginError('Invalid password. Please check credentials or use Google Sign-in.');
+    setAdminLoginError('Invalid credential. Please enter aldahracademy@gmail.com or passcode.');
     return false;
   };
 
@@ -656,6 +683,7 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         currentUser,
         isAdminLoggedIn,
         adminLoginError,
+        setAdminLoginError,
         handleAdminLoginWithGoogle,
         handleAdminLoginWithPassword,
         handleAdminLogout,

@@ -1,13 +1,12 @@
 import React from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import {
   X,
   BookOpen,
   GraduationCap,
   Sparkles,
   Activity,
-  CheckCircle,
-  ArrowRight,
 } from 'lucide-react';
 
 export const ClassDetailsModal: React.FC = () => {
@@ -17,6 +16,8 @@ export const ClassDetailsModal: React.FC = () => {
     setIsAdmissionModalOpen,
     setEnquiryPrefill,
   } = useAcademy();
+
+  const { t, isRTL } = useLanguage();
 
   if (!selectedClassForModal) return null;
 
@@ -31,33 +32,36 @@ export const ClassDetailsModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-in fade-in">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden text-white">
+    <div
+      dir={isRTL ? 'rtl' : 'ltr'}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-in fade-in"
+    >
+      <div className="relative w-full max-w-2xl bg-[#071330] border border-blue-900/80 rounded-2xl shadow-2xl overflow-hidden text-white">
         {/* Header with image */}
-        <div className="relative h-48 sm:h-56 overflow-hidden bg-slate-950">
+        <div className="relative h-48 sm:h-56 overflow-hidden bg-[#050e26]">
           {selectedClassForModal.imageUrl && (
             <img
               src={selectedClassForModal.imageUrl}
               alt={selectedClassForModal.name}
-              className="w-full h-full object-cover opacity-40"
+              className="w-full h-full object-cover opacity-35"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#071330] via-[#071330]/70 to-transparent" />
 
           <button
             onClick={() => setSelectedClassForModal(null)}
-            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-950/70 text-white hover:bg-slate-800 transition"
+            className="absolute top-4 right-4 p-2 rounded-xl bg-[#050e26]/80 text-white hover:bg-blue-900/70 border border-blue-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="absolute bottom-4 left-6 right-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500 text-slate-950 text-xs font-bold mb-1.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500 text-slate-950 text-xs font-bold mb-1.5 shadow-md">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Session 2025–2026</span>
+              <span>{t('class_modal_badge')}</span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
-              {selectedClassForModal.name} Syllabus & Details
+              {selectedClassForModal.name} - {t('class_modal_syllabus')}
             </h3>
             <p className="text-xs text-slate-300 line-clamp-1">
               {selectedClassForModal.description}
@@ -68,10 +72,10 @@ export const ClassDetailsModal: React.FC = () => {
         {/* Content body */}
         <div className="p-6 space-y-6 max-h-[65vh] overflow-y-auto">
           {/* Islamic Curriculum */}
-          <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 space-y-2">
-            <h4 className="text-sm font-bold text-amber-400 flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              <span>Islamic Curriculum for {selectedClassForModal.name}</span>
+          <div className="bg-[#050e26] rounded-xl p-4 border border-blue-900/80 space-y-2">
+            <h4 className="text-sm font-bold text-sky-300 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-sky-400" />
+              <span>{t('class_islamic_curr')} ({selectedClassForModal.name})</span>
             </h4>
             <p className="text-xs text-slate-300 leading-relaxed">
               {selectedClassForModal.islamicCurriculum}
@@ -79,10 +83,10 @@ export const ClassDetailsModal: React.FC = () => {
           </div>
 
           {/* Modern Academic Curriculum */}
-          <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 space-y-2">
+          <div className="bg-[#050e26] rounded-xl p-4 border border-blue-900/80 space-y-2">
             <h4 className="text-sm font-bold text-sky-400 flex items-center gap-2">
-              <GraduationCap className="w-4 h-4" />
-              <span>Modern Academic Curriculum</span>
+              <GraduationCap className="w-4 h-4 text-sky-400" />
+              <span>{t('class_modern_curr')}</span>
             </h4>
             <p className="text-xs text-slate-300 leading-relaxed">
               {selectedClassForModal.modernCurriculum}
@@ -92,13 +96,13 @@ export const ClassDetailsModal: React.FC = () => {
           {/* Subjects List */}
           <div>
             <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5">
-              Subjects Taught in {selectedClassForModal.name}:
+              {t('class_subjects_taught')} ({selectedClassForModal.name}):
             </h4>
             <div className="flex flex-wrap gap-2">
               {selectedClassForModal.subjects.map((sub, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-200 font-medium"
+                  className="px-3 py-1 bg-[#0b1e4f] border border-blue-800 rounded-lg text-xs text-slate-200 font-medium"
                 >
                   ✓ {sub}
                 </span>
@@ -110,16 +114,16 @@ export const ClassDetailsModal: React.FC = () => {
           {selectedClassForModal.activities && selectedClassForModal.activities.length > 0 && (
             <div>
               <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Activities & Tarbiyah Highlights:</span>
+                <Activity className="w-3.5 h-3.5 text-sky-400" />
+                <span>{t('class_activities_tarbiyah')}:</span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {selectedClassForModal.activities.map((act, idx) => (
                   <div
                     key={idx}
-                    className="p-2 bg-slate-950 border border-slate-800/80 rounded-lg text-xs text-slate-300 flex items-center gap-2"
+                    className="p-2 bg-[#050e26] border border-blue-900/80 rounded-lg text-xs text-slate-300 flex items-center gap-2"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
                     <span>{act}</span>
                   </div>
                 ))}
@@ -128,28 +132,28 @@ export const ClassDetailsModal: React.FC = () => {
           )}
 
           {/* Fee Matrix for this class */}
-          <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 space-y-3">
+          <div className="bg-[#050e26] rounded-xl p-4 border border-blue-900/80 space-y-3">
             <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-              Monthly Fee Structure for {selectedClassForModal.name}:
+              {t('class_monthly_fee_struct')} - {selectedClassForModal.name}:
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 rounded-lg bg-slate-900 border border-amber-500/30">
-                <p className="text-[11px] text-amber-400 font-bold">Residential Program</p>
+              <div className="p-3 rounded-lg bg-[#071330] border border-sky-500/40">
+                <p className="text-[11px] text-sky-400 font-bold">{t('nav_residential')}</p>
                 <p className="text-lg font-bold text-white font-['Cinzel',serif] my-1">
                   ₹{selectedClassForModal.feeResidential}
                   <span className="text-xs text-slate-400 font-normal"> / mo</span>
                 </p>
-                <p className="text-[10px] text-slate-400">Boarding + Full Education</p>
+                <p className="text-[10px] text-slate-400">Boarding + Deen + School</p>
                 <button
                   onClick={() => handleApplyForClass('Residential Program')}
-                  className="mt-2 w-full py-1 text-[11px] bg-amber-500 text-slate-950 font-bold rounded hover:bg-amber-400 transition"
+                  className="mt-2 w-full py-1.5 text-[11px] bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold rounded-lg hover:from-sky-400 hover:to-blue-500 shadow transition"
                 >
-                  Apply Residential
+                  {t('class_apply_btn')} Residential
                 </button>
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-900 border border-sky-500/30">
-                <p className="text-[11px] text-sky-400 font-bold">Full-Time Program</p>
+              <div className="p-3 rounded-lg bg-[#071330] border border-blue-700/50">
+                <p className="text-[11px] text-sky-300 font-bold">{t('nav_fulltime')}</p>
                 <p className="text-lg font-bold text-white font-['Cinzel',serif] my-1">
                   ₹{selectedClassForModal.feeFullTime}
                   <span className="text-xs text-slate-400 font-normal"> / mo</span>
@@ -157,14 +161,14 @@ export const ClassDetailsModal: React.FC = () => {
                 <p className="text-[10px] text-slate-400">Complete Day Schooling</p>
                 <button
                   onClick={() => handleApplyForClass('Full-Time Program')}
-                  className="mt-2 w-full py-1 text-[11px] bg-sky-500 text-slate-950 font-bold rounded hover:bg-sky-400 transition"
+                  className="mt-2 w-full py-1.5 text-[11px] bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 transition"
                 >
-                  Apply Full-Time
+                  {t('class_apply_btn')} Full-Time
                 </button>
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-900 border border-emerald-500/30">
-                <p className="text-[11px] text-emerald-400 font-bold">Short-Time Program</p>
+              <div className="p-3 rounded-lg bg-[#071330] border border-cyan-800/60">
+                <p className="text-[11px] text-cyan-400 font-bold">{t('nav_shorttime')}</p>
                 <p className="text-lg font-bold text-white font-['Cinzel',serif] my-1">
                   ₹{selectedClassForModal.feeShortTime}
                   <span className="text-xs text-slate-400 font-normal"> / mo</span>
@@ -172,9 +176,9 @@ export const ClassDetailsModal: React.FC = () => {
                 <p className="text-[10px] text-slate-400">Arabic + Urdu Only</p>
                 <button
                   onClick={() => handleApplyForClass('Short-Time Program')}
-                  className="mt-2 w-full py-1 text-[11px] bg-emerald-500 text-slate-950 font-bold rounded hover:bg-emerald-400 transition"
+                  className="mt-2 w-full py-1.5 text-[11px] bg-cyan-700 text-white font-bold rounded-lg hover:bg-cyan-600 transition"
                 >
-                  Apply Short-Time
+                  {t('class_apply_btn')} Short-Time
                 </button>
               </div>
             </div>

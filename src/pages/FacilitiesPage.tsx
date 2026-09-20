@@ -32,14 +32,16 @@ export const FacilitiesPage: React.FC = () => {
       </div>
 
       {/* Facilities Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {facilities.map((fac) => (
+      <div id="facilities-list-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {facilities.map((fac, idx) => (
           <div
+            id={`facility-card-${fac.id}`}
             key={fac.id}
             className="rounded-3xl bg-slate-900 border border-slate-800 overflow-hidden flex flex-col justify-between group hover:border-amber-500/40 transition duration-300 shadow-xl"
           >
             <div className="h-52 overflow-hidden bg-slate-950 relative">
               <img
+                id={`facility-card-img-${fac.id || idx}`}
                 src={fac.imageUrl}
                 alt={fac.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
@@ -49,10 +51,10 @@ export const FacilitiesPage: React.FC = () => {
 
             <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
               <div className="space-y-2">
-                <h3 className="text-xl font-bold font-['Cinzel',serif] text-white group-hover:text-amber-400 transition">
+                <h3 id={`facility-card-title-${fac.id}`} className="text-xl font-bold font-['Cinzel',serif] text-white group-hover:text-amber-400 transition">
                   {fac.title}
                 </h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p id={`facility-card-desc-${fac.id}`} className="text-xs text-slate-300 leading-relaxed">
                   {fac.description}
                 </p>
               </div>

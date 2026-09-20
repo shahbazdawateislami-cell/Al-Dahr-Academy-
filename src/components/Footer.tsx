@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import { PageRoute } from '../types';
 import {
   Phone,
@@ -11,10 +12,65 @@ import {
   ExternalLink,
   Shield,
   Heart,
+  Upload,
+  Camera,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { settings, setCurrentPage, setIsAdmissionModalOpen } = useAcademy();
+  const { settings, setCurrentPage, setIsAdmissionModalOpen, updateSettings } = useAcademy();
+  const { t } = useLanguage();
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast('Kripya valid photo ya logo file chunein (PNG, JPG, SVG, WebP)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        const maxDimension = 600;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.9);
+          await updateSettings({ logoUrl: compressed });
+        } else {
+          await updateSettings({ logoUrl: event.target?.result as string });
+        }
+        showToast('Academy Logo Gallery se successfully add ho gaya!');
+      };
+      img.onerror = () => {
+        showToast('Photo process karne mein dikkat aayi.');
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const navigateTo = (page: PageRoute) => {
     setCurrentPage(page);
@@ -33,13 +89,13 @@ export const Footer: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold mb-2">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Admissions Open for Session 2025–2026</span>
+              <span>{t('footer_admissions_open', 'Admissions Open for Session 2025–2026')}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
-              Give Your Child Both Deen & Modern Success
+              {t('footer_give_child', 'Give Your Child Both Deen & Modern Success')}
             </h2>
             <p className="text-sm text-slate-400 mt-1 max-w-2xl">
-              Classes 1 to 8 • Residential, Full-Time & Short-Time Programs with comprehensive Tarbiyah & Modern Academics in Phulwari Sharif, Patna.
+              {t('footer_classes_desc', 'Classes 1 to 8 • Residential, Full-Time & Short-Time Programs with comprehensive Tarbiyah & Modern Academics in Phulwari Sharif, Patna.')}
             </p>
           </div>
 
@@ -48,43 +104,68 @@ export const Footer: React.FC = () => {
               onClick={() => setIsAdmissionModalOpen(true)}
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition transform active:scale-95"
             >
-              Apply for Admission
+              {t('hero_btn_apply', 'Apply for Admission')}
             </button>
-            <a
-              href={`tel:+91${settings.phone}`}
-              className="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm border border-slate-700 transition flex items-center gap-2"
-            >
-              <Phone className="w-4 h-4 text-amber-400" />
-              <span>Call: {settings.phone}</span>
-            </a>
           </div>
         </div>
       </div>
 
       {/* Main Footer Body */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        {/* Hidden device gallery logo input */}
+        <input
+          id="footer-logo-file-input"
+          ref={logoFileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleLogoFileChange}
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Column 1: Academy Identity */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+              <div
+                id="footer-logo-container"
+                onClick={() => logoFileInputRef.current?.click()}
+                className="relative group w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0 cursor-pointer overflow-hidden hover:border-amber-400 transition"
+                title="Click karein gallery se logo select ya change karne ke liye"
+                role="button"
+                tabIndex={0}
+              >
                 {settings.logoUrl ? (
                   <img
+                    id="footer-logo-image"
                     src={settings.logoUrl}
                     alt={settings.academyName}
-                    className="w-10 h-10 object-cover rounded-lg"
+                    className="w-10 h-10 object-cover rounded-lg group-hover:opacity-60 transition"
                   />
                 ) : (
-                  <GraduationCap className="w-7 h-7 text-amber-400" />
+                  <GraduationCap className="w-7 h-7 text-amber-400 group-hover:opacity-60 transition" />
                 )}
+                <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                  <Camera className="w-4 h-4 text-amber-400" />
+                </div>
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white font-['Cinzel',serif] tracking-wide">
                   {settings.academyName}
                 </h3>
-                <p className="text-xs text-amber-400 font-semibold tracking-wider uppercase">
-                  {settings.subtitle}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-amber-400 font-semibold tracking-wider uppercase">
+                    {settings.subtitle}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => logoFileInputRef.current?.click()}
+                    className="text-[10px] text-slate-400 hover:text-amber-300 underline flex items-center gap-1 cursor-pointer transition"
+                    title="Gallery se logo chunein"
+                  >
+                    <Upload className="w-2.5 h-2.5" />
+                    <span>Change Logo</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -384,6 +465,16 @@ export const Footer: React.FC = () => {
             </button>
           </div>
         </div>
+        {/* Floating Toast Notification */}
+        {toastMessage && (
+          <div
+            id="footer-logo-toast"
+            className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-slate-900 border border-emerald-500/50 text-emerald-300 rounded-xl text-xs font-semibold shadow-2xl flex items-center gap-2"
+          >
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
       </div>
     </footer>
   );

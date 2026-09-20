@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ProgramCode } from '../types';
 import {
   X,
   Calculator,
-  Sparkles,
-  CheckCircle,
-  HelpCircle,
   ArrowRight,
 } from 'lucide-react';
 
@@ -20,6 +18,8 @@ export const FeeCalculatorModal: React.FC = () => {
     setIsAdmissionModalOpen,
     setEnquiryPrefill,
   } = useAcademy();
+
+  const { t, isRTL } = useLanguage();
 
   const [selectedGrade, setSelectedGrade] = useState<number>(1);
   const [selectedProgramCode, setSelectedProgramCode] = useState<ProgramCode>('residential');
@@ -65,26 +65,29 @@ export const FeeCalculatorModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-in fade-in">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden text-white">
+    <div
+      dir={isRTL ? 'rtl' : 'ltr'}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-in fade-in"
+    >
+      <div className="relative w-full max-w-lg bg-[#071330] border border-blue-900/80 rounded-2xl shadow-2xl overflow-hidden text-white">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-6 py-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-[#050e26] via-[#0B1E4F] to-[#050e26] px-6 py-5 border-b border-blue-900/60 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <div className="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 shadow-inner">
               <Calculator className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-white font-['Cinzel',serif]">
-                Admission & Fee Calculator
+                {t('calc_modal_title')}
               </h3>
-              <p className="text-xs text-amber-400 font-medium">
-                Transparent Fee Structure • No Hidden Charges
+              <p className="text-xs text-sky-300 font-medium">
+                {t('calc_modal_subtitle')}
               </p>
             </div>
           </div>
           <button
             onClick={() => setIsFeeCalculatorOpen(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-blue-900/50 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -96,7 +99,7 @@ export const FeeCalculatorModal: React.FC = () => {
           <div className="space-y-3">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                1. Select Desired Program:
+                {t('calc_step1')}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {programs.map((p) => (
@@ -106,8 +109,8 @@ export const FeeCalculatorModal: React.FC = () => {
                     onClick={() => setSelectedProgramCode(p.code)}
                     className={`py-2 px-2 rounded-xl text-xs font-bold transition text-center border ${
                       selectedProgramCode === p.code
-                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md'
-                        : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white border-sky-400 shadow-md shadow-sky-950/40'
+                        : 'bg-[#050e26] text-slate-300 border-blue-900/60 hover:border-blue-700'
                     }`}
                   >
                     {p.name.replace(' Program', '')}
@@ -118,7 +121,7 @@ export const FeeCalculatorModal: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                2. Select Class (Class 1 to 8):
+                {t('calc_step2')}
               </label>
               <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
                 {classes.map((c) => (
@@ -128,8 +131,8 @@ export const FeeCalculatorModal: React.FC = () => {
                     onClick={() => setSelectedGrade(c.gradeNumber)}
                     className={`py-2 rounded-lg text-xs font-bold transition border ${
                       selectedGrade === c.gradeNumber
-                        ? 'bg-sky-500 text-slate-950 border-sky-400'
-                        : 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
+                        ? 'bg-sky-500 text-slate-950 font-black border-sky-300 shadow-md shadow-sky-950/30'
+                        : 'bg-[#050e26] text-slate-300 border-blue-900/60 hover:border-blue-700'
                     }`}
                   >
                     {c.name.replace('Class ', 'C-')}
@@ -140,35 +143,35 @@ export const FeeCalculatorModal: React.FC = () => {
           </div>
 
           {/* Breakdown Card */}
-          <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 space-y-2.5">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
-              <span className="text-xs text-slate-400">Selected Plan:</span>
-              <span className="text-xs font-bold text-amber-400">
+          <div className="bg-[#050e26] rounded-xl p-4 border border-blue-900/80 space-y-2.5">
+            <div className="flex items-center justify-between pb-2 border-b border-blue-900/60">
+              <span className="text-xs text-slate-400">{t('calc_selected_plan')}</span>
+              <span className="text-xs font-bold text-sky-400">
                 {currentClass.name} • {selectedProgramCode.toUpperCase()}
               </span>
             </div>
 
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-300">Admission Fee (One-Time)</span>
+              <span className="text-slate-300">{t('calc_admission_fee')}</span>
               <span className="font-semibold text-white">₹{admissionFee.toLocaleString()}</span>
             </div>
 
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-300">
-                1st Month Advance Fee ({selectedProgramCode === 'residential' ? 'Boarding + Education' : 'Tuition'})
+                {t('calc_first_month')} ({selectedProgramCode === 'residential' ? 'Boarding + Deen' : 'Tuition'})
               </span>
               <span className="font-semibold text-white">₹{monthlyFeeForSelection.toLocaleString()}</span>
             </div>
 
             {selectedProgramCode !== 'short-time' && (
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-300">Dress / Uniform Kit (2 Sets)</span>
+                <span className="text-slate-300">{t('calc_dress_fee')}</span>
                 <span className="font-semibold text-white">₹{dressFee.toLocaleString()}</span>
               </div>
             )}
 
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-300">Course Books & Materials</span>
+              <span className="text-slate-300">{t('calc_books_fee')}</span>
               <span className="font-semibold text-white">₹{booksFee.toLocaleString()}</span>
             </div>
 
@@ -180,35 +183,35 @@ export const FeeCalculatorModal: React.FC = () => {
             ))}
 
             {/* Total Highlight */}
-            <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+            <div className="pt-3 border-t border-blue-900/60 flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-400">Total Amount at Admission:</p>
-                <p className="text-[10px] text-amber-400/90">(Includes 1st Month advance)</p>
+                <p className="text-xs text-slate-400">{t('calc_total_admission')}</p>
+                <p className="text-[10px] text-sky-400/90">{t('calc_includes_advance')}</p>
               </div>
               <div className="text-right">
-                <span className="text-2xl font-black text-amber-400 font-['Cinzel',serif]">
+                <span className="text-2xl font-black text-sky-400 font-['Cinzel',serif]">
                   ₹{totalAdmissionInitial.toLocaleString()}
                 </span>
               </div>
             </div>
 
-            <div className="pt-2 text-[11px] text-slate-400 border-t border-slate-900 flex items-center justify-between">
-              <span>Subsequent Monthly Fee:</span>
+            <div className="pt-2 text-[11px] text-slate-400 border-t border-blue-950 flex items-center justify-between">
+              <span>{t('calc_subsequent_monthly')}</span>
               <span className="font-bold text-sky-300">₹{monthlyFeeForSelection.toLocaleString()} / month</span>
             </div>
           </div>
 
           <p className="text-[11px] text-slate-400 italic">
-            * Note: {admissionFeeConfig.note || 'No hidden extra exam fees or development charges. Sibling discounts applicable on consultation.'}
+            * {admissionFeeConfig.note || t('calc_note')}
           </p>
 
           {/* Action CTA */}
           <div className="pt-2">
             <button
               onClick={handleApplyNow}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition active:scale-98"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 via-blue-600 to-blue-700 hover:from-sky-400 hover:to-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-sky-950/50 transition active:scale-98"
             >
-              <span>Apply for {currentClass.name} ({selectedProgramCode})</span>
+              <span>{t('calc_apply_btn')} - {currentClass.name}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

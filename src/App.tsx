@@ -1,5 +1,6 @@
 import React from 'react';
 import { AcademyProvider, useAcademy } from './context/AcademyContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { MobileQuickBar } from './components/MobileQuickBar';
@@ -25,6 +26,7 @@ import { AdminDashboard } from './admin/AdminDashboard';
 
 const MainContent: React.FC = () => {
   const { currentPage } = useAcademy();
+  const { isRTL } = useLanguage();
 
   const renderCurrentView = () => {
     switch (currentPage) {
@@ -76,7 +78,10 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-amber-500 selection:text-slate-950 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div
+      dir={isRTL ? 'rtl' : 'ltr'}
+      className="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-amber-500 selection:text-slate-950 font-['Plus_Jakarta_Sans',sans-serif]"
+    >
       {/* Global Navigation */}
       <Navbar />
 
@@ -102,7 +107,9 @@ const MainContent: React.FC = () => {
 export default function App() {
   return (
     <AcademyProvider>
-      <MainContent />
+      <LanguageProvider>
+        <MainContent />
+      </LanguageProvider>
     </AcademyProvider>
   );
 }

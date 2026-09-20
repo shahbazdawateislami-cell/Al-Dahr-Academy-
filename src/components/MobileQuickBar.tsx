@@ -1,9 +1,11 @@
 import React from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Phone, MessageCircle, Sparkles, Calculator } from 'lucide-react';
 
 export const MobileQuickBar: React.FC = () => {
   const { settings, setIsAdmissionModalOpen, setIsFeeCalculatorOpen } = useAcademy();
+  const { t } = useLanguage();
 
   const whatsappHref = `https://wa.me/91${settings.whatsapp}?text=${encodeURIComponent(
     `Assalamu Alaikum, I would like to enquire about admission at ${settings.academyName}, Phulwari Sharif, Patna.`
@@ -16,7 +18,7 @@ export const MobileQuickBar: React.FC = () => {
         className="flex-1 py-2.5 px-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 flex items-center justify-center gap-1.5 text-xs font-bold active:scale-95 transition"
       >
         <Phone className="w-4 h-4 text-amber-400 shrink-0" />
-        <span>Call Now</span>
+        <span>{t('btn_call_now', 'Call Now')}</span>
       </a>
 
       <a
@@ -34,14 +36,14 @@ export const MobileQuickBar: React.FC = () => {
         className="flex-1 py-2.5 px-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 flex items-center justify-center gap-1.5 text-xs font-extrabold shadow-md shadow-amber-500/20 active:scale-95 transition"
       >
         <Sparkles className="w-4 h-4 shrink-0" />
-        <span>Apply</span>
+        <span>{t('nav_apply_now', 'Apply')}</span>
       </button>
 
       <button
         onClick={() => setIsFeeCalculatorOpen(true)}
         className="w-10 h-10 rounded-xl bg-slate-800 text-amber-400 flex items-center justify-center border border-slate-700 shrink-0"
-        title="Fee Calculator"
-        aria-label="Fee Calculator"
+        title={t('hero_btn_fee', 'Fee Calculator')}
+        aria-label={t('hero_btn_fee', 'Fee Calculator')}
       >
         <Calculator className="w-4 h-4" />
       </button>

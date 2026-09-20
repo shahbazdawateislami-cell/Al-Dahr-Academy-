@@ -54,11 +54,11 @@ export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfi
 export const db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
 export const auth = getAuth(app);
 
-// Google Auth Provider with Workspace Scopes configured
+// Google Auth Provider configured for clean, frictionless sign-in
 export const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('https://www.googleapis.com/auth/forms.body');
-googleProvider.addScope('https://www.googleapis.com/auth/meetings.space.created');
-googleProvider.addScope('https://www.googleapis.com/auth/contacts');
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
+});
 
 export let cachedWorkspaceToken: string | null = null;
 
@@ -70,8 +70,24 @@ export async function signInAdminWithGoogle() {
       cachedWorkspaceToken = credential.accessToken;
     }
     return result.user;
-  } catch (err) {
-    console.error('Sign-in error:', err);
+  } catch (err: any) {
+    // Handle expected user cancellation or popup dismissal cleanly
+    if (
+      err?.code === 'auth/popup-closed-by-user' ||
+      err?.code === 'auth/cancelled-popup-request'
+    ) {
+      console.info('Google sign-in popup was dismissed by user.');
+      return null;
+    }
+    if (err?.code === 'auth/popup-blocked') {
+      console.warn('Google sign-in popup was blocked by the browser.');
+      throw new Error('Sign-in popup was blocked by your browser. Please allow popups or use the Admin Passcode below.');
+    }
+    if (err?.code === 'auth/unauthorized-domain') {
+      console.warn('Domain not authorized for Google Sign-In in Firebase Console.');
+      throw new Error('Current domain is not authorized in Firebase Auth. Please use the Admin Passcode (aldahr2025) below.');
+    }
+    console.warn('Sign-in issue encountered:', err?.message || err);
     throw err;
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAcademy } from '../context/AcademyContext';
 import {
   AdmissionEnquiry,
@@ -43,6 +43,9 @@ import {
   Layers,
   Search,
   Filter,
+  Upload,
+  X,
+  Edit2,
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -78,6 +81,7 @@ export const AdminDashboard: React.FC = () => {
     resetAllToDefaults,
     isAdminLoggedIn,
     adminLoginError,
+    setAdminLoginError,
     handleAdminLoginWithGoogle,
     handleAdminLoginWithPassword,
     handleAdminLogout,
@@ -119,6 +123,14 @@ export const AdminDashboard: React.FC = () => {
   // State for adding/editing a program
   const [editingProgram, setEditingProgram] = useState<ProgramItem | null>(null);
 
+  // State for adding/editing a facility
+  const [editingFacility, setEditingFacility] = useState<FacilityItem | null>(null);
+  const facilityFileInputRef = useRef<HTMLInputElement>(null);
+
+  // State for adding/editing gallery items
+  const [editingGalleryItem, setEditingGalleryItem] = useState<GalleryMediaItem | null>(null);
+  const galleryEditFileInputRef = useRef<HTMLInputElement>(null);
+
   // State for adding new media items
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
   const [newGalleryTitle, setNewGalleryTitle] = useState('');
@@ -133,6 +145,54 @@ export const AdminDashboard: React.FC = () => {
   // Enquiries search & filter
   const [enquirySearch, setEnquirySearch] = useState('');
   const [enquiryStatusFilter, setEnquiryStatusFilter] = useState('all');
+
+  // File input refs for choosing photo from phone/device gallery
+  const heroFileInputRef = useRef<HTMLInputElement>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement>(null);
+  const logoAdminFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Helper to read and optimize selected photo from gallery
+  const processImageFile = (file: File, callback: (base64Url: string) => void) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast('Kripya valid photo file select karein (JPG, PNG, WebP)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        const maxDimension = 1280;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL('image/jpeg', 0.82);
+          callback(compressed);
+        } else {
+          callback(event.target?.result as string);
+        }
+        showToast('Photo gallery se successfully select ho gayi!');
+      };
+      img.onerror = () => {
+        showToast('Photo process karne mein error aaya.');
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // If not logged in, show the Admin Login Portal
   if (!isAdminLoggedIn) {
@@ -155,13 +215,23 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {adminLoginError && (
-            <div className="p-3 bg-red-950/60 border border-red-700/50 rounded-xl text-xs text-red-300 flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-              <span>{adminLoginError}</span>
+            <div className="p-3 bg-red-950/60 border border-red-700/50 rounded-xl text-xs text-red-300 flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <span>{adminLoginError}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAdminLoginError(null)}
+                className="text-slate-400 hover:text-white p-0.5 shrink-0 text-sm leading-none"
+                title="Dismiss message"
+              >
+                ✕
+              </button>
             </div>
           )}
 
-          {/* Option 1: Fast Passcode Sign-In */}
+          {/* Option 1: Fast Email / Passcode Sign-In */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -171,17 +241,20 @@ export const AdminDashboard: React.FC = () => {
           >
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Admin Passcode
+                Admin Email / Passcode
               </label>
               <input
-                type="password"
+                type="text"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                placeholder="Enter administrator passcode"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-500"
+                placeholder="Enter aldahracademy@gmail.com"
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-500 font-medium"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
               />
-              <p className="text-[11px] text-slate-500 mt-1">
-                Authorized passcode: <code className="text-amber-400 font-mono">aldahr2025</code>
+              <p className="text-[11px] text-slate-400 mt-1">
+                Enter <code className="text-amber-400 font-mono font-semibold">aldahracademy@gmail.com</code> to log in
               </p>
             </div>
 
@@ -189,7 +262,7 @@ export const AdminDashboard: React.FC = () => {
               type="submit"
               className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-lg transition active:scale-98"
             >
-              Sign In with Passcode
+              Sign In to Dashboard
             </button>
           </form>
 
@@ -755,6 +828,67 @@ export const AdminDashboard: React.FC = () => {
             </p>
           </div>
 
+          {/* Hidden Admin Logo File Input */}
+          <input
+            type="file"
+            ref={logoAdminFileInputRef}
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                processImageFile(file, (dataUrl) => {
+                  setSettingsForm((prev) => ({ ...prev, logoUrl: dataUrl }));
+                });
+              }
+              e.target.value = '';
+            }}
+          />
+
+          {/* Logo Selection Section */}
+          <div className="p-4 bg-slate-950/70 border border-slate-800 rounded-2xl space-y-2">
+            <label className="block text-xs font-semibold text-slate-300">
+              Academy Logo (Gallery Se Select Karein)
+            </label>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="w-16 h-16 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+                {settingsForm.logoUrl ? (
+                  <img src={settingsForm.logoUrl} alt="Logo Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <GraduationCap className="w-8 h-8 text-amber-400" />
+                )}
+              </div>
+              <div className="flex-1 min-w-[200px] space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => logoAdminFileInputRef.current?.click()}
+                    className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-pointer shadow transition active:scale-95"
+                  >
+                    <Upload className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>📱 Gallery Se Logo Chunein</span>
+                  </button>
+                  {settingsForm.logoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setSettingsForm((prev) => ({ ...prev, logoUrl: '' }))}
+                      className="px-3 py-2 bg-red-950/60 hover:bg-red-900/80 text-red-300 border border-red-700/50 rounded-xl text-xs transition cursor-pointer"
+                    >
+                      Remove Logo
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  value={settingsForm.logoUrl}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, logoUrl: e.target.value })}
+                  placeholder="Logo URL ya seedha gallery se photo chunein"
+                  className="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-white text-[11px] font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div>
               <label className="block font-semibold text-slate-300 mb-1">
@@ -864,16 +998,97 @@ export const AdminDashboard: React.FC = () => {
               />
             </div>
 
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-2 space-y-2">
               <label className="block font-semibold text-slate-300 mb-1">
-                Hero Banner Image URL
+                Hero Banner Photo (Gallery Se Select Karein)
               </label>
               <input
                 type="text"
                 value={settingsForm.heroImageUrl}
                 onChange={(e) => setSettingsForm({ ...settingsForm, heroImageUrl: e.target.value })}
+                placeholder="Photo link ya neeche diye gaye button se seedha Gallery se photo select karein"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-[11px]"
               />
+
+              {/* Workable Gallery Photo Selector */}
+              <input
+                type="file"
+                ref={heroFileInputRef}
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    processImageFile(file, (dataUrl) => {
+                      setSettingsForm((prev) => ({ ...prev, heroImageUrl: dataUrl }));
+                    });
+                  }
+                  e.target.value = '';
+                }}
+              />
+
+              <div className="p-3.5 bg-slate-950/70 border border-slate-800 rounded-2xl space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => heroFileInputRef.current?.click()}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-lg transition active:scale-95 cursor-pointer"
+                  >
+                    <Upload className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+                    <span>📱 Phone / Device Gallery Se Photo Chunein (Select Photo)</span>
+                  </button>
+                  <span className="text-[11px] text-slate-400">
+                    Aapke phone ya PC ki gallery se direct photo upload hogi
+                  </span>
+                </div>
+
+                {/* Live Photo Preview */}
+                {settingsForm.heroImageUrl ? (
+                  <div className="relative rounded-xl overflow-hidden border border-slate-700 bg-slate-900">
+                    <img
+                      src={settingsForm.heroImageUrl}
+                      alt="Banner Preview"
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent flex items-end justify-between p-3">
+                      <span className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/90 px-2.5 py-1 rounded-lg border border-emerald-700/60 flex items-center gap-1.5 shadow">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        Photo Selected & Active
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => heroFileInputRef.current?.click()}
+                          className="px-3 py-1 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs text-white border border-slate-600 font-medium transition cursor-pointer"
+                        >
+                          Change Photo
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSettingsForm((prev) => ({ ...prev, heroImageUrl: '' }))}
+                          className="p-1.5 rounded-lg bg-red-950/90 hover:bg-red-900 text-red-300 border border-red-700/60 transition cursor-pointer"
+                          title="Remove photo"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => heroFileInputRef.current?.click()}
+                    className="border-2 border-dashed border-slate-800 hover:border-amber-500/50 rounded-xl p-6 text-center cursor-pointer transition bg-slate-900/40 hover:bg-slate-900/70"
+                  >
+                    <Upload className="w-8 h-8 text-amber-400/80 mx-auto mb-2" />
+                    <p className="text-xs font-semibold text-slate-300">
+                      Yahan click karke Gallery se Banner Photo choose karein
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      JPG, PNG, WebP supported • Automatic web optimization
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="sm:col-span-2">
@@ -1290,30 +1505,66 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Add photo form */}
-          <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+          <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
             <h3 className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
               <Plus className="w-4 h-4" />
               <span>Add New Photo to Gallery</span>
             </h3>
+
+            {/* Hidden device gallery photo input */}
+            <input
+              type="file"
+              ref={galleryFileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  if (!newGalleryTitle) {
+                    const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+                    setNewGalleryTitle(cleanName);
+                  }
+                  processImageFile(file, (dataUrl) => {
+                    setNewGalleryUrl(dataUrl);
+                  });
+                }
+                e.target.value = '';
+              }}
+            />
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => galleryFileInputRef.current?.click()}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow transition active:scale-95 cursor-pointer"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>📱 Gallery Se Photo Chunein (Choose Photo)</span>
+              </button>
+              <span className="text-[11px] text-slate-400">
+                Phone ya computer se photo chunein ya link paste karein
+              </span>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <input
                 type="text"
                 placeholder="Image Title (e.g., Morning Assembly)"
                 value={newGalleryTitle}
                 onChange={(e) => setNewGalleryTitle(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white"
               />
               <input
                 type="text"
-                placeholder="Image URL (Unsplash or direct image link)"
+                placeholder="Image URL / Selected Photo Data"
                 value={newGalleryUrl}
                 onChange={(e) => setNewGalleryUrl(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-[11px]"
               />
               <select
                 value={newGalleryCat}
                 onChange={(e) => setNewGalleryCat(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white"
               >
                 <option value="Campus Life">Campus Life</option>
                 <option value="Islamic Studies">Islamic Studies</option>
@@ -1323,9 +1574,39 @@ export const AdminDashboard: React.FC = () => {
                 <option value="Events">Events</option>
               </select>
             </div>
+
+            {/* Thumbnail Preview of selected photo */}
+            {newGalleryUrl && (
+              <div className="flex items-center gap-3 p-2 bg-slate-900/60 rounded-xl border border-slate-800">
+                <img
+                  src={newGalleryUrl}
+                  alt="Selected preview"
+                  className="w-16 h-12 rounded-lg object-cover border border-slate-700 shrink-0"
+                />
+                <div className="flex-1 min-w-0 text-xs">
+                  <p className="text-white font-medium truncate">{newGalleryTitle || 'Photo Selected'}</p>
+                  <p className="text-[11px] text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Ready to add to {newGalleryCat}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNewGalleryUrl('')}
+                  className="p-1 rounded-lg text-slate-400 hover:text-red-400"
+                  title="Clear"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
             <button
               onClick={async () => {
-                if (!newGalleryUrl || !newGalleryTitle) return;
+                if (!newGalleryUrl || !newGalleryTitle) {
+                  showToast('Kripya photo select karein aur Title enter karein');
+                  return;
+                }
                 await saveGalleryItem({
                   id: 'gal-' + Date.now(),
                   title: newGalleryTitle,
@@ -1339,36 +1620,212 @@ export const AdminDashboard: React.FC = () => {
                 setNewGalleryUrl('');
                 showToast('Photo added to gallery!');
               }}
-              className="px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow cursor-pointer transition active:scale-95"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Photo</span>
+              <span>Add Photo to Gallery</span>
             </button>
           </div>
 
           {/* Current Gallery List */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {gallery.map((g) => (
-              <div
-                key={g.id}
-                className="rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden space-y-2 p-2"
-              >
-                <div className="h-32 rounded-xl overflow-hidden bg-black">
-                  <img src={g.imageUrl} alt={g.title} className="w-full h-full object-cover" />
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-white flex items-center justify-between">
+              <span>All Photos ({gallery.length})</span>
+              <span className="text-[11px] text-slate-400 font-normal">Har photo ka title, category aur photo edit kiya ja sakta hai</span>
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {gallery.map((g) => (
+                <div
+                  key={g.id}
+                  className="rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex flex-col justify-between p-3 space-y-3 hover:border-slate-700 transition"
+                >
+                  <div className="space-y-2">
+                    <div className="h-36 rounded-xl overflow-hidden bg-black relative group">
+                      <img src={g.imageUrl} alt={g.title} className="w-full h-full object-cover" />
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/80 text-[10px] font-bold text-amber-400 border border-amber-500/30">
+                        {g.category}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-sm truncate" title={g.title}>{g.title}</h4>
+                      <p className="text-slate-400 text-xs line-clamp-2 mt-0.5">{g.caption || g.title}</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingGalleryItem(g)}
+                      className="flex-1 py-1.5 px-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Edit Photo & Title</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (confirm(`"${g.title}" photo delete karein?`)) {
+                          deleteGalleryItem(g.id);
+                          showToast('Photo delete ho gayi');
+                        }
+                      }}
+                      className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition cursor-pointer"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-xs px-1">
-                  <span className="font-semibold text-white truncate max-w-[120px]">{g.title}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Edit Gallery Item Modal */}
+          {editingGalleryItem && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2 text-white font-bold font-['Cinzel',serif] text-base">
+                    <ImageIcon className="w-5 h-5 text-amber-400" />
+                    <span>Edit Gallery Photo Details</span>
+                  </div>
                   <button
-                    onClick={() => deleteGalleryItem(g.id)}
-                    className="text-red-400 hover:text-red-300 p-1"
-                    title="Delete"
+                    onClick={() => setEditingGalleryItem(null)}
+                    className="p-1 text-slate-400 hover:text-white rounded-lg"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Hidden edit file input */}
+                <input
+                  type="file"
+                  ref={galleryEditFileInputRef}
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      processImageFile(file, (dataUrl) => {
+                        setEditingGalleryItem((prev) => (prev ? { ...prev, imageUrl: dataUrl } : null));
+                      });
+                    }
+                    e.target.value = '';
+                  }}
+                />
+
+                <div className="space-y-4 text-xs">
+                  {/* Image Preview & Change Button */}
+                  <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center gap-4">
+                    <img
+                      src={editingGalleryItem.imageUrl}
+                      alt="Preview"
+                      className="w-24 h-20 rounded-xl object-cover border border-slate-700 shrink-0"
+                    />
+                    <div className="space-y-1.5 flex-1">
+                      <button
+                        type="button"
+                        onClick={() => galleryEditFileInputRef.current?.click()}
+                        className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow transition cursor-pointer active:scale-95"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>📱 Gallery Se Nayi Photo Chunein</span>
+                      </button>
+                      <p className="text-[11px] text-slate-400">Device se photo replace karein ya URL badlein</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Photo Title</label>
+                    <input
+                      type="text"
+                      value={editingGalleryItem.title}
+                      onChange={(e) => setEditingGalleryItem({ ...editingGalleryItem, title: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-medium"
+                      placeholder="Title"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Caption / Description</label>
+                    <textarea
+                      rows={2}
+                      value={editingGalleryItem.caption}
+                      onChange={(e) => setEditingGalleryItem({ ...editingGalleryItem, caption: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white leading-relaxed"
+                      placeholder="Caption ya detail"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-1">Category</label>
+                      <select
+                        value={editingGalleryItem.category}
+                        onChange={(e) => setEditingGalleryItem({ ...editingGalleryItem, category: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                      >
+                        <option value="Campus Life">Campus Life</option>
+                        <option value="Islamic Studies">Islamic Studies</option>
+                        <option value="Academic">Academic</option>
+                        <option value="Residential">Residential</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Events">Events</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-1">Featured on Home</label>
+                      <select
+                        value={editingGalleryItem.isFeatured ? 'yes' : 'no'}
+                        onChange={(e) => setEditingGalleryItem({ ...editingGalleryItem, isFeatured: e.target.value === 'yes' })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                      >
+                        <option value="yes">Yes (Display on Home)</option>
+                        <option value="no">No</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Image URL / Data</label>
+                    <input
+                      type="text"
+                      value={editingGalleryItem.imageUrl}
+                      onChange={(e) => setEditingGalleryItem({ ...editingGalleryItem, imageUrl: e.target.value })}
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-[11px] font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setEditingGalleryItem(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!editingGalleryItem.title || !editingGalleryItem.imageUrl) {
+                        showToast('Title aur photo dono zaroori hain');
+                        return;
+                      }
+                      await saveGalleryItem(editingGalleryItem);
+                      setEditingGalleryItem(null);
+                      showToast('Photo details successfully update ho gayi!');
+                    }}
+                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Save Changes</span>
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1507,23 +1964,232 @@ export const AdminDashboard: React.FC = () => {
       {/* TAB CONTENT: FACILITIES */}
       {activeTab === 'facilities' && (
         <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
-          <h2 className="text-2xl font-bold font-['Cinzel',serif] text-white">
-            Campus Facilities Management
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold font-['Cinzel',serif] text-white">
+                Campus Facilities Management
+              </h2>
+              <p className="text-xs text-slate-400">
+                Har facility ka Photo (Gallery se), Title, aur Description yahan se add ya change kar sakte hain.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                setEditingFacility({
+                  id: 'fac-' + Date.now(),
+                  title: '',
+                  description: '',
+                  iconName: 'Building',
+                  imageUrl: '',
+                  order: facilities.length + 1,
+                })
+              }
+              className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow transition cursor-pointer active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nayi Facility Add Karein</span>
+            </button>
+          </div>
+
+          {/* Hidden facility file input */}
+          <input
+            type="file"
+            ref={facilityFileInputRef}
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                processImageFile(file, (dataUrl) => {
+                  setEditingFacility((prev) => (prev ? { ...prev, imageUrl: dataUrl } : null));
+                });
+              }
+              e.target.value = '';
+            }}
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {facilities.map((f) => (
               <div
                 key={f.id}
-                className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2 text-xs"
+                className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-3 text-xs hover:border-slate-700 transition"
               >
-                <div className="h-28 rounded-xl overflow-hidden bg-black">
-                  <img src={f.imageUrl} alt={f.title} className="w-full h-full object-cover" />
+                <div className="space-y-2">
+                  <div className="h-36 rounded-xl overflow-hidden bg-black relative group">
+                    <img src={f.imageUrl} alt={f.title} className="w-full h-full object-cover" />
+                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-slate-950/80 text-[10px] font-bold text-amber-400 border border-amber-500/30">
+                      Order #{f.order}
+                    </div>
+                  </div>
+                  <h4 className="font-bold text-white text-sm" title={f.title}>{f.title}</h4>
+                  <p className="text-slate-400 text-xs line-clamp-3 leading-relaxed">{f.description}</p>
                 </div>
-                <h4 className="font-bold text-white text-sm">{f.title}</h4>
-                <p className="text-slate-400 line-clamp-2">{f.description}</p>
+
+                <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingFacility(f)}
+                    className="flex-1 py-1.5 px-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Edit Photo & Info</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (confirm(`"${f.title}" facility delete karein?`)) {
+                        await deleteFacility(f.id);
+                        showToast('Facility delete ho gayi');
+                      }
+                    }}
+                    className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition cursor-pointer"
+                    title="Delete Facility"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+
+          {/* Edit / Add Facility Modal */}
+          {editingFacility && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2 text-white font-bold font-['Cinzel',serif] text-base">
+                    <Building className="w-5 h-5 text-amber-400" />
+                    <span>{facilities.some((item) => item.id === editingFacility.id) ? 'Edit Campus Facility' : 'Add New Campus Facility'}</span>
+                  </div>
+                  <button
+                    onClick={() => setEditingFacility(null)}
+                    className="p-1 text-slate-400 hover:text-white rounded-lg"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  {/* Photo Preview & Gallery Select Button */}
+                  <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center gap-4">
+                    {editingFacility.imageUrl ? (
+                      <img
+                        src={editingFacility.imageUrl}
+                        alt="Preview"
+                        className="w-24 h-20 rounded-xl object-cover border border-slate-700 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-24 h-20 rounded-xl bg-slate-900 border border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500 text-[10px] shrink-0">
+                        <ImageIcon className="w-6 h-6 mb-1 text-slate-600" />
+                        <span>No Photo</span>
+                      </div>
+                    )}
+                    <div className="space-y-1.5 flex-1">
+                      <button
+                        type="button"
+                        onClick={() => facilityFileInputRef.current?.click()}
+                        className="px-3.5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow transition cursor-pointer active:scale-95"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>📱 Phone / Device Se Photo Chunein</span>
+                      </button>
+                      <p className="text-[11px] text-slate-400">Direct gallery se photo upload karein ya neeche URL paste karein</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Facility Title (Naam)</label>
+                    <input
+                      type="text"
+                      value={editingFacility.title}
+                      onChange={(e) => setEditingFacility({ ...editingFacility, title: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-medium"
+                      placeholder="e.g. Residential Hostel, Smart Classrooms..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Description (Tafseel)</label>
+                    <textarea
+                      rows={3}
+                      value={editingFacility.description}
+                      onChange={(e) => setEditingFacility({ ...editingFacility, description: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white leading-relaxed"
+                      placeholder="Is facility ke bare mein detail likhein..."
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-1">Icon Representation</label>
+                      <select
+                        value={editingFacility.iconName}
+                        onChange={(e) => setEditingFacility({ ...editingFacility, iconName: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                      >
+                        <option value="Home">Hostel (Home)</option>
+                        <option value="Moon">Islamic / Musalla (Moon)</option>
+                        <option value="Building">Classrooms (Building)</option>
+                        <option value="Atom">Science Lab (Atom)</option>
+                        <option value="Utensils">Dining / Food (Utensils)</option>
+                        <option value="Shield">Security & Care (Shield)</option>
+                        <option value="Trophy">Sports & Fitness (Trophy)</option>
+                        <option value="Heart">Tarbiyah (Heart)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-semibold mb-1">Display Order #</label>
+                      <input
+                        type="number"
+                        value={editingFacility.order}
+                        onChange={(e) => setEditingFacility({ ...editingFacility, order: parseInt(e.target.value) || 1 })}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Image URL ya Photo Data</label>
+                    <input
+                      type="text"
+                      value={editingFacility.imageUrl}
+                      onChange={(e) => setEditingFacility({ ...editingFacility, imageUrl: e.target.value })}
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-[11px] font-mono"
+                      placeholder="Image URL"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setEditingFacility(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!editingFacility.title.trim() || !editingFacility.imageUrl.trim()) {
+                        showToast('Title aur Photo select karna zaroori hai');
+                        return;
+                      }
+                      await saveFacility(editingFacility);
+                      setEditingFacility(null);
+                      showToast('Facility details successfully update ho gayi!');
+                    }}
+                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Save Facility</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
