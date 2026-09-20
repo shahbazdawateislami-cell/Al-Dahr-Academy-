@@ -83,17 +83,9 @@ export const Navbar: React.FC = () => {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-white font-['Cinzel',serif] truncate">
-                    {settings.academyName}
-                  </span>
-                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-sky-500/15 text-sky-300 border border-sky-400/30 px-1.5 py-0.5 rounded-full shrink-0">
-                    Phulwari
-                  </span>
-                </div>
-                <p className="text-[10px] sm:text-xs text-sky-200/80 font-medium tracking-wide truncate max-w-[180px] sm:max-w-none">
-                  {settings.subtitle}
-                </p>
+                <span className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-white font-['Cinzel',serif] truncate block">
+                  {settings.academyName}
+                </span>
               </div>
             </div>
 
@@ -298,17 +290,16 @@ export const Navbar: React.FC = () => {
                   id="navbar-language-select-button"
                   type="button"
                   onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-950/80 hover:bg-blue-900/80 text-sky-200 hover:text-white text-xs font-semibold border border-blue-700/60 transition cursor-pointer shadow-sm active:scale-95"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-950/80 hover:bg-blue-900/80 text-sky-200 hover:text-white text-[11px] font-bold border border-blue-700/60 transition cursor-pointer shadow-sm active:scale-95"
                   aria-label="Select Language"
                   title={t('select_language_title', 'Select Website Language')}
                 >
-                  <Globe className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                  <span className="font-semibold text-xs flex items-center gap-1">
-                    <span>{currentLanguageInfo.flag}</span>
-                    <span>{currentLanguageInfo.name}</span>
+                  <Globe className="w-3 h-3 text-sky-400 shrink-0" />
+                  <span className="tracking-wider uppercase font-extrabold text-[11px]">
+                    {currentLanguageInfo.code.toUpperCase()}
                   </span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-sky-300 transition-transform ${
+                    className={`w-3 h-3 text-sky-300 transition-transform ${
                       languageDropdownOpen ? 'rotate-180 text-sky-400' : ''
                     }`}
                   />
