@@ -56,22 +56,6 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full shadow-md">
-      {/* Top Announcement Bar */}
-      {settings.showAnnouncement && settings.announcement && (
-        <div className="bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-sky-100 px-4 py-1.5 text-xs sm:text-sm font-semibold flex items-center justify-between overflow-hidden border-b border-sky-500/30 shadow-inner">
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 truncate">
-            <Sparkles className="w-4 h-4 shrink-0 text-sky-400" />
-            <span className="truncate">{settings.announcement}</span>
-          </div>
-          <button
-            onClick={() => setIsAdmissionModalOpen(true)}
-            className="hidden sm:inline-flex shrink-0 ml-4 px-3 py-0.5 bg-gradient-to-r from-sky-400 to-blue-500 text-slate-950 rounded-full text-xs font-bold hover:brightness-110 transition shadow"
-          >
-            Apply Now
-          </button>
-        </div>
-      )}
-
       {/* Main Navigation Bar */}
       <nav className="bg-[#071330] text-white border-b border-blue-900/60 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

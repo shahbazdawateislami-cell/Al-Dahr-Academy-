@@ -7,6 +7,7 @@ import {
   Calculator,
   ArrowRight,
 } from 'lucide-react';
+import { getLocalizedClass, getLocalizedProgram } from '../data/localizedData';
 
 export const FeeCalculatorModal: React.FC = () => {
   const {
@@ -19,21 +20,22 @@ export const FeeCalculatorModal: React.FC = () => {
     setEnquiryPrefill,
   } = useAcademy();
 
-  const { t, isRTL } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
 
   const [selectedGrade, setSelectedGrade] = useState<number>(1);
   const [selectedProgramCode, setSelectedProgramCode] = useState<ProgramCode>('residential');
 
   if (!isFeeCalculatorOpen) return null;
 
-  const currentClass = classes.find((c) => c.gradeNumber === selectedGrade) || classes[0];
+  const rawClass = classes.find((c) => c.gradeNumber === selectedGrade) || classes[0];
+  const currentClass = getLocalizedClass(rawClass, language);
 
   // Dynamic monthly fee based on class and program
-  let monthlyFeeForSelection = currentClass?.feeResidential || 2700;
+  let monthlyFeeForSelection = rawClass?.feeResidential || 2700;
   if (selectedProgramCode === 'full-time') {
-    monthlyFeeForSelection = currentClass?.feeFullTime || 900;
+    monthlyFeeForSelection = rawClass?.feeFullTime || 900;
   } else if (selectedProgramCode === 'short-time') {
-    monthlyFeeForSelection = currentClass?.feeShortTime || 500;
+    monthlyFeeForSelection = rawClass?.feeShortTime || 500;
   }
 
   // Base admission items
@@ -64,6 +66,9 @@ export const FeeCalculatorModal: React.FC = () => {
     setIsAdmissionModalOpen(true);
   };
 
+  const localizedPrograms = programs.map((p) => getLocalizedProgram(p, language));
+  const localizedClasses = classes.map((c) => getLocalizedClass(c, language));
+
   return (
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
@@ -78,10 +83,10 @@ export const FeeCalculatorModal: React.FC = () => {
             </div>
             <div>
               <h3 className="text-lg font-bold text-white font-['Cinzel',serif]">
-                {t('calc_modal_title')}
+                {t('calc_modal_title', 'Admission Fee Calculator')}
               </h3>
               <p className="text-xs text-sky-300 font-medium">
-                {t('calc_modal_subtitle')}
+                {t('calc_modal_subtitle', 'Instant transparent fee breakdown for Class 1 to 8')}
               </p>
             </div>
           </div>
@@ -99,10 +104,10 @@ export const FeeCalculatorModal: React.FC = () => {
           <div className="space-y-3">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {t('calc_step1')}
+                {t('calc_step1', 'Step 1: Select Enrollment Mode')}
               </label>
               <div className="grid grid-cols-3 gap-2">
-                {programs.map((p) => (
+                {localizedPrograms.map((p) => (
                   <button
                     key={p.id}
                     type="button"
@@ -113,7 +118,7 @@ export const FeeCalculatorModal: React.FC = () => {
                         : 'bg-[#050e26] text-slate-300 border-blue-900/60 hover:border-blue-700'
                     }`}
                   >
-                    {p.name.replace(' Program', '')}
+                    {p.name.replace(' Program', '').replace(' پروگرام', '').replace(' प्रोग्राम', '')}
                   </button>
                 ))}
               </div>
@@ -121,10 +126,10 @@ export const FeeCalculatorModal: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {t('calc_step2')}
+                {t('calc_step2', 'Step 2: Select Student Grade')}
               </label>
               <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
-                {classes.map((c) => (
+                {localizedClasses.map((c) => (
                   <button
                     key={c.id}
                     type="button"
@@ -135,7 +140,7 @@ export const FeeCalculatorModal: React.FC = () => {
                         : 'bg-[#050e26] text-slate-300 border-blue-900/60 hover:border-blue-700'
                     }`}
                   >
-                    {c.name.replace('Class ', 'C-')}
+                    C{c.gradeNumber}
                   </button>
                 ))}
               </div>
@@ -145,33 +150,33 @@ export const FeeCalculatorModal: React.FC = () => {
           {/* Breakdown Card */}
           <div className="bg-[#050e26] rounded-xl p-4 border border-blue-900/80 space-y-2.5">
             <div className="flex items-center justify-between pb-2 border-b border-blue-900/60">
-              <span className="text-xs text-slate-400">{t('calc_selected_plan')}</span>
+              <span className="text-xs text-slate-400">{t('calc_selected_plan', 'Selected Plan')}</span>
               <span className="text-xs font-bold text-sky-400">
                 {currentClass.name} • {selectedProgramCode.toUpperCase()}
               </span>
             </div>
 
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-300">{t('calc_admission_fee')}</span>
+              <span className="text-slate-300">{t('calc_admission_fee', 'One-Time Admission Fee')}</span>
               <span className="font-semibold text-white">₹{admissionFee.toLocaleString()}</span>
             </div>
 
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-300">
-                {t('calc_first_month')} ({selectedProgramCode === 'residential' ? 'Boarding + Deen' : 'Tuition'})
+                {t('calc_first_month', 'First Month Fee')} ({selectedProgramCode === 'residential' ? t('home_residential_fee', 'Residential') : t('home_fulltime_fee', 'Full-Time')})
               </span>
               <span className="font-semibold text-white">₹{monthlyFeeForSelection.toLocaleString()}</span>
             </div>
 
             {selectedProgramCode !== 'short-time' && (
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-300">{t('calc_dress_fee')}</span>
+                <span className="text-slate-300">{t('calc_dress_fee', 'Uniform & Identity Kit')}</span>
                 <span className="font-semibold text-white">₹{dressFee.toLocaleString()}</span>
               </div>
             )}
 
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-300">{t('calc_books_fee')}</span>
+              <span className="text-slate-300">{t('calc_books_fee', 'Curriculum Books & Stationery')}</span>
               <span className="font-semibold text-white">₹{booksFee.toLocaleString()}</span>
             </div>
 
@@ -185,8 +190,8 @@ export const FeeCalculatorModal: React.FC = () => {
             {/* Total Highlight */}
             <div className="pt-3 border-t border-blue-900/60 flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-400">{t('calc_total_admission')}</p>
-                <p className="text-[10px] text-sky-400/90">{t('calc_includes_advance')}</p>
+                <p className="text-xs text-slate-400">{t('calc_total_admission', 'Total Payable at Admission')}</p>
+                <p className="text-[10px] text-sky-400/90">{t('calc_includes_advance', '(Includes 1st month fee & kit)')}</p>
               </div>
               <div className="text-right">
                 <span className="text-2xl font-black text-sky-400 font-['Cinzel',serif]">
@@ -196,13 +201,13 @@ export const FeeCalculatorModal: React.FC = () => {
             </div>
 
             <div className="pt-2 text-[11px] text-slate-400 border-t border-blue-950 flex items-center justify-between">
-              <span>{t('calc_subsequent_monthly')}</span>
-              <span className="font-bold text-sky-300">₹{monthlyFeeForSelection.toLocaleString()} / month</span>
+              <span>{t('calc_subsequent_monthly', 'Subsequent Monthly Fee')}</span>
+              <span className="font-bold text-sky-300">₹{monthlyFeeForSelection.toLocaleString()} / {language === 'ur' ? 'ماہانہ' : language === 'hi' ? 'माह' : 'month'}</span>
             </div>
           </div>
 
           <p className="text-[11px] text-slate-400 italic">
-            * {admissionFeeConfig.note || t('calc_note')}
+            * {admissionFeeConfig.note || t('calc_note', 'Merit-based scholarships available for needy orphans and deserving students.')}
           </p>
 
           {/* Action CTA */}
@@ -211,7 +216,7 @@ export const FeeCalculatorModal: React.FC = () => {
               onClick={handleApplyNow}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 via-blue-600 to-blue-700 hover:from-sky-400 hover:to-blue-600 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-sky-950/50 transition active:scale-98"
             >
-              <span>{t('calc_apply_btn')} - {currentClass.name}</span>
+              <span>{t('btn_apply_now', 'Apply Now')} - {currentClass.name}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

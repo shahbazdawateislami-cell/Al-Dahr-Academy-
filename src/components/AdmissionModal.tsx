@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAcademy } from '../context/AcademyContext';
 import { useLanguage } from '../context/LanguageContext';
 import { createGoogleMeetSpace } from '../services/googleWorkspace';
+import { getLocalizedClass, getLocalizedProgram } from '../data/localizedData';
 import {
   X,
   Sparkles,
@@ -25,7 +26,10 @@ export const AdmissionModal: React.FC = () => {
     submitEnquiry,
   } = useAcademy();
 
-  const { t, isRTL } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
+
+  const localizedClasses = classes.map((c) => getLocalizedClass(c, language));
+  const localizedPrograms = programs.map((p) => getLocalizedProgram(p, language));
 
   const [parentName, setParentName] = useState('');
   const [studentName, setStudentName] = useState('');
@@ -278,7 +282,7 @@ export const AdmissionModal: React.FC = () => {
                     onChange={(e) => setStudentClass(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-[#050e26] border border-blue-900/80 text-white text-xs focus:outline-none focus:border-sky-400"
                   >
-                    {classes.map((cls) => (
+                    {localizedClasses.map((cls) => (
                       <option key={cls.id} value={cls.name} className="bg-[#071330] text-white">
                         {cls.name}
                       </option>
@@ -295,9 +299,9 @@ export const AdmissionModal: React.FC = () => {
                     onChange={(e) => setProgram(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-[#050e26] border border-blue-900/80 text-white text-xs focus:outline-none focus:border-sky-400"
                   >
-                    {programs.map((prog) => (
+                    {localizedPrograms.map((prog) => (
                       <option key={prog.id} value={prog.name} className="bg-[#071330] text-white">
-                        {prog.name} ({prog.code})
+                        {prog.name}
                       </option>
                     ))}
                   </select>

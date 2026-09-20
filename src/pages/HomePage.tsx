@@ -20,6 +20,11 @@ import {
   Clock,
   Users,
 } from 'lucide-react';
+import {
+  getLocalizedProgram,
+  getLocalizedClass,
+  getLocalizedFacility,
+} from '../data/localizedData';
 
 export const HomePage: React.FC = () => {
   const {
@@ -34,6 +39,10 @@ export const HomePage: React.FC = () => {
     setSelectedClassForModal,
   } = useAcademy();
   const { t, language } = useLanguage();
+
+  const localizedPrograms = programs.map((p) => getLocalizedProgram(p, language));
+  const localizedClasses = classes.map((c) => getLocalizedClass(c, language));
+  const localizedFacilities = facilities.map((f) => getLocalizedFacility(f, language));
 
   const navigateTo = (page: PageRoute) => {
     setCurrentPage(page);
@@ -79,13 +88,13 @@ export const HomePage: React.FC = () => {
                 )}
               </h1>
               <p className="text-sm sm:text-base lg:text-lg text-sky-300/95 font-semibold tracking-wider uppercase mt-2">
-                {t('hero_subtitle', settings.heroSubtitle)}
+                {t('sec_modern_subtitle', settings.heroSubtitle)}
               </p>
             </div>
 
             {/* Tagline Box */}
             <div className="inline-block px-4 py-2 rounded-xl bg-blue-950/80 border border-blue-800/80 text-sky-200 font-bold font-['Amiri',serif] text-lg sm:text-xl shadow-lg">
-              “{t('academy_tagline', settings.tagline)}”
+              “{settings.tagline}”
             </div>
 
             <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl">
@@ -98,65 +107,97 @@ export const HomePage: React.FC = () => {
                 onClick={() => setIsAdmissionModalOpen(true)}
                 className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-sky-500/25 transition transform active:scale-95 flex items-center gap-2"
               >
-                <Sparkles className="w-4 h-4 text-slate-950" />
+                <Sparkles className="w-4 h-4 shrink-0" />
                 <span>{t('hero_btn_apply', 'Apply for Admission')}</span>
               </button>
 
               <button
                 onClick={() => setIsFeeCalculatorOpen(true)}
-                className="px-6 py-3.5 rounded-xl bg-blue-950/90 hover:bg-blue-900/90 text-sky-300 border border-sky-400/40 font-bold text-sm sm:text-base shadow-md transition flex items-center gap-2"
+                className="px-6 py-3.5 rounded-xl bg-blue-950/90 hover:bg-blue-900 border border-sky-400/40 text-sky-200 font-bold text-sm sm:text-base transition flex items-center gap-2"
               >
-                <Calculator className="w-4 h-4 text-sky-400" />
+                <Calculator className="w-4 h-4 text-sky-400 shrink-0" />
                 <span>{t('hero_btn_fee', 'Calculate Fee')}</span>
               </button>
+
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-3.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-600 text-white font-bold text-sm sm:text-base transition flex items-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4 shrink-0" />
+                <span>{t('btn_whatsapp', 'WhatsApp')}</span>
+              </a>
+            </div>
+
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-blue-900/60">
+              <div className="p-3 bg-blue-950/60 rounded-xl border border-blue-900/60 text-center">
+                <span className="block text-xl sm:text-2xl font-black text-sky-400">1 – 8</span>
+                <span className="text-[11px] text-slate-300 font-medium">{t('hero_stat_classes', 'Classes 1 to 8')}</span>
+              </div>
+              <div className="p-3 bg-blue-950/60 rounded-xl border border-blue-900/60 text-center">
+                <span className="block text-xl sm:text-2xl font-black text-sky-400">24/7</span>
+                <span className="text-[11px] text-slate-300 font-medium">{t('hero_stat_boarding', 'Residential Boarding')}</span>
+              </div>
+              <div className="p-3 bg-blue-950/60 rounded-xl border border-blue-900/60 text-center">
+                <span className="block text-xl sm:text-2xl font-black text-sky-400">حفظ</span>
+                <span className="text-[11px] text-slate-300 font-medium">{t('hero_stat_hifz', 'Quran & Tajweed')}</span>
+              </div>
+              <div className="p-3 bg-blue-950/60 rounded-xl border border-blue-900/60 text-center">
+                <span className="block text-xl sm:text-2xl font-black text-sky-400">Patna</span>
+                <span className="text-[11px] text-slate-300 font-medium">{t('hero_stat_location', 'Phulwari Sharif')}</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* The 3 Core Academic Programs */}
+      {/* 3 Core Academic Pathways */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12 space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-bold uppercase tracking-wider">
-            {t('nav_programs', 'Academic Pathways')}
+        <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider">
+            {t('home_pathways_badge', '3 Academic Pathways')}
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white font-['Cinzel',serif]">
-            {t('sec_programs_title', 'Choose the Right Program for Your Child')}
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-['Cinzel',serif] tracking-tight">
+            {t('home_pathways_title', 'Choose the Right Pathway for Your Child')}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400">
-            {t('sec_programs_subtitle', 'Tailored education balancing Islamic spirituality, academic distinction, and flexible daily or residential structures.')}
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            {t('home_pathways_desc', 'Whether you need comprehensive 24/7 residential boarding, full-day modern schooling with Islamic studies, or focused Arabic-Urdu language modules, Al-Dahr Academy caters to your specific needs.')}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {programs.map((prog) => {
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {localizedPrograms.map((prog) => {
             const isResidential = prog.code === 'residential';
             const isFullTime = prog.code === 'full-time';
 
             return (
               <div
                 key={prog.id}
-                className={`relative rounded-2xl bg-[#071330] border ${
+                className={`relative rounded-3xl overflow-hidden bg-[#071330] border flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 shadow-xl ${
                   isResidential
-                    ? 'border-sky-500/70 shadow-2xl shadow-blue-950/70'
+                    ? 'border-sky-500/50 shadow-sky-950/50'
                     : isFullTime
-                    ? 'border-blue-700/60'
-                    : 'border-teal-600/60'
-                } overflow-hidden flex flex-col justify-between group hover:-translate-y-1 transition duration-300`}
+                    ? 'border-blue-700/60 hover:border-sky-400/60'
+                    : 'border-blue-900/60 hover:border-teal-500/50'
+                }`}
               >
-                {/* Image & Overlay */}
+                {/* Header Image / Badge */}
                 <div className="relative h-48 overflow-hidden bg-slate-950">
                   <img
                     src={prog.imageUrl}
                     alt={prog.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    className="w-full h-full object-cover opacity-75 hover:opacity-90 hover:scale-105 transition duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#071330] via-[#071330]/40 to-transparent" />
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#050e26]/90 text-sky-200 border border-blue-800">
-                    {prog.classes}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#071330] via-transparent to-transparent" />
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 rounded-full bg-blue-950/90 border border-blue-700/80 text-sky-300 text-xs font-bold shadow">
+                      {prog.classes}
+                    </span>
                   </div>
-                  <div className="absolute bottom-3 left-4">
-                    <h3 className="text-xl font-bold text-white font-['Cinzel',serif]">
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <h3 className="text-2xl font-bold text-white font-['Cinzel',serif]">
                       {prog.name}
                     </h3>
                   </div>
@@ -170,13 +211,13 @@ export const HomePage: React.FC = () => {
                     </p>
 
                     <div className="p-3 bg-[#050e26] rounded-xl border border-blue-900/60">
-                      <p className="text-[11px] text-sky-200/70">Tuition & Boarding:</p>
+                      <p className="text-[11px] text-sky-200/70">{t('class_monthly_fee_struct', 'Tuition & Boarding:')}</p>
                       <p className="text-sm font-bold text-sky-300">{prog.feeNote}</p>
                     </div>
 
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-sky-200 uppercase tracking-wider">
-                        Key Features:
+                        {t('class_activities_tarbiyah', 'Key Features:')}
                       </p>
                       <ul className="space-y-1.5 text-xs text-slate-300">
                         {prog.features.slice(0, 4).map((f, i) => (
@@ -194,13 +235,13 @@ export const HomePage: React.FC = () => {
                       onClick={() => navigateTo(`${prog.code}-program` as PageRoute)}
                       className="flex-1 py-2.5 rounded-xl bg-blue-950/80 hover:bg-blue-900/80 text-white font-semibold text-xs transition text-center border border-blue-800/60"
                     >
-                      View Details
+                      {t('btn_view_details', 'View Details')}
                     </button>
                     <button
                       onClick={() => setIsAdmissionModalOpen(true)}
                       className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-bold text-xs transition shadow"
                     >
-                      Apply
+                      {t('btn_apply_now', 'Apply')}
                     </button>
                   </div>
                 </div>
@@ -215,26 +256,26 @@ export const HomePage: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider mb-2">
-              Grades Offered
+              {t('home_classes_badge', 'Grades Offered')}
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
-              Classes 1 to 8 Curriculum & Progression
+              {t('home_classes_title', 'Classes 1 to 8 Curriculum & Progression')}
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 mt-1">
-              Click any class to view subjects, Islamic syllabus, modern syllabus, activities, and exact fees.
+              {t('home_classes_desc', 'Click any class to view subjects, Islamic syllabus, modern syllabus, activities, and exact fees.')}
             </p>
           </div>
           <button
             onClick={() => navigateTo('classes')}
             className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0"
           >
-            <span>View All Class Syllabi</span>
+            <span>{t('home_view_all_classes', 'View All Class Syllabi')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {classes.map((cls) => (
+          {localizedClasses.map((cls) => (
             <div
               key={cls.id}
               onClick={() => setSelectedClassForModal(cls)}
@@ -255,11 +296,11 @@ export const HomePage: React.FC = () => {
 
               <div className="pt-2 border-t border-blue-900/60 flex items-center justify-between text-xs">
                 <div>
-                  <span className="text-sky-200/60 block text-[10px]">Residential Fee:</span>
+                  <span className="text-sky-200/60 block text-[10px]">{t('home_residential_fee', 'Residential Fee')}:</span>
                   <span className="font-bold text-white">₹{cls.feeResidential}/mo</span>
                 </div>
                 <div>
-                  <span className="text-sky-200/60 block text-[10px]">Full-Time:</span>
+                  <span className="text-sky-200/60 block text-[10px]">{t('home_fulltime_fee', 'Full-Time')}:</span>
                   <span className="font-bold text-sky-400">₹{cls.feeFullTime}/mo</span>
                 </div>
                 <div className="text-sky-400 group-hover:translate-x-1 transition font-bold">
@@ -276,13 +317,13 @@ export const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider">
-              Holistic Philosophy
+              {t('home_synthesis_badge', 'Holistic Philosophy')}
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white font-['Cinzel',serif]">
-              The Harmonious Synthesis of Deen and Modernity
+              {t('home_synthesis_title', 'The Harmonious Synthesis of Deen and Modernity')}
             </h2>
             <p className="text-xs sm:text-sm text-slate-300">
-              We eliminate the false divide between worldly competence and spiritual uprightness.
+              {t('home_synthesis_desc', 'We eliminate the false divide between worldly competence and spiritual uprightness.')}
             </p>
           </div>
 
@@ -295,34 +336,34 @@ export const HomePage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white font-['Cinzel',serif]">
-                    Islamic Education
+                    {t('sec_islamic_title', 'Islamic Education')}
                   </h3>
                   <p className="text-xs text-sky-300 font-semibold">
-                    Faith, Character, and Sacred Knowledge
+                    {t('sec_islamic_subtitle', 'Faith, Character, and Sacred Knowledge')}
                   </p>
                 </div>
               </div>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Taught by devoted scholars and Asatizah with structured recitation, proper Tajweed articulation, daily congregational prayer routines, and profound understanding of prophetic traditions.
+                {t('sec_islamic_desc', 'Taught by devoted scholars and Asatizah with structured recitation, proper Tajweed articulation, daily congregational prayer routines, and profound understanding of prophetic traditions.')}
               </p>
 
               <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>Qur'an & Tajweed from Noorani Qaida to fluent recitation</span>
+                  <span>{t('about_pillar4', "Qur'an & Tajweed from Noorani Qaida to fluent recitation")}</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>Hifz-e-Qur'an track with certified Hafiz supervision</span>
+                  <span>{t('hero_stat_hifz', 'Hifz-e-Qur\'an track with certified Hafiz supervision')}</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>Hadith, Sunnah, and 6 Kalimas memorization</span>
+                  <span>{t('sec_islamic_subtitle', 'Hadith, Sunnah, and 6 Kalimas memorization')}</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>Daily Masnoon Duas and Islamic Manners (Adab & Akhlaq)</span>
+                  <span>{t('about_pillar1', 'Daily Masnoon Duas and Islamic Manners (Adab & Akhlaq)')}</span>
                 </li>
               </ul>
 
@@ -330,8 +371,7 @@ export const HomePage: React.FC = () => {
                 onClick={() => navigateTo('islamic-education')}
                 className="w-full py-3 rounded-xl bg-blue-950 hover:bg-blue-900 text-sky-300 font-bold text-xs border border-sky-500/30 transition flex items-center justify-center gap-2"
               >
-                <span>Read Islamic Education Details</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>{t('home_read_islamic', 'Read Islamic Education Details →')}</span>
               </button>
             </div>
 
@@ -343,34 +383,34 @@ export const HomePage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white font-['Cinzel',serif]">
-                    Modern Education
+                    {t('sec_modern_title', 'Modern Education')}
                   </h3>
                   <p className="text-xs text-sky-300 font-semibold">
-                    Scientific Temper, Literacy, and Digital Skills
+                    {t('sec_modern_subtitle', 'Scientific Temper, Literacy, and Digital Skills')}
                   </p>
                 </div>
               </div>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Standard academic education covering the complete state and national curriculum, preparing children to excel in board examinations, higher studies, and global careers.
+                {t('sec_modern_desc', 'Standard academic education covering the complete state and national curriculum, preparing children to excel in board examinations, higher studies, and global careers.')}
               </p>
 
               <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>English Language, Grammar, Phonics & Spoken communication</span>
+                  <span>{t('about_pillar3', 'English Language, Grammar, Phonics & Spoken communication')}</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>Mathematics: Arithmetic, logic, geometry, and algebra</span>
+                  <span>{t('about_pillar2', 'Mathematics: Arithmetic, logic, geometry, and algebra')}</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>General Science with hands-on experiment demonstrations</span>
+                  <span>{t('modern_page_subtitle', 'General Science with hands-on experiment demonstrations')}</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>Social Studies, Urdu literature, and Computer foundations</span>
+                  <span>{t('sec_modern_desc', 'Social Studies, Urdu literature, and Computer foundations')}</span>
                 </li>
               </ul>
 
@@ -378,8 +418,7 @@ export const HomePage: React.FC = () => {
                 onClick={() => navigateTo('modern-education')}
                 className="w-full py-3 rounded-xl bg-blue-950 hover:bg-blue-900 text-sky-300 font-bold text-xs border border-sky-500/30 transition flex items-center justify-center gap-2"
               >
-                <span>Read Modern Education Details</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>{t('home_read_modern', 'Read Modern Education Details →')}</span>
               </button>
             </div>
           </div>
@@ -391,26 +430,26 @@ export const HomePage: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider mb-2">
-              Campus Environment
+              {t('home_facilities_badge', 'Campus Environment')}
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
-              World-Class Residential & Academic Facilities
+              {t('sec_facilities_title', 'World-Class Residential & Academic Facilities')}
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 mt-1">
-              A serene, secure environment designed for high academic focus and student wellness.
+              {t('home_facilities_desc', 'A serene, secure environment designed for high academic focus and student wellness.')}
             </p>
           </div>
           <button
             onClick={() => navigateTo('facilities')}
             className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0"
           >
-            <span>Explore All Facilities</span>
+            <span>{t('home_explore_facilities', 'Explore All Facilities')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {facilities.slice(0, 4).map((fac) => (
+          {localizedFacilities.slice(0, 4).map((fac) => (
             <div
               key={fac.id}
               className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden group hover:border-sky-400/60 transition duration-300 shadow-lg"
@@ -441,13 +480,13 @@ export const HomePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider mb-2">
-                Watch & Discover
+                {t('home_videos_badge', 'Watch & Discover')}
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
-                Campus Life in Motion: Videos & Shorts
+                {t('home_videos_title', 'Campus Life in Motion: Videos & Shorts')}
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 mt-1">
-                Experience the recitations, classroom dynamics, and student interviews.
+                {t('home_videos_desc', 'Experience the recitations, classroom dynamics, and student interviews.')}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -455,21 +494,21 @@ export const HomePage: React.FC = () => {
                 onClick={() => navigateTo('videos')}
                 className="text-xs font-bold text-sky-400 hover:underline"
               >
-                All Videos
+                {t('home_all_videos', 'All Videos')}
               </button>
               <span className="text-slate-600">•</span>
               <button
                 onClick={() => navigateTo('youtube-shorts')}
                 className="text-xs font-bold text-blue-400 hover:underline"
               >
-                YouTube Shorts
+                {t('home_yt_shorts', 'YouTube Shorts')}
               </button>
               <span className="text-slate-600">•</span>
               <button
                 onClick={() => navigateTo('instagram-videos')}
                 className="text-xs font-bold text-teal-400 hover:underline"
               >
-                Instagram Reels
+                {t('home_ig_reels', 'Instagram Reels')}
               </button>
             </div>
           </div>
@@ -518,7 +557,7 @@ export const HomePage: React.FC = () => {
                     rel="noopener noreferrer"
                     className="pt-2 text-xs font-semibold text-sky-400 hover:underline inline-flex items-center gap-1"
                   >
-                    <span>Watch on {vid.type === 'youtube' ? 'YouTube' : vid.type === 'shorts' ? 'YouTube Shorts' : 'Instagram'}</span>
+                    <span>{t('home_watch_on', 'Watch on')} {vid.type === 'youtube' ? 'YouTube' : vid.type === 'shorts' ? 'YouTube Shorts' : 'Instagram'}</span>
                     <ArrowRight className="w-3 h-3" />
                   </a>
                 </div>
@@ -540,7 +579,7 @@ export const HomePage: React.FC = () => {
                 {t('sec_location_subtitle', 'Located in Phulwari Sharif, Patna')}
               </h2>
               <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                Parents are welcome to visit our premises, inspect the residential hostel, interact with Asatizah, and experience our peaceful academic environment firsthand.
+                {t('home_location_desc', 'Located in the serene surroundings of Phulwari Sharif, Patna, our campus provides an optimal atmosphere away from city distractions while remaining easily accessible by road and rail.')}
               </p>
 
               <div className="space-y-3 text-xs sm:text-sm text-slate-200">
@@ -559,7 +598,7 @@ export const HomePage: React.FC = () => {
                   onClick={() => setIsAdmissionModalOpen(true)}
                   className="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-bold text-xs sm:text-sm transition shadow-lg"
                 >
-                  {t('sec_schedule_visit', 'Schedule Campus Visit')}
+                  {t('home_schedule_visit', 'Schedule Campus Visit')}
                 </button>
                 <a
                   href={whatsappHref}
@@ -568,7 +607,7 @@ export const HomePage: React.FC = () => {
                   className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition flex items-center gap-2"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>{t('sec_whatsapp_chat', 'Chat on WhatsApp')}</span>
+                  <span>{t('home_chat_whatsapp', 'Chat on WhatsApp')}</span>
                 </a>
               </div>
             </div>

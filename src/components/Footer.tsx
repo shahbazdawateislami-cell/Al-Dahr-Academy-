@@ -9,9 +9,7 @@ import {
   Mail,
   GraduationCap,
   Sparkles,
-  ExternalLink,
   Shield,
-  Heart,
   Upload,
   Camera,
   CheckCircle2,
@@ -130,7 +128,7 @@ export const Footer: React.FC = () => {
                 id="footer-logo-container"
                 onClick={() => logoFileInputRef.current?.click()}
                 className="relative group w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0 cursor-pointer overflow-hidden hover:border-amber-400 transition"
-                title="Click karein gallery se logo select ya change karne ke liye"
+                title="Click to select or change logo"
                 role="button"
                 tabIndex={0}
               >
@@ -160,10 +158,10 @@ export const Footer: React.FC = () => {
                     type="button"
                     onClick={() => logoFileInputRef.current?.click()}
                     className="text-[10px] text-slate-400 hover:text-amber-300 underline flex items-center gap-1 cursor-pointer transition"
-                    title="Gallery se logo chunein"
+                    title="Change Logo"
                   >
                     <Upload className="w-2.5 h-2.5" />
-                    <span>Change Logo</span>
+                    <span>{t('footer_change_logo', 'Change Logo')}</span>
                   </button>
                 </div>
               </div>
@@ -176,11 +174,11 @@ export const Footer: React.FC = () => {
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              Al-Dahr Academy is a premiere residential and day-boarding Islamic educational institute dedicated to instilling sound faith, pristine moral conduct (Akhlaq), and high modern academic excellence.
+              {t('footer_about_desc', 'Al-Dahr Academy is a premiere residential and day-boarding Islamic educational institute dedicated to instilling sound faith, pristine moral conduct (Akhlaq), and high modern academic excellence.')}
             </p>
 
             <div className="pt-2">
-              <p className="text-xs font-semibold text-slate-300 mb-2">Connect With Us:</p>
+              <p className="text-xs font-semibold text-slate-300 mb-2">{t('footer_connect_with_us', 'Connect With Us:')}</p>
               <div className="flex items-center gap-2">
                 {settings.socialYoutube && (
                   <a
@@ -232,7 +230,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              Quick Links
+              {t('footer_quick_links', 'Quick Navigation')}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
@@ -240,7 +238,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('home')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Home
+                  {t('nav_home', 'Home')}
                 </button>
               </li>
               <li>
@@ -248,7 +246,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('about')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  About Academy
+                  {t('nav_about', 'About Academy')}
                 </button>
               </li>
               <li>
@@ -256,7 +254,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('classes')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Classes 1 to 8
+                  {t('nav_classes', 'Classes 1 to 8')}
                 </button>
               </li>
               <li>
@@ -264,7 +262,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('fee-structure')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Fee Structure & Calculator
+                  {t('nav_fee', 'Fee Structure & Calculator')}
                 </button>
               </li>
               <li>
@@ -272,7 +270,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('admission')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Admission Information
+                  {t('nav_admission', 'Admission Information')}
                 </button>
               </li>
               <li>
@@ -280,7 +278,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('facilities')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Campus Facilities
+                  {t('nav_facilities', 'Campus Facilities')}
                 </button>
               </li>
               <li>
@@ -288,7 +286,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('curriculum')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Curriculum & Syllabus
+                  {t('nav_curriculum', 'Curriculum & Syllabus')}
                 </button>
               </li>
               <li>
@@ -296,7 +294,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('gallery')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Photo Gallery
+                  {t('nav_gallery', 'Photo Gallery')}
                 </button>
               </li>
               <li>
@@ -304,7 +302,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('videos')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Academy Videos & Shorts
+                  {t('nav_videos', 'Academy Videos & Shorts')}
                 </button>
               </li>
               <li>
@@ -312,7 +310,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('contact')}
                   className="text-slate-400 hover:text-amber-400 transition"
                 >
-                  Contact & Location
+                  {t('nav_contact', 'Contact & Location')}
                 </button>
               </li>
             </ul>
@@ -322,7 +320,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              Our Programs
+              {t('footer_our_programs', 'Our Programs')}
             </h4>
             <ul className="space-y-3 text-xs">
               <li className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-amber-500/50 transition">
@@ -330,8 +328,8 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('residential-program')}
                   className="text-left w-full"
                 >
-                  <p className="font-bold text-white hover:text-amber-400">Residential Program</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Stay + Education + Islamic Education</p>
+                  <p className="font-bold text-white hover:text-amber-400">{t('nav_residential_prog', 'Residential Program')}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{t('home_stat_boarding', 'Stay + Education + Islamic Education')}</p>
                 </button>
               </li>
               <li className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-sky-500/50 transition">
@@ -339,8 +337,8 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('full-time-program')}
                   className="text-left w-full"
                 >
-                  <p className="font-bold text-white hover:text-sky-400">Full-Time Program</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Complete Day Education + Islamic Studies</p>
+                  <p className="font-bold text-white hover:text-sky-400">{t('nav_fulltime_prog', 'Full-Time Program')}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{t('sec_modern_title', 'Complete Day Education + Islamic Studies')}</p>
                 </button>
               </li>
               <li className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/50 transition">
@@ -348,8 +346,8 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('short-time-program')}
                   className="text-left w-full"
                 >
-                  <p className="font-bold text-white hover:text-emerald-400">Short-Time Program</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Arabic + Urdu Only Module</p>
+                  <p className="font-bold text-white hover:text-emerald-400">{t('nav_shorttime_prog', 'Short-Time Program')}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{t('nav_shorttime_desc', 'Arabic + Urdu Only Module')}</p>
                 </button>
               </li>
             </ul>
@@ -359,13 +357,13 @@ export const Footer: React.FC = () => {
                 onClick={() => navigateTo('islamic-education')}
                 className="text-xs text-amber-400 hover:underline block"
               >
-                Explore Islamic Education →
+                {t('footer_explore_islamic', 'Explore Islamic Education →')}
               </button>
               <button
                 onClick={() => navigateTo('modern-education')}
                 className="text-xs text-sky-400 hover:underline block mt-1"
               >
-                Explore Modern Education →
+                {t('footer_explore_modern', 'Explore Modern Education →')}
               </button>
             </div>
           </div>
@@ -374,7 +372,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              Contact & Location
+              {t('footer_contact_info', 'Campus Contact')}
             </h4>
             <div className="space-y-3 text-xs">
               <div className="flex items-start gap-2.5">
@@ -388,7 +386,7 @@ export const Footer: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-amber-400 shrink-0" />
                 <div>
-                  <p className="text-slate-400">Admission Hotline:</p>
+                  <p className="text-slate-400">{t('footer_admission_hotline', 'Admission Hotline')}:</p>
                   <a
                     href={`tel:+91${settings.phone}`}
                     className="font-bold text-white hover:text-amber-400 transition"
@@ -401,7 +399,7 @@ export const Footer: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <MessageCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                 <div>
-                  <p className="text-slate-400">WhatsApp Enquiry:</p>
+                  <p className="text-slate-400">{t('btn_whatsapp', 'WhatsApp Enquiry')}:</p>
                   <a
                     href={whatsappHref}
                     target="_blank"
@@ -431,7 +429,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigateTo('contact')}
                   className="w-full py-2 bg-slate-900 hover:bg-slate-850 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition"
                 >
-                  View Interactive Google Map
+                  {t('sec_location_title', 'Campus Location & Contact')}
                 </button>
               </div>
             </div>

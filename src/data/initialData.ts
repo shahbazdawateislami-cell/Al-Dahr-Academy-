@@ -28,7 +28,7 @@ export const initialSettings: WebsiteSettings = {
   admissionOpen: true,
   admissionButtonText: 'Admission Open 2025–26',
   announcement: '✨ Admissions Now Open for Session 2025–2026 for Classes 1 to 8! Limited seats available in Residential & Day-Boarding.',
-  showAnnouncement: true,
+  showAnnouncement: false,
   footerText: '© 2025 Al-Dahr Academy. All rights reserved. Registered Islamic & Modern Residential Educational Society, Phulwari Sharif, Patna, Bihar.',
   socialFacebook: 'https://facebook.com',
   socialInstagram: 'https://instagram.com',

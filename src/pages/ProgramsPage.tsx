@@ -1,19 +1,18 @@
 import React from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import { ProgramCode } from '../types';
 import {
   Building,
   GraduationCap,
   BookOpen,
   CheckCircle2,
-  Clock,
-  Sparkles,
-  Phone,
   ArrowRight,
   ShieldCheck,
   Utensils,
   Moon,
 } from 'lucide-react';
+import { getLocalizedProgram } from '../data/localizedData';
 
 interface ProgramsPageProps {
   initialCode?: ProgramCode;
@@ -21,34 +20,37 @@ interface ProgramsPageProps {
 
 export const ProgramsPage: React.FC<ProgramsPageProps> = ({ initialCode }) => {
   const { programs, setIsAdmissionModalOpen, setIsFeeCalculatorOpen, setEnquiryPrefill } = useAcademy();
+  const { t, language } = useLanguage();
 
   const handleApply = (programName: string) => {
     setEnquiryPrefill({ program: programName });
     setIsAdmissionModalOpen(true);
   };
 
-  const activePrograms = initialCode
+  const rawPrograms = initialCode
     ? programs.filter((p) => p.code === initialCode)
     : programs;
+
+  const activePrograms = rawPrograms.map((prog) => getLocalizedProgram(prog, language));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16 text-white">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider">
-          Our Educational Offerings
+          {t('home_pathways_badge', 'Our Educational Offerings')}
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold font-['Cinzel',serif] tracking-tight">
           {initialCode === 'residential'
-            ? 'Residential Boarding Program'
+            ? t('nav_residential_prog', 'Residential Boarding Program')
             : initialCode === 'full-time'
-            ? 'Full-Time Day Schooling Program'
+            ? t('nav_fulltime_prog', 'Full-Time Day Schooling Program')
             : initialCode === 'short-time'
-            ? 'Short-Time Arabic & Urdu Program'
-            : 'Academic Programs & Pathways'}
+            ? t('nav_shorttime_prog', 'Short-Time Arabic & Urdu Program')
+            : t('sec_programs_title', 'Academic Programs & Pathways')}
         </h1>
         <p className="text-sm sm:text-base text-slate-300">
-          Tailored learning options combining classical Islamic upbringing, modern education, and character mentorship for Classes 1 to 8 in Phulwari Sharif, Patna.
+          {t('home_pathways_desc', 'Tailored learning options combining classical Islamic upbringing, modern education, and character mentorship for Classes 1 to 8 in Phulwari Sharif, Patna.')}
         </p>
       </div>
 
@@ -82,7 +84,7 @@ export const ProgramsPage: React.FC<ProgramsPageProps> = ({ initialCode }) => {
                     {prog.classes}
                   </div>
                   <div className="absolute bottom-3 left-4 right-4">
-                    <p className="text-xs text-slate-300">Tuition & Charges:</p>
+                    <p className="text-xs text-slate-300">{t('class_monthly_fee_struct', 'Tuition & Charges:')}</p>
                     <p className="text-base font-bold text-amber-400">{prog.feeNote}</p>
                   </div>
                 </div>
@@ -112,7 +114,7 @@ export const ProgramsPage: React.FC<ProgramsPageProps> = ({ initialCode }) => {
                         {prog.name}
                       </h2>
                       <p className="text-xs text-slate-400">
-                        Available for Grades: {prog.classes}
+                        {t('home_classes_badge', 'Available for Grades')}: {prog.classes}
                       </p>
                     </div>
                   </div>
@@ -123,7 +125,7 @@ export const ProgramsPage: React.FC<ProgramsPageProps> = ({ initialCode }) => {
 
                   <div className="space-y-2.5">
                     <p className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                      Key Highlights & Inclusions:
+                      {t('class_activities_tarbiyah', 'Key Highlights & Inclusions:')}
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
                       {prog.features.map((feat, idx) => (
@@ -154,14 +156,14 @@ export const ProgramsPage: React.FC<ProgramsPageProps> = ({ initialCode }) => {
                           : 'bg-emerald-500 hover:bg-emerald-600 text-slate-950'
                       }`}
                     >
-                      Apply for {prog.name}
+                      {t('btn_apply_now', 'Apply')} - {prog.name}
                     </button>
 
                     <button
                       onClick={() => setIsFeeCalculatorOpen(true)}
                       className="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 font-semibold text-xs sm:text-sm transition flex items-center gap-2"
                     >
-                      <span>Check Fee Breakdown</span>
+                      <span>{t('hero_btn_fee', 'Check Fee Breakdown')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -174,22 +176,22 @@ export const ProgramsPage: React.FC<ProgramsPageProps> = ({ initialCode }) => {
                   <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                     <Utensils className="w-5 h-5 text-amber-400 shrink-0 mt-1" />
                     <div>
-                      <p className="text-xs font-bold text-white">Halal Nutritious Diet</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">Wholesome 3-time dining + morning milk/snacks.</p>
+                      <p className="text-xs font-bold text-white">{t('about_pillar1', 'Halal Nutritious Diet')}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{t('home_facilities_desc', 'Wholesome 3-time dining + morning milk/snacks.')}</p>
                     </div>
                   </div>
                   <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                     <Moon className="w-5 h-5 text-amber-400 shrink-0 mt-1" />
                     <div>
-                      <p className="text-xs font-bold text-white">Tahajjud & Congregations</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">5 daily prayers in Musalla with Asatizah.</p>
+                      <p className="text-xs font-bold text-white">{t('sec_islamic_title', 'Tahajjud & Congregations')}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{t('sec_islamic_desc', '5 daily prayers in Musalla with Asatizah.')}</p>
                     </div>
                   </div>
                   <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
                     <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0 mt-1" />
                     <div>
-                      <p className="text-xs font-bold text-white">24/7 Security & Wardens</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">CCTV monitored campus and resident housemasters.</p>
+                      <p className="text-xs font-bold text-white">{t('home_stat_boarding', '24/7 Security & Wardens')}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{t('sec_facilities_subtitle', 'CCTV monitored campus and resident housemasters.')}</p>
                     </div>
                   </div>
                 </div>
