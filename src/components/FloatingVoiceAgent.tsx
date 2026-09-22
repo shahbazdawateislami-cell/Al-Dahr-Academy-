@@ -17,7 +17,7 @@ interface SpokenExchange {
 }
 
 const GREETING_TEXT =
-  'Assalamu Alaikum! AL-DAHR Academy mein khush aamdeed. Main Academy ka AI Receptionist hoon. Main aapko Admission, Fees, Residential, Full-Time, Short-Time aur Education System ke baare mein maloomat de sakta hoon. Aap kis baare mein maloomat lena chahte hain?';
+  "Assalamu Alaikum wa Rahmatullah! AL-DAHR Academy mein khush aamdeed. Main Academy ka AI Voice Receptionist hoon. Main aap ko Admission, Monthly Fees, Hifz-e-Qur'an, CBSE Taleem aur Facilities ke baare mein maloomat de sakta hoon. Aap kis baare mein daryaft karna chahte hain mohtaram?";
 
 const WAKE_WORDS = [
   'assalamu alaikum',
@@ -80,8 +80,8 @@ export const FloatingVoiceAgent: React.FC = () => {
   const [agentStatus, setAgentStatus] = useState<'idle' | 'speaking' | 'listening' | 'processing'>('idle');
   const [statusMessage, setStatusMessage] = useState<string>('');
 
-  // Wake Word ("Assalamualaikum") States
-  const [isWakeWordActive, setIsWakeWordActive] = useState(true);
+  // Wake Word ("Assalamualaikum") States - Default FALSE to prevent periodic browser mic beeps
+  const [isWakeWordActive, setIsWakeWordActive] = useState(false);
   const [wakeWordDetectedMessage, setWakeWordDetectedMessage] = useState<string | null>(null);
   const wakeWordRecognitionRef = useRef<any>(null);
 
@@ -293,7 +293,7 @@ export const FloatingVoiceAgent: React.FC = () => {
     isSpeakingRef.current = false;
   }, []);
 
-  // Primary Advanced Text-To-Speech: Google Gemini Voice TTS API (Puck - fluent, youthful, natural)
+  // Primary Advanced Text-To-Speech: Google Gemini Voice TTS API (Fenrir - deep, dignified male Hafiz voice)
   const speakText = useCallback(
     async (text: string, onEndCallback?: () => void) => {
       stopSpeaking();
@@ -309,13 +309,12 @@ export const FloatingVoiceAgent: React.FC = () => {
       setStatusMessage('AI Voice bol rahe hain...');
 
       try {
-        // Request Google Gemini TTS (Puck: natural, fluent modern Indian male voice)
         const res = await fetch('/api/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             text: cleanText,
-            voice: 'Puck',
+            voice: 'Fenrir',
           }),
         });
 
@@ -335,7 +334,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         audio.onplay = () => {
           isSpeakingRef.current = true;
           setAgentStatus('speaking');
-          setStatusMessage('Gemini AI bol rahe hain...');
+          setStatusMessage('AI Receptionist (Hafiz Assistant) bol rahe hain...');
         };
 
         audio.onended = () => {
@@ -343,7 +342,7 @@ export const FloatingVoiceAgent: React.FC = () => {
           currentAudioRef.current = null;
           if (activeCallRef.current) {
             setAgentStatus('listening');
-            setStatusMessage('🎤 Boliye, sun rahe hain...');
+            setStatusMessage('🎤 Boliye mohtaram, sun rahe hain...');
             if (onEndCallback) {
               onEndCallback();
             } else {
@@ -402,7 +401,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         }
       }
 
-      // 2. Fee inquiries (Conversational, no data tables)
+      // 2. Fee inquiries
       if (
         q.includes('fee') ||
         q.includes('fees') ||
@@ -412,10 +411,10 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('rate') ||
         q.includes('charge')
       ) {
-        return 'Hostel mein rehna, 3-time taza khana aur padhai sab mila kar lagbhag 4,500 rupaye mahina hai bhai. Aur agar sirf din mein aana chahein toh 2,000 rupaye hai. Aap hostel ke liye dekh rahe hain ya day school?';
+        return 'Walaikum Assalam mohtaram! Residential (Hostel) fee Class 1 ke liye 2,700 rupaye mahana hai, aur Full-time Day education 900 rupaye hai. Aap kis class ke liye maloomat chahte hain mohtaram?';
       }
 
-      // 3. Admission inquiries (Conversational, no session dates)
+      // 3. Admission inquiries
       if (
         q.includes('admission') ||
         q.includes('dakhla') ||
@@ -424,7 +423,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('seat') ||
         q.includes('registration')
       ) {
-        return 'Haan ji bilkul bhai, admissions abhi open hain! Aapka bachha kaun si class mein padhega?';
+        return 'Ji bilkul mohtaram, AL-DAHR Academy mein admissions open hain! Class 1 se Class 8 tak Dakhla shuru hai. Aap ka beta ya beti kis class ke liye hai mohtaram?';
       }
 
       // 4. Location & Address
@@ -437,7 +436,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('pata') ||
         q.includes('jagah')
       ) {
-        return 'Hamara campus Phulwari Sharif, Patna mein hai. Aap aaram se Monday se Saturday kisi bhi din aakar dekh sakte hain. Kya aap Patna se hi hain?';
+        return 'Hamara campus Phulwari Sharif, Patna, Bihar mein hai mohtaram. Aap Monday se Saturday kisi bhi din aakar mulaqat kar sakte hain.';
       }
 
       // 5. Hostel & Khana (Food)
@@ -450,7 +449,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('mess') ||
         q.includes('stay')
       ) {
-        return 'Hostel facility ekdum safe aur clean hai bhai, 3 time taza halal khana milta hai aur 24 ghante teachers ki dekh-rekh rehti hai. Aur kuch janna chahte hain?';
+        return 'Residential facility mein shandar rehna, 3-time halal aur taza khana, aur Deeni wa modern taleem shamil hai mohtaram. Kya aap Hostel ke baare mein mazeed janna chahte hain?';
       }
 
       // 6. Syllabus & Padhai (Curriculum)
@@ -463,11 +462,11 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('math') ||
         q.includes('subject')
       ) {
-        return 'Yahan Deeni taleem aur Hifz ke sath-sath CBSE pattern par English, Math, Science aur Computer sab padhaya jata hai. Aapka bachha kis class mein hai?';
+        return 'Yahan Hifz-e-Qur\'an, Tajweed aur Diniyat ke sath CBSE pattern par English, Math, Science, Computer, AI aur Social Media Master Class padhaya jata hai. Aap kis class ke baare mein poochna chahte hain?';
       }
 
       // 7. Polite fallback
-      return 'Aap chahein toh screen par diye helpline button se directly call kar sakte hain. Aur kuch janna hai bhai?';
+      return 'Ji mohtaram, aap 7079988808 par directly call ya WhatsApp bhi kar sakte hain. Aur koi maloomat chahiye aap ko?';
     },
     [voiceKnowledge]
   );
@@ -476,10 +475,14 @@ export const FloatingVoiceAgent: React.FC = () => {
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
       try {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onend = null;
         recognitionRef.current.abort();
       } catch (e) {
         // ignore
       }
+      recognitionRef.current = null;
     }
   }, []);
 
@@ -489,21 +492,20 @@ export const FloatingVoiceAgent: React.FC = () => {
       if (!activeCallRef.current) return;
       stopListening();
       setAgentStatus('processing');
-      setStatusMessage(`Sun liya: "${query.slice(0, 30)}..."`);
+      setStatusMessage(`Sawal samjha: "${query.slice(0, 30)}..."`);
 
       try {
-        // Send all queries to Gemini AI for natural, fluent Hinglish conversation
         const res = await fetch('/api/voice-query', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, voice: 'Puck' }),
+          body: JSON.stringify({ query, voice: 'Fenrir' }),
         });
 
         if (res.ok) {
           const data = await res.json();
           if (data.answer) {
             if (!activeCallRef.current) return;
-            setStatusMessage('Jawab de rahe hain...');
+            setStatusMessage('Jawab de rahe hain mohtaram...');
 
             if (data.audioUrl) {
               stopSpeaking();
@@ -519,7 +521,7 @@ export const FloatingVoiceAgent: React.FC = () => {
                 currentAudioRef.current = null;
                 if (activeCallRef.current) {
                   setAgentStatus('listening');
-                  setStatusMessage('🎤 Boliye, sun rahe hain...');
+                  setStatusMessage('🎤 Boliye mohtaram, sun rahe hain...');
                   startListeningRef.current();
                 } else {
                   setAgentStatus('idle');
@@ -529,7 +531,7 @@ export const FloatingVoiceAgent: React.FC = () => {
                 speakText(data.answer, () => {
                   if (activeCallRef.current) {
                     setAgentStatus('listening');
-                    setStatusMessage('🎤 Boliye, sun rahe hain...');
+                    setStatusMessage('🎤 Boliye mohtaram, sun rahe hain...');
                     startListeningRef.current();
                   }
                 });
@@ -540,7 +542,7 @@ export const FloatingVoiceAgent: React.FC = () => {
               speakText(data.answer, () => {
                 if (activeCallRef.current) {
                   setAgentStatus('listening');
-                  setStatusMessage('🎤 Boliye, sun rahe hain...');
+                  setStatusMessage('🎤 Boliye mohtaram, sun rahe hain...');
                   startListeningRef.current();
                 }
               });
@@ -556,11 +558,11 @@ export const FloatingVoiceAgent: React.FC = () => {
       const localAnswer = findAnswer(query);
       setTimeout(() => {
         if (!activeCallRef.current) return;
-        setStatusMessage('Jawab de rahe hain...');
+        setStatusMessage('Jawab de rahe hain mohtaram...');
         speakText(localAnswer, () => {
           if (activeCallRef.current) {
             setAgentStatus('listening');
-            setStatusMessage('🎤 Boliye, sun rahe hain...');
+            setStatusMessage('🎤 Boliye mohtaram, sun rahe hain...');
             startListeningRef.current();
           }
         });
@@ -571,7 +573,7 @@ export const FloatingVoiceAgent: React.FC = () => {
 
   // Start microphone recognition with continuous conversation loop
   const startListening = useCallback(() => {
-    if (!activeCallRef.current) return;
+    if (!activeCallRef.current || isSpeakingRef.current) return;
     stopSpeaking();
 
     const SpeechRecognition =
@@ -584,25 +586,29 @@ export const FloatingVoiceAgent: React.FC = () => {
 
     if (recognitionRef.current) {
       try {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onend = null;
         recognitionRef.current.abort();
       } catch (e) {
         // ignore
       }
+      recognitionRef.current = null;
     }
 
     try {
       const recognition = new SpeechRecognition();
-      recognition.continuous = true;
+      recognition.continuous = false; // Note: false allows reliable sentence-by-sentence capture without getting stuck
       recognition.interimResults = false;
       recognition.lang = 'hi-IN';
 
       recognition.onstart = () => {
         if (!activeCallRef.current) {
-          recognition.abort();
+          try { recognition.abort(); } catch (e) {}
           return;
         }
         setAgentStatus('listening');
-        setStatusMessage('🎤 Boliye, sun rahe hain...');
+        setStatusMessage('🎤 Boliye mohtaram, sun rahe hain...');
       };
 
       recognition.onresult = (event: any) => {
@@ -627,15 +633,11 @@ export const FloatingVoiceAgent: React.FC = () => {
       };
 
       recognition.onend = () => {
-        // Keep listening loop continuously alive while call is active
+        // Keep listening continuously alive while call is active
         if (activeCallRef.current && !isSpeakingRef.current) {
           setTimeout(() => {
             if (activeCallRef.current && !isSpeakingRef.current) {
-              try {
-                recognition.start();
-              } catch (e) {
-                // ignore
-              }
+              startListeningRef.current();
             }
           }, 300);
         }
