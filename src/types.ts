@@ -179,6 +179,8 @@ export interface WebsiteSettings {
   metaTitle: string;
   metaDescription: string;
   metaKeywords: string;
+  customVoiceAgentUrl?: string;
+  customVoiceAgentEmbedScript?: string;
 }
 
 export type PageRoute =

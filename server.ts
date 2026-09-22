@@ -3,6 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Modality } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
+import { WebSocketServer, WebSocket } from 'ws';
 
 dotenv.config();
 
@@ -280,8 +281,8 @@ If asked who you are:
 
 STRICT RULE: Do NOT use markdown tables, bullet points, asterisks, or robotic formatting. Speak only plain, natural, respectful conversational sentences.`;
 
-    // Attempt generation with gemini-3.8-live model for real-time live voice conversations
-    const textModels = ['gemini-3.8-live', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash'];
+    // Attempt generation with gemini-3.8-live and gemini models for real-time conversational voice responses
+    const textModels = ['gemini-3.8-live', 'gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'];
     for (const model of textModels) {
       try {
         const promptResponse = await ai.models.generateContent({
@@ -311,6 +312,13 @@ STRICT RULE: Do NOT use markdown tables, bullet points, asterisks, or robotic fo
   }
 });
 
+// System Prompt constant for Live WebSocket API
+const SYSTEM_VOICE_PROMPT = `AL-DAHR ACADEMY - AI Voice Receptionist
+You are the official AI Voice Receptionist of AL-DAHR Academy (Phulwari Sharif, Patna, Bihar).
+You speak in the dignified, respectful, warm, and polite manner of an educated Hafiz Sahab / Alim Receptionist.
+Always greet and respond with deep respect ("Assalamu Alaikum", "Walaikum Assalam", "Ji mohtaram").
+Provide concise, clear answers about Al-Dahr Academy admissions, fees, residential hostel, and classes 1 to 8.`;
+
 // Vite middleware & Static serving
 async function start() {
   if (process.env.NODE_ENV !== 'production') {
@@ -327,8 +335,67 @@ async function start() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
+  });
+
+  // Attach Live API WebSocket Server for gemini-3.8-live real-time voice conversations
+  const wss = new WebSocketServer({ server, path: '/live' });
+
+  wss.on('connection', async (clientWs: WebSocket) => {
+    console.log('Client connected to gemini-3.8-live WebSocket session');
+    let session: any = null;
+
+    try {
+      const ai = getAi();
+      session = await ai.live.connect({
+        model: 'gemini-3.8-live',
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: {
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } },
+          },
+          systemInstruction: SYSTEM_VOICE_PROMPT,
+        },
+        callbacks: {
+          onmessage: (message: any) => {
+            const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+            if (audio && clientWs.readyState === WebSocket.OPEN) {
+              clientWs.send(JSON.stringify({ audio }));
+            }
+            if (message.serverContent?.interrupted && clientWs.readyState === WebSocket.OPEN) {
+              clientWs.send(JSON.stringify({ interrupted: true }));
+            }
+          },
+        },
+      });
+
+      clientWs.on('message', (data: any) => {
+        try {
+          const msg = JSON.parse(data.toString());
+          if (msg.audio && session) {
+            session.sendRealtimeInput({
+              audio: { data: msg.audio, mimeType: 'audio/pcm;rate=16000' },
+            });
+          }
+        } catch (e) {
+          console.warn('Error processing realtime audio input:', e);
+        }
+      });
+
+      clientWs.on('close', () => {
+        if (session) {
+          try {
+            session.close();
+          } catch (e) {}
+        }
+      });
+    } catch (err: any) {
+      console.warn('Gemini 3.8 Live API WebSocket setup note:', err?.message || err);
+      if (clientWs.readyState === WebSocket.OPEN) {
+        clientWs.send(JSON.stringify({ error: 'Live API initialized with HTTP fallback mode' }));
+      }
+    }
   });
 }
 

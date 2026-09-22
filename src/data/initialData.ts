@@ -40,6 +40,8 @@ export const initialSettings: WebsiteSettings = {
   metaTitle: 'Al-Dahr Academy | Residential Islamic & Modern Education Institute Patna',
   metaDescription: 'Al-Dahr Academy in Phulwari Sharif, Patna offers Residential, Full-Time, and Short-Time education from Class 1 to 8 combining Quran, Tajweed, English, Science, and character building.',
   metaKeywords: 'Al-Dahr Academy, Islamic school Patna, Residential Islamic Academy Bihar, Phulwari Sharif school, Quran Hifz modern education',
+  customVoiceAgentUrl: '',
+  customVoiceAgentEmbedScript: '',
 };
 
 export const initialPrograms: ProgramItem[] = [

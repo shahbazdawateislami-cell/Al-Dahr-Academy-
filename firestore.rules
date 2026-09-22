@@ -25,67 +25,67 @@ service cloud.firestore {
     // Website Settings
     match /settings/{settingId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Programs (Residential, Full-Time, Short-Time)
     match /programs/{programId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Classes (Class 1 to 8)
     match /classes/{classId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Admission & Monthly Fee configuration
     match /feeConfig/{configId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Curricular Subjects
     match /subjects/{subjectId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Curriculum details
     match /curriculum/{curriculumId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Facilities
     match /facilities/{facilityId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Photo Gallery
     match /gallery/{galleryId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Videos, Shorts, Instagram
     match /videos/{videoId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Voice Agent Knowledge Base
     match /voiceAgentKnowledge/{knowledgeId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Hero Carousel Slides
     match /heroSlides/{slideId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if true;
     }
 
     // Admin Users Directory

@@ -19,10 +19,41 @@ import {
   Filter,
   Eye,
   EyeOff,
+  Link,
+  Globe,
+  Code,
+  Check,
 } from 'lucide-react';
 
 export const VoiceAgentManager: React.FC<{ showToast: (msg: string) => void }> = ({ showToast }) => {
-  const { voiceKnowledge, saveVoiceKnowledge, deleteVoiceKnowledge, setIsVoiceAgentOpen } = useAcademy();
+  const {
+    settings,
+    updateSettings,
+    voiceKnowledge,
+    saveVoiceKnowledge,
+    deleteVoiceKnowledge,
+    setIsVoiceAgentOpen,
+  } = useAcademy();
+
+  const [customAgentUrl, setCustomAgentUrl] = useState(settings.customVoiceAgentUrl || '');
+  const [customAgentEmbed, setCustomAgentEmbed] = useState(settings.customVoiceAgentEmbedScript || '');
+  const [isSavingCustomAgent, setIsSavingCustomAgent] = useState(false);
+
+  const handleSaveCustomAgentConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingCustomAgent(true);
+    try {
+      await updateSettings({
+        customVoiceAgentUrl: customAgentUrl.trim(),
+        customVoiceAgentEmbedScript: customAgentEmbed.trim(),
+      });
+      showToast('Custom External Voice Call Agent configuration save ho gaya!');
+    } catch (err) {
+      showToast('Save karne me error aaya');
+    } finally {
+      setIsSavingCustomAgent(false);
+    }
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -186,6 +217,75 @@ export const VoiceAgentManager: React.FC<{ showToast: (msg: string) => void }> =
           )}
         </div>
       </div>
+
+      {/* External Custom Call Agent Integration Section (e.g. Bland AI, Vapi, Retell AI, ElevenLabs) */}
+      <form
+        onSubmit={handleSaveCustomAgentConfig}
+        className="p-5 bg-gradient-to-br from-slate-900 via-emerald-950/20 to-slate-900 border-2 border-emerald-500/30 rounded-3xl space-y-4 shadow-xl"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+              <Globe className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <span>Custom External Voice Call Agent Link / Widget Embed</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30">
+                  Optional Integration
+                </span>
+              </h3>
+              <p className="text-[11px] text-slate-400">
+                Agar aap ke paas koi pehle se bana hua external Call Agent hai (jaise Vapi.ai, Bland AI, ElevenLabs, Retell AI, ya custom link), to uska URL ya Widget Link yahan paste karein.
+              </p>
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={isSavingCustomAgent}
+            className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shrink-0 shadow-lg"
+          >
+            <Check className="w-4 h-4" />
+            <span>{isSavingCustomAgent ? 'Saving...' : 'Save Agent Link'}</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label className="block text-slate-300 font-semibold mb-1 flex items-center gap-1.5">
+              <Link className="w-3.5 h-3.5 text-emerald-400" />
+              <span>External Agent Call Link / Webhook / WebRTC URL</span>
+            </label>
+            <input
+              type="url"
+              value={customAgentUrl}
+              onChange={(e) => setCustomAgentUrl(e.target.value)}
+              placeholder="e.g. https://vapi.ai/embed/... or https://elevenlabs.io/app/talk-to/..."
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-emerald-400"
+            />
+            <span className="text-[10px] text-slate-400 mt-1 block">
+              Jab yahan link hoga, to floating voice call button click karne par aapka ye custom agent direct khulega!
+            </span>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 font-semibold mb-1 flex items-center gap-1.5">
+              <Code className="w-3.5 h-3.5 text-amber-400" />
+              <span>External Widget Iframe Snippet (Optional)</span>
+            </label>
+            <input
+              type="text"
+              value={customAgentEmbed}
+              onChange={(e) => setCustomAgentEmbed(e.target.value)}
+              placeholder='e.g. <iframe src="https://..." width="100%" height="500"></iframe>'
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-white font-mono text-[11px] focus:outline-none focus:border-amber-400"
+            />
+            <span className="text-[10px] text-slate-400 mt-1 block">
+              Khali rakhne par built-in AI Voice Receptionist (Hafiz Assistant) istemal hoga.
+            </span>
+          </div>
+        </div>
+      </form>
 
       {/* Live AI Test Box */}
       <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-sky-950/40 to-slate-900 border border-sky-500/30 rounded-3xl space-y-3">
