@@ -95,7 +95,7 @@ export const HomePage: React.FC = () => {
             return (
               <div
                 key={prog.id}
-                className={`relative rounded-3xl overflow-hidden bg-[#071330] border flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 shadow-xl ${
+                className={`relative rounded-3xl overflow-hidden bg-[#071330] border flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 shadow-xl h-full ${
                   isResidential
                     ? 'border-sky-500/50 shadow-sky-950/50'
                     : isFullTime
@@ -125,17 +125,17 @@ export const HomePage: React.FC = () => {
 
                 {/* Body */}
                 <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-3.5">
+                  <div className="space-y-3.5 flex-1 flex flex-col justify-between">
                     <p className="text-xs text-slate-300 leading-relaxed min-h-[38px] line-clamp-2">
                       {prog.description}
                     </p>
 
-                    <div className="p-3 bg-[#050e26] rounded-xl border border-blue-900/60 min-h-[56px] flex flex-col justify-center">
+                    <div className="p-3 bg-[#050e26] rounded-xl border border-blue-900/60 h-14 flex flex-col justify-center shrink-0">
                       <p className="text-[11px] text-sky-200/70">{t('class_monthly_fee_struct', 'Tuition & Boarding:')}</p>
                       <p className="text-sm font-bold text-sky-300 truncate">{prog.feeNote}</p>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 shrink-0">
                       <p className="text-xs font-semibold text-sky-200 uppercase tracking-wider">
                         {t('class_activities_tarbiyah', 'Key Features:')}
                       </p>
@@ -150,7 +150,7 @@ export const HomePage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-blue-900/60 flex items-center gap-2 mt-auto">
+                  <div className="pt-3 border-t border-blue-900/60 flex items-center gap-2 mt-auto shrink-0">
                     <button
                       onClick={() => navigateTo(`${prog.code}-program` as PageRoute)}
                       className="flex-1 py-2.5 rounded-xl bg-blue-950/80 hover:bg-blue-900/80 text-white font-semibold text-xs transition text-center border border-blue-800/60"
@@ -159,7 +159,7 @@ export const HomePage: React.FC = () => {
                     </button>
                     <button
                       onClick={() => setIsAdmissionModalOpen(true)}
-                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-bold text-xs transition shadow"
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-bold text-xs transition shadow shrink-0"
                     >
                       {t('btn_apply_now', 'Apply')}
                     </button>

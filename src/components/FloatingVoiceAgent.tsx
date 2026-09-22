@@ -17,7 +17,32 @@ interface SpokenExchange {
 }
 
 const GREETING_TEXT =
-  'Assalamu Alaikum bhai! Welcome to Al-Dahr Academy Patna. Main aapka AI Voice Receptionist hoon. Admissions, monthly fees, hostel ya syllabus ke baare mein aap freely pooch sakte hain. Boliye, main aapki kya help karoon?';
+  'Assalamu Alaikum! AL-DAHR Academy mein khush aamdeed. Main Academy ka AI Receptionist hoon. Main aapko Admission, Fees, Residential, Full-Time, Short-Time aur Education System ke baare mein maloomat de sakta hoon. Aap kis baare mein maloomat lena chahte hain?';
+
+const WAKE_WORDS = [
+  'assalamu alaikum',
+  'assalam alaikum',
+  'assalam-o-alaikum',
+  'assalamoalaikum',
+  'as-salamu alaykum',
+  'salam alaikum',
+  'assalamualaikum',
+  'assalam',
+  'assalaam',
+  'salaam',
+  'salam',
+  'अस्सलाम वालेकुम',
+  'अस्सलाम',
+  'सलाम',
+  'السلام عليكم',
+  'السلام',
+];
+
+const isWakeWordPresent = (text: string): boolean => {
+  if (!text) return false;
+  const lower = text.toLowerCase().trim();
+  return WAKE_WORDS.some((w) => lower.includes(w));
+};
 
 export const FloatingVoiceAgent: React.FC = () => {
   const {
@@ -54,6 +79,11 @@ export const FloatingVoiceAgent: React.FC = () => {
   const [isActiveCall, setIsActiveCall] = useState(false);
   const [agentStatus, setAgentStatus] = useState<'idle' | 'speaking' | 'listening' | 'processing'>('idle');
   const [statusMessage, setStatusMessage] = useState<string>('');
+
+  // Wake Word ("Assalamualaikum") States
+  const [isWakeWordActive, setIsWakeWordActive] = useState(true);
+  const [wakeWordDetectedMessage, setWakeWordDetectedMessage] = useState<string | null>(null);
+  const wakeWordRecognitionRef = useRef<any>(null);
 
   const recognitionRef = useRef<any>(null);
   const isSpeakingRef = useRef<boolean>(false);
@@ -703,6 +733,114 @@ export const FloatingVoiceAgent: React.FC = () => {
     }
   }, [isVoiceAgentOpen]);
 
+  // Background Wake Word Listener ("Assalamualaikum")
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) return;
+
+    // If call is already active or wake word feature is disabled, stop background wake word listener
+    if (isActiveCall || !isWakeWordActive) {
+      if (wakeWordRecognitionRef.current) {
+        try {
+          wakeWordRecognitionRef.current.abort();
+        } catch (e) {
+          // ignore
+        }
+        wakeWordRecognitionRef.current = null;
+      }
+      return;
+    }
+
+    let isComponentMounted = true;
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'hi-IN';
+
+      recognition.onresult = (event: any) => {
+        if (activeCallRef.current || !isComponentMounted) return;
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const transcript = event.results[i]?.[0]?.transcript || '';
+          if (isWakeWordPresent(transcript)) {
+            // WAKE WORD DETECTED!
+            setWakeWordDetectedMessage('🎙️ Wake word: "Assalamualaikum" detected!');
+            setTimeout(() => setWakeWordDetectedMessage(null), 3500);
+
+            try {
+              recognition.abort();
+            } catch (e) {
+              // ignore
+            }
+
+            // Immediately start the call & greeting!
+            toggleReceptionistCall();
+            break;
+          }
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        if (activeCallRef.current || !isComponentMounted) return;
+        if (
+          event.error === 'no-speech' ||
+          event.error === 'aborted' ||
+          event.error === 'network'
+        ) {
+          setTimeout(() => {
+            if (!activeCallRef.current && isWakeWordActive && isComponentMounted) {
+              try {
+                recognition.start();
+              } catch (e) {
+                // ignore
+              }
+            }
+          }, 800);
+        }
+      };
+
+      recognition.onend = () => {
+        if (!activeCallRef.current && isWakeWordActive && isComponentMounted) {
+          setTimeout(() => {
+            if (!activeCallRef.current && isWakeWordActive && isComponentMounted) {
+              try {
+                recognition.start();
+              } catch (e) {
+                // ignore
+              }
+            }
+          }, 500);
+        }
+      };
+
+      wakeWordRecognitionRef.current = recognition;
+      try {
+        recognition.start();
+      } catch (e) {
+        // ignore
+      }
+    } catch (err) {
+      console.warn('Wake word listener notice:', err);
+    }
+
+    return () => {
+      isComponentMounted = false;
+      if (wakeWordRecognitionRef.current) {
+        try {
+          wakeWordRecognitionRef.current.abort();
+        } catch (e) {
+          // ignore
+        }
+        wakeWordRecognitionRef.current = null;
+      }
+    };
+  }, [isActiveCall, isWakeWordActive]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -723,6 +861,26 @@ export const FloatingVoiceAgent: React.FC = () => {
       }}
       className="select-none flex flex-col items-center pointer-events-auto"
     >
+      {/* Toast Banner when Wake Word is detected */}
+      {wakeWordDetectedMessage && (
+        <div className="mb-2 -translate-y-1 animate-in fade-in zoom-in-95 duration-200 pointer-events-none">
+          <div className="px-3.5 py-1.5 rounded-full shadow-2xl bg-gradient-to-r from-amber-500 via-emerald-600 to-teal-700 text-white border border-amber-300 text-[11px] font-black flex items-center gap-2 whitespace-nowrap animate-bounce">
+            <Sparkles className="w-4 h-4 text-amber-200 animate-spin" />
+            <span>{wakeWordDetectedMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Standby Wake Word Indicator Pill (When not in call) */}
+      {!isActiveCall && isWakeWordActive && !wakeWordDetectedMessage && (
+        <div className="mb-1.5 pointer-events-auto">
+          <div className="px-2.5 py-0.5 rounded-full shadow-lg bg-emerald-950/90 backdrop-blur-md border border-emerald-500/50 text-emerald-300 text-[10px] font-bold flex items-center gap-1.5 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span>Say "Assalamualaikum"</span>
+          </div>
+        </div>
+      )}
+
       {/* Dynamic Mini Floating Status Capsule (NO Page/Modal, just a sleek floating pill above button) */}
       {isActiveCall && (
         <div className="mb-2 -translate-y-1 animate-in fade-in zoom-in-95 duration-200 pointer-events-none">

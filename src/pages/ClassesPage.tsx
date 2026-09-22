@@ -36,21 +36,21 @@ export const ClassesPage: React.FC = () => {
       </div>
 
       {/* Classes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
         {localizedClasses.map((cls) => (
           <div
             key={cls.id}
-            className="rounded-3xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 overflow-hidden flex flex-col justify-between transition duration-300 p-6 sm:p-8 space-y-6 group"
+            className="rounded-3xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 overflow-hidden flex flex-col justify-between transition duration-300 p-6 sm:p-8 space-y-6 group h-full shadow-xl"
           >
-            <div className="space-y-4">
+            <div className="space-y-4 flex-1 flex flex-col justify-between">
               {/* Class Header */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg font-['Cinzel',serif]">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg font-['Cinzel',serif] shrink-0">
                     C{cls.gradeNumber}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold font-['Cinzel',serif] text-white group-hover:text-amber-400 transition">
+                    <h2 className="text-xl sm:text-2xl font-bold font-['Cinzel',serif] text-white group-hover:text-amber-400 transition line-clamp-1">
                       {cls.name}
                     </h2>
                     <p className="text-xs text-slate-400">
@@ -61,45 +61,45 @@ export const ClassesPage: React.FC = () => {
 
                 <button
                   onClick={() => setSelectedClassForModal(cls)}
-                  className="text-xs font-semibold text-sky-400 hover:underline flex items-center gap-1"
+                  className="text-xs font-semibold text-sky-400 hover:underline flex items-center gap-1 shrink-0"
                 >
                   <span>{t('classes_view_syllabus', 'Full Syllabus')}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-300 leading-relaxed min-h-[40px] line-clamp-2">
                 {cls.description}
               </p>
 
               {/* Islamic Curriculum snippet */}
-              <div className="p-3.5 rounded-xl bg-slate-950 border border-amber-500/20 space-y-1">
+              <div className="p-3.5 rounded-xl bg-slate-950 border border-amber-500/20 space-y-1 shrink-0">
                 <p className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5" />
                   <span>{t('class_islamic_curriculum', 'Islamic Curriculum')}:</span>
                 </p>
-                <p className="text-xs text-slate-300 line-clamp-2">
+                <p className="text-xs text-slate-300 line-clamp-2 min-h-[36px]">
                   {cls.islamicCurriculum}
                 </p>
               </div>
 
               {/* Modern Curriculum snippet */}
-              <div className="p-3.5 rounded-xl bg-slate-950 border border-sky-500/20 space-y-1">
+              <div className="p-3.5 rounded-xl bg-slate-950 border border-sky-500/20 space-y-1 shrink-0">
                 <p className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
                   <GraduationCap className="w-3.5 h-3.5" />
                   <span>{t('class_modern_curriculum', 'Modern Academic Curriculum')}:</span>
                 </p>
-                <p className="text-xs text-slate-300 line-clamp-2">
+                <p className="text-xs text-slate-300 line-clamp-2 min-h-[36px]">
                   {cls.modernCurriculum}
                 </p>
               </div>
 
               {/* Subjects Pills */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 shrink-0">
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   {t('class_subjects_covered', 'Key Subjects')}:
                 </p>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 min-h-[48px] align-content-start">
                   {cls.subjects.map((s, idx) => (
                     <span
                       key={idx}
@@ -113,18 +113,18 @@ export const ClassesPage: React.FC = () => {
             </div>
 
             {/* Fee Breakdown & Actions */}
-            <div className="pt-4 border-t border-slate-800 space-y-4">
+            <div className="pt-4 border-t border-slate-800 space-y-4 shrink-0 mt-auto">
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
-                  <p className="text-[10px] text-slate-400">{t('home_residential_fee', 'Residential')}</p>
+                <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-center h-14">
+                  <p className="text-[10px] text-slate-400 truncate">{t('home_residential_fee', 'Residential')}</p>
                   <p className="text-xs font-bold text-amber-400">₹{cls.feeResidential}/mo</p>
                 </div>
-                <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
-                  <p className="text-[10px] text-slate-400">{t('home_fulltime_fee', 'Full-Time')}</p>
+                <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-center h-14">
+                  <p className="text-[10px] text-slate-400 truncate">{t('home_fulltime_fee', 'Full-Time')}</p>
                   <p className="text-xs font-bold text-sky-400">₹{cls.feeFullTime}/mo</p>
                 </div>
-                <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
-                  <p className="text-[10px] text-slate-400">{t('nav_shorttime_prog', 'Short-Time')}</p>
+                <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 flex flex-col justify-center h-14">
+                  <p className="text-[10px] text-slate-400 truncate">{t('nav_shorttime_prog', 'Short-Time')}</p>
                   <p className="text-xs font-bold text-emerald-400">₹{cls.feeShortTime}/mo</p>
                 </div>
               </div>
@@ -138,7 +138,7 @@ export const ClassesPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => handleApply(cls)}
-                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition"
+                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition shrink-0"
                 >
                   {t('btn_apply_now', 'Apply Now')}
                 </button>

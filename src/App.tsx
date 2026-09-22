@@ -1,4 +1,5 @@
 import React from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { AcademyProvider, useAcademy } from './context/AcademyContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { Navbar } from './components/Navbar';
@@ -113,6 +114,7 @@ export default function App() {
     <AcademyProvider>
       <LanguageProvider>
         <MainContent />
+        <Analytics />
       </LanguageProvider>
     </AcademyProvider>
   );

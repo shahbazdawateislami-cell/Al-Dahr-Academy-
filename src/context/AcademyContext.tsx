@@ -108,6 +108,29 @@ interface AcademyContextType {
   resetAllToDefaults: () => Promise<void>;
 }
 
+const CURRENT_CACHE_VER = 'v3_2026_09_22';
+if (typeof window !== 'undefined') {
+  try {
+    const savedVer = localStorage.getItem('aldahr_cache_ver');
+    if (savedVer !== CURRENT_CACHE_VER) {
+      localStorage.removeItem('aldahr_settings');
+      localStorage.removeItem('aldahr_programs');
+      localStorage.removeItem('aldahr_classes');
+      localStorage.removeItem('aldahr_fees');
+      localStorage.removeItem('aldahr_subjects');
+      localStorage.removeItem('aldahr_curriculum');
+      localStorage.removeItem('aldahr_facilities');
+      localStorage.removeItem('aldahr_gallery');
+      localStorage.removeItem('aldahr_videos');
+      localStorage.removeItem('aldahr_hero_slides');
+      localStorage.removeItem('aldahr_voice_knowledge');
+      localStorage.setItem('aldahr_cache_ver', CURRENT_CACHE_VER);
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
 const AcademyContext = createContext<AcademyContextType | undefined>(undefined);
 
 export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -224,6 +247,8 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const data = snapshot.data() as WebsiteSettings;
             setSettings(data);
             localStorage.setItem('aldahr_settings', JSON.stringify(data));
+          } else {
+            setDoc(doc(db, 'settings', 'global'), initialSettings).catch(() => {});
           }
         },
         (err) => handleFirestoreError(err, OperationType.GET, 'settings/global')
@@ -243,6 +268,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setPrograms(items);
             localStorage.setItem('aldahr_programs', JSON.stringify(items));
+          } else {
+            initialPrograms.forEach((p) => {
+              setDoc(doc(db, 'programs', p.id), p).catch(() => {});
+            });
           }
         },
         (err) => handleFirestoreError(err, OperationType.LIST, 'programs')
@@ -262,6 +291,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             items.sort((a, b) => a.gradeNumber - b.gradeNumber);
             setClasses(items);
             localStorage.setItem('aldahr_classes', JSON.stringify(items));
+          } else {
+            initialClasses.forEach((c) => {
+              setDoc(doc(db, 'classes', c.id), c).catch(() => {});
+            });
           }
         },
         (err) => handleFirestoreError(err, OperationType.LIST, 'classes')
@@ -280,6 +313,8 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const data = snapshot.data() as AdmissionFeeConfig;
             setAdmissionFeeConfig(data);
             localStorage.setItem('aldahr_fees', JSON.stringify(data));
+          } else {
+            setDoc(doc(db, 'feeConfig', 'current'), initialAdmissionFeeConfig).catch(() => {});
           }
         },
         (err) => handleFirestoreError(err, OperationType.GET, 'feeConfig/current')
@@ -299,6 +334,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setGallery(items);
             localStorage.setItem('aldahr_gallery', JSON.stringify(items));
+          } else {
+            initialGallery.forEach((g) => {
+              setDoc(doc(db, 'gallery', g.id), g).catch(() => {});
+            });
           }
         },
         (err) => handleFirestoreError(err, OperationType.LIST, 'gallery')
@@ -318,6 +357,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setVideos(items);
             localStorage.setItem('aldahr_videos', JSON.stringify(items));
+          } else {
+            initialVideos.forEach((v) => {
+              setDoc(doc(db, 'videos', v.id), v).catch(() => {});
+            });
           }
         },
         (err) => handleFirestoreError(err, OperationType.LIST, 'videos')
@@ -337,6 +380,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setHeroSlides(items);
             localStorage.setItem('aldahr_hero_slides', JSON.stringify(items));
+          } else {
+            initialHeroSlides.forEach((hs) => {
+              setDoc(doc(db, 'heroSlides', hs.id), hs).catch(() => {});
+            });
           }
         },
         (err) => handleFirestoreError(err, OperationType.LIST, 'heroSlides')
@@ -355,6 +402,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as VoiceKnowledgeItem));
             setVoiceKnowledge(items);
             localStorage.setItem('aldahr_voice_knowledge', JSON.stringify(items));
+          } else {
+            initialVoiceKnowledge.forEach((vk) => {
+              setDoc(doc(db, 'voiceAgentKnowledge', vk.id), vk).catch(() => {});
+            });
           }
         },
         (err) => handleFirestoreError(err, OperationType.LIST, 'voiceAgentKnowledge')

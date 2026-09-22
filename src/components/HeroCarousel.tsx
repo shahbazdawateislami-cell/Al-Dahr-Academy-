@@ -143,10 +143,10 @@ export const HeroCarousel: React.FC = () => {
             </p>
 
             {/* Action Buttons */}
-            <div className="pt-2 sm:pt-3 flex flex-wrap items-center gap-2.5 sm:gap-3.5">
+            <div className="pt-2 sm:pt-3 flex flex-wrap items-center gap-2 sm:gap-3.5">
               <button
                 onClick={() => handleAction(currentSlide.primaryBtnAction || 'admission')}
-                className="flex-1 sm:flex-initial justify-center px-4 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs sm:text-sm shadow-xl shadow-amber-950/40 transition active:scale-98 flex items-center gap-2 uppercase tracking-wider text-center"
+                className="flex-1 sm:flex-initial h-9 sm:h-auto px-3.5 sm:px-7 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-[11px] sm:text-sm shadow-xl shadow-amber-950/40 transition active:scale-98 flex items-center justify-center gap-1.5 uppercase tracking-wider text-center min-w-0"
               >
                 <span className="truncate">{currentSlide.primaryBtnText || t('btn_apply_now', 'Admission 2025–26')}</span>
                 <ArrowRight className="w-3.5 h-3.5 shrink-0" />
@@ -154,7 +154,7 @@ export const HeroCarousel: React.FC = () => {
 
               <button
                 onClick={() => handleAction(currentSlide.secondaryBtnAction || 'programs')}
-                className="flex-1 sm:flex-initial justify-center px-4 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm border border-slate-700/80 hover:border-sky-400/50 shadow-lg backdrop-blur-md transition active:scale-98 flex items-center gap-2 uppercase tracking-wider text-center"
+                className="flex-1 sm:flex-initial h-9 sm:h-auto px-3.5 sm:px-7 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white font-bold text-[11px] sm:text-sm border border-slate-700/80 hover:border-sky-400/50 shadow-lg backdrop-blur-md transition active:scale-98 flex items-center justify-center gap-1.5 uppercase tracking-wider text-center min-w-0"
               >
                 <span className="truncate">{currentSlide.secondaryBtnText || t('nav_programs', 'Explore Programs')}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-sky-400 shrink-0" />
@@ -162,11 +162,11 @@ export const HeroCarousel: React.FC = () => {
 
               <button
                 onClick={() => setIsFeeCalculatorOpen(true)}
-                className="w-auto px-3.5 py-2.5 sm:py-3 rounded-xl bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 font-semibold text-xs border border-sky-800/60 shadow-lg transition flex items-center justify-center gap-1.5 shrink-0"
+                className="h-9 sm:h-auto px-3 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 font-semibold text-[11px] sm:text-xs border border-sky-800/60 shadow-lg transition flex items-center justify-center gap-1.5 shrink-0 min-w-0"
                 title="Calculate School & Residential Fees"
               >
-                <Calculator className="w-4 h-4 text-sky-400 shrink-0" />
-                <span className="hidden sm:inline">{t('calc_badge', 'Fee Calculator')}</span>
+                <Calculator className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 shrink-0" />
+                <span className="truncate">{t('calc_badge', 'Fee Calc')}</span>
               </button>
             </div>
           </div>
