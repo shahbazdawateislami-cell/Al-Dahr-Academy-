@@ -178,9 +178,28 @@
         "displayName": { "type": "string", "maxLength": 100 }
       },
       "required": ["email", "role"]
+    },
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "Registered user profile with preferences and tracked enquiries",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 100 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "photoURL": { "type": "string", "maxLength": 1000 },
+        "phoneNumber": { "type": "string", "maxLength": 30 },
+        "createdAt": { "type": "string" },
+        "lastLoginAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
     }
   },
   "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "User profile data and settings"
+    },
     "/settings/{settingId}": {
       "schema": "settings",
       "description": "Website configurations"

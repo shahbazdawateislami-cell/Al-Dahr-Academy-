@@ -87,7 +87,7 @@ export const HomePage: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
           {localizedPrograms.map((prog) => {
             const isResidential = prog.code === 'residential';
             const isFullTime = prog.code === 'full-time';
@@ -104,7 +104,7 @@ export const HomePage: React.FC = () => {
                 }`}
               >
                 {/* Header Image / Badge */}
-                <div className="relative h-48 overflow-hidden bg-slate-950">
+                <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-950 shrink-0">
                   <img
                     src={prog.imageUrl}
                     alt={prog.name}
@@ -117,40 +117,40 @@ export const HomePage: React.FC = () => {
                     </span>
                   </div>
                   <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-2xl font-bold text-white font-['Cinzel',serif]">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white font-['Cinzel',serif] line-clamp-1">
                       {prog.name}
                     </h3>
                   </div>
                 </div>
 
                 {/* Body */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-5">
-                  <div className="space-y-4">
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="space-y-3.5">
+                    <p className="text-xs text-slate-300 leading-relaxed min-h-[38px] line-clamp-2">
                       {prog.description}
                     </p>
 
-                    <div className="p-3 bg-[#050e26] rounded-xl border border-blue-900/60">
+                    <div className="p-3 bg-[#050e26] rounded-xl border border-blue-900/60 min-h-[56px] flex flex-col justify-center">
                       <p className="text-[11px] text-sky-200/70">{t('class_monthly_fee_struct', 'Tuition & Boarding:')}</p>
-                      <p className="text-sm font-bold text-sky-300">{prog.feeNote}</p>
+                      <p className="text-sm font-bold text-sky-300 truncate">{prog.feeNote}</p>
                     </div>
 
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-sky-200 uppercase tracking-wider">
                         {t('class_activities_tarbiyah', 'Key Features:')}
                       </p>
-                      <ul className="space-y-1.5 text-xs text-slate-300">
+                      <ul className="space-y-1.5 text-xs text-slate-300 min-h-[96px]">
                         {prog.features.slice(0, 4).map((f, i) => (
                           <li key={i} className="flex items-start gap-2">
                             <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
-                            <span>{f}</span>
+                            <span className="line-clamp-1">{f}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-blue-900/60 flex items-center gap-2">
+                  <div className="pt-3 border-t border-blue-900/60 flex items-center gap-2 mt-auto">
                     <button
                       onClick={() => navigateTo(`${prog.code}-program` as PageRoute)}
                       className="flex-1 py-2.5 rounded-xl bg-blue-950/80 hover:bg-blue-900/80 text-white font-semibold text-xs transition text-center border border-blue-800/60"
@@ -215,30 +215,30 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* Classes Fold / Unfold Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-stretch">
           {localizedClasses.map((cls) => {
             const isUnfolded = !!unfoldedClassIds[cls.id];
             return (
               <div
                 key={cls.id}
-                className={`rounded-2xl border transition-all duration-200 shadow-md overflow-hidden ${
+                className={`rounded-2xl border transition-all duration-200 shadow-md overflow-hidden flex flex-col ${
                   isUnfolded
                     ? 'bg-[#071330] border-sky-400/80 shadow-sky-950/40 ring-1 ring-sky-400/20'
                     : 'bg-[#071330]/90 border-blue-900/60 hover:border-sky-500/50 hover:bg-[#0a1945]'
                 }`}
               >
-                {/* Folded Header (In fold state: ONLY class name and an arrow) */}
+                {/* Folded Header (In fold state: ONLY class name and an arrow, uniform height and line-height) */}
                 <button
                   type="button"
                   onClick={() => toggleClassFold(cls.id)}
                   aria-expanded={isUnfolded}
-                  className="w-full p-4 flex items-center justify-between gap-3 text-left transition cursor-pointer select-none group"
+                  className="w-full h-14 sm:h-16 px-4 py-3 flex items-center justify-between gap-3 text-left transition cursor-pointer select-none group shrink-0"
                 >
-                  <span className="text-base sm:text-lg font-bold text-white font-['Cinzel',serif] tracking-wide group-hover:text-sky-300 transition">
+                  <span className="text-base sm:text-lg font-bold text-white font-['Cinzel',serif] tracking-wide group-hover:text-sky-300 transition truncate">
                     {cls.name}
                   </span>
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 shrink-0 ${
                       isUnfolded
                         ? 'bg-sky-500/20 text-sky-300 rotate-180'
                         : 'bg-blue-900/50 text-slate-300 group-hover:bg-sky-500/20 group-hover:text-sky-300'
@@ -250,40 +250,42 @@ export const HomePage: React.FC = () => {
 
                 {/* Unfolded Details (Visible ONLY when unfolded) */}
                 {isUnfolded && (
-                  <div className="px-4 pb-4 pt-1 space-y-3.5 border-t border-blue-900/50 animate-in fade-in duration-200">
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <span className="text-xs font-bold text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded-full border border-sky-400/30">
-                        Grade {cls.gradeNumber}
-                      </span>
-                      <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
-                        Admissions Open
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
-                      {cls.description}
-                    </p>
-
-                    <div className="pt-1.5 border-t border-blue-900/60 grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2 rounded-lg bg-blue-950/60 border border-blue-900/50">
-                        <span className="text-sky-200/60 block text-[10px]">
-                          {t('home_residential_fee', 'Residential')}:
+                  <div className="px-4 pb-4 pt-1 space-y-3.5 border-t border-blue-900/50 animate-in fade-in duration-200 flex-1 flex flex-col justify-between">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-xs pt-1">
+                        <span className="text-xs font-bold text-sky-300 bg-sky-500/15 px-2.5 py-0.5 rounded-full border border-sky-400/30">
+                          Grade {cls.gradeNumber}
                         </span>
-                        <span className="font-bold text-white text-xs">
-                          ₹{cls.feeResidential}/mo
+                        <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
+                          Admissions Open
                         </span>
                       </div>
-                      <div className="p-2 rounded-lg bg-blue-950/60 border border-blue-900/50">
-                        <span className="text-sky-200/60 block text-[10px]">
-                          {t('home_fulltime_fee', 'Full-Time')}:
-                        </span>
-                        <span className="font-bold text-sky-400 text-xs">
-                          ₹{cls.feeFullTime}/mo
-                        </span>
+
+                      <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
+                        {cls.description}
+                      </p>
+
+                      <div className="pt-1.5 border-t border-blue-900/60 grid grid-cols-2 gap-2 text-xs">
+                        <div className="p-2 rounded-lg bg-blue-950/60 border border-blue-900/50">
+                          <span className="text-sky-200/60 block text-[10px]">
+                            {t('home_residential_fee', 'Residential')}:
+                          </span>
+                          <span className="font-bold text-white text-xs">
+                            ₹{cls.feeResidential}/mo
+                          </span>
+                        </div>
+                        <div className="p-2 rounded-lg bg-blue-950/60 border border-blue-900/50">
+                          <span className="text-sky-200/60 block text-[10px]">
+                            {t('home_fulltime_fee', 'Full-Time')}:
+                          </span>
+                          <span className="font-bold text-sky-400 text-xs">
+                            ₹{cls.feeFullTime}/mo
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="pt-1 flex items-center gap-2">
+                    <div className="pt-2 flex items-center gap-2">
                       <button
                         type="button"
                         onClick={(e) => {

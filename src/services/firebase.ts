@@ -1,7 +1,10 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore, getFirestore, setLogLevel, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
+
+// Silence Firestore internal network watchdog warnings (such as 10s streaming timeouts)
+setLogLevel('silent');
 
 export enum OperationType {
   CREATE = 'create',
@@ -30,8 +33,23 @@ export interface FirestoreErrorInfo {
 }
 
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errCode = (error as any)?.code;
+  const errMsg = error instanceof Error ? error.message : String(error);
+
+  // Avoid noisy console warnings for standard offline/unavailable network blips
+  if (
+    errCode === 'unavailable' ||
+    errMsg.includes('offline') ||
+    errMsg.includes('backend') ||
+    errMsg.includes('10 seconds') ||
+    errMsg.includes('Could not reach Cloud Firestore')
+  ) {
+    console.info(`[Firestore] Operating with offline cache for ${path || 'query'}.`);
+    return;
+  }
+
   const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? error.message : String(error),
+    error: errMsg,
     authInfo: {
       userId: auth.currentUser?.uid,
       email: auth.currentUser?.email,
@@ -51,7 +69,24 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 }
 
 export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
+const databaseId = (firebaseConfig as any).firestoreDatabaseId;
+
+// Initialize Firestore with immediate long-polling in browser environments to avoid streaming WebSocket timeouts behind reverse proxies/iframes
+export const db = (() => {
+  try {
+    const isBrowser = typeof window !== 'undefined';
+    return initializeFirestore(
+      app,
+      isBrowser
+        ? { experimentalForceLongPolling: true }
+        : { experimentalAutoDetectLongPolling: true },
+      databaseId
+    );
+  } catch {
+    return getFirestore(app, databaseId);
+  }
+})();
+
 export const auth = getAuth(app);
 
 // Google Auth Provider configured for clean, frictionless sign-in
@@ -97,13 +132,22 @@ export async function signOutAdmin() {
   cachedWorkspaceToken = null;
 }
 
-// Connection test on boot
+// Connection test on boot (softly checks connection without throwing unhandled exceptions)
 export async function testConnection() {
   try {
-    await getDocFromServer(doc(db, 'settings', 'test-connection'));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn('Firebase client offline status detected. Operating with optimistic state.');
+    const probePromise = getDocFromServer(doc(db, 'settings', 'test-connection'));
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('timeout')), 4000)
+    );
+    await Promise.race([probePromise, timeoutPromise]);
+  } catch (error: any) {
+    if (
+      error?.code === 'unavailable' ||
+      error?.message?.includes('offline') ||
+      error?.message?.includes('could not reach') ||
+      error?.message?.includes('timeout')
+    ) {
+      console.info('[Firestore] Initial connection probe: operating with cache/optimistic state.');
     }
   }
 }

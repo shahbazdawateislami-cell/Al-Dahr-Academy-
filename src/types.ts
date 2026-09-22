@@ -137,6 +137,18 @@ export interface AdmissionEnquiry {
   status: 'new' | 'contacted' | 'interested' | 'completed' | 'cancelled';
   createdAt: string;
   googleMeetLink?: string;
+  userId?: string;
+  userEmail?: string;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string;
+  photoURL?: string;
+  phoneNumber?: string;
+  createdAt: string;
+  lastLoginAt: string;
 }
 
 export interface WebsiteSettings {

@@ -17,7 +17,7 @@ interface SpokenExchange {
 }
 
 const GREETING_TEXT =
-  'Assalamu Alaikum wa Rahmatullahi wa Barakatuh! Main Al-Dahr Academy ka Virtual Receptionist hoon. Aap admission, fees, courses ya hostel ke baare mein poochh sakte hain. Batayein, main aapki kya madad karoon?';
+  'Assalamu Alaikum bhai! Welcome to Al-Dahr Academy Patna. Main aapka AI Voice Receptionist hoon. Admissions, monthly fees, hostel ya syllabus ke baare mein aap freely pooch sakte hain. Boliye, main aapki kya help karoon?';
 
 export const FloatingVoiceAgent: React.FC = () => {
   const {
@@ -58,6 +58,8 @@ export const FloatingVoiceAgent: React.FC = () => {
   const recognitionRef = useRef<any>(null);
   const isSpeakingRef = useRef<boolean>(false);
   const activeCallRef = useRef<boolean>(false);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const startListeningRef = useRef<() => void>(() => {});
 
   // Keep activeCallRef in sync
   useEffect(() => {
@@ -80,8 +82,99 @@ export const FloatingVoiceAgent: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Text-To-Speech function
-  const speakText = useCallback(
+  // Helper function to detect and disqualify female voices
+  const isFemaleVoice = (voice: SpeechSynthesisVoice): boolean => {
+    const n = (voice.name || '').toLowerCase();
+    const lang = (voice.lang || '').toLowerCase();
+    return (
+      n.includes('female') ||
+      n.includes('woman') ||
+      n.includes('girl') ||
+      n.includes('kalpana') ||
+      n.includes('heera') ||
+      n.includes('zira') ||
+      n.includes('susan') ||
+      n.includes('samantha') ||
+      n.includes('victoria') ||
+      n.includes('karen') ||
+      n.includes('moira') ||
+      n.includes('fiona') ||
+      n.includes('tessa') ||
+      n.includes('serena') ||
+      n.includes('lekha') ||
+      n.includes('veena') ||
+      n.includes('swara') ||
+      n.includes('ananya') ||
+      n.includes('geeta') ||
+      n.includes('priya') ||
+      n.includes('shruti') ||
+      n.includes('sunita') ||
+      n.includes('zoya') ||
+      // Default Google Hindi voice is female, so block it from being selected as male
+      (n.includes('google') && (n.includes('hindi') || n.includes('हिन्दी') || lang === 'hi-in' || lang === 'hi_in'))
+    );
+  };
+
+  // Find guaranteed male voice from browser synthesis engine
+  const getGuaranteedMaleVoice = useCallback((): SpeechSynthesisVoice | null => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices || voices.length === 0) return null;
+
+    // Filter out all female voices
+    const nonFemaleVoices = voices.filter((v) => !isFemaleVoice(v));
+
+    // 1. Highest Priority: Natural Indian English Male voice (Microsoft Ravi, Apple Rishi, Google en-IN Male, etc.)
+    // These voices are trained specifically on Indian English and Roman Hinglish!
+    const indianEnglishMale = nonFemaleVoices.find((v) => {
+      const l = v.lang.toLowerCase().replace('_', '-');
+      const n = v.name.toLowerCase();
+      const isIndian = l.includes('en-in') || n.includes('india') || n.includes('indian');
+      const isNamedMale = n.includes('male') || n.includes('ravi') || n.includes('rishi') || n.includes('kunal') || n.includes('prabhat') || n.includes('hemant');
+      return isIndian && isNamedMale && !l.startsWith('hi');
+    });
+    if (indianEnglishMale) return indianEnglishMale;
+
+    // 2. Any Indian English non-female voice (strictly NOT hi-IN because hi-IN spells out Latin letters robotically like Google Translate)
+    const anyIndianEnglish = nonFemaleVoices.find((v) => {
+      const l = v.lang.toLowerCase().replace('_', '-');
+      return l.includes('en-in') && !l.startsWith('hi');
+    });
+    if (anyIndianEnglish) return anyIndianEnglish;
+
+    // 3. High Quality Modern English Male voices (Natural, smooth conversational flow)
+    const standardMale = nonFemaleVoices.find((v) => {
+      const n = v.name.toLowerCase();
+      return (
+        n.includes('natural') ||
+        n.includes('neural') ||
+        n.includes('guy') ||
+        n.includes('male') ||
+        n.includes('david') ||
+        n.includes('george') ||
+        n.includes('daniel') ||
+        n.includes('oliver')
+      );
+    });
+    if (standardMale) return standardMale;
+
+    // 4. Any non-female voice that is NOT hi-IN (to prevent letter-by-letter spelling)
+    const safeNonHindi = nonFemaleVoices.find((v) => !v.lang.toLowerCase().startsWith('hi'));
+    return safeNonHindi || nonFemaleVoices[0] || null;
+  }, []);
+
+  // Pre-fetch voices on mount so they are available immediately
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+  }, []);
+
+  // Guaranteed Male Browser Speech Synthesis (Smooth, natural, no robotic spelling)
+  const fallbackBrowserSpeak = useCallback(
     (text: string, onEndCallback?: () => void) => {
       if (typeof window === 'undefined' || !window.speechSynthesis) {
         if (onEndCallback) onEndCallback();
@@ -98,37 +191,33 @@ export const FloatingVoiceAgent: React.FC = () => {
         .replace(/[•*#_\[\]()]/g, ' ')
         .replace(/₹/g, ' rupees ')
         .replace(/\n+/g, '. ')
+        .replace(/\s+/g, ' ')
         .trim();
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.rate = 0.95;
+      // Natural modern cadence:
+      utterance.lang = 'en-IN';
       utterance.pitch = 1.0;
+      utterance.rate = 1.02;
 
-      // Select natural Hindi/Urdu/Indian English voice if available
-      const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(
-        (v) =>
-          v.lang.includes('hi') ||
-          v.lang.includes('ur') ||
-          v.name.includes('India') ||
-          v.lang.includes('en-IN')
-      );
-      if (preferredVoice) utterance.voice = preferredVoice;
+      const maleVoice = getGuaranteedMaleVoice();
+      if (maleVoice) {
+        utterance.voice = maleVoice;
+      }
 
       utterance.onstart = () => {
         isSpeakingRef.current = true;
         setAgentStatus('speaking');
-        setStatusMessage('Salam bol rahe hain...');
+        setStatusMessage('AI Voice बोल रहे हैं...');
       };
 
       utterance.onend = () => {
         isSpeakingRef.current = false;
         if (activeCallRef.current) {
-          if (onEndCallback) {
-            onEndCallback();
-          } else {
-            startListening();
-          }
+          setAgentStatus('listening');
+          setStatusMessage('🎤 Boliye, sun rahe hain...');
+          if (onEndCallback) onEndCallback();
+          else startListeningRef.current();
         } else {
           setAgentStatus('idle');
           setStatusMessage('');
@@ -138,8 +227,10 @@ export const FloatingVoiceAgent: React.FC = () => {
       utterance.onerror = () => {
         isSpeakingRef.current = false;
         if (activeCallRef.current) {
+          setAgentStatus('listening');
+          setStatusMessage('🎤 Boliye, sun rahe hain...');
           if (onEndCallback) onEndCallback();
-          else startListening();
+          else startListeningRef.current();
         } else {
           setAgentStatus('idle');
           setStatusMessage('');
@@ -148,17 +239,105 @@ export const FloatingVoiceAgent: React.FC = () => {
 
       window.speechSynthesis.speak(utterance);
     },
-    []
+    [getGuaranteedMaleVoice]
   );
 
+  // Stop currently playing audio or speech
   const stopSpeaking = useCallback(() => {
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      isSpeakingRef.current = false;
+    if (currentAudioRef.current) {
+      try {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+      } catch (e) {
+        // ignore
+      }
+      currentAudioRef.current = null;
     }
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {
+        // ignore
+      }
+    }
+    isSpeakingRef.current = false;
   }, []);
 
-  // Knowledge Matching Algorithm (Al-Dahr Receptionist Source of Truth)
+  // Primary Advanced Text-To-Speech: Google Gemini Voice TTS API (Puck - fluent, youthful, natural)
+  const speakText = useCallback(
+    async (text: string, onEndCallback?: () => void) => {
+      stopSpeaking();
+
+      const cleanText = text
+        .replace(/[•*#_\[\]()]/g, ' ')
+        .replace(/₹/g, ' rupees ')
+        .replace(/\n+/g, '. ')
+        .trim();
+
+      isSpeakingRef.current = true;
+      setAgentStatus('speaking');
+      setStatusMessage('AI Voice bol rahe hain...');
+
+      try {
+        // Request Google Gemini TTS (Puck: natural, fluent modern Indian male voice)
+        const res = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: cleanText,
+            voice: 'Puck',
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data || !data.audioUrl) {
+          fallbackBrowserSpeak(cleanText, onEndCallback);
+          return;
+        }
+
+        const audio = new Audio(data.audioUrl);
+        currentAudioRef.current = audio;
+
+        audio.onplay = () => {
+          isSpeakingRef.current = true;
+          setAgentStatus('speaking');
+          setStatusMessage('Gemini AI bol rahe hain...');
+        };
+
+        audio.onended = () => {
+          isSpeakingRef.current = false;
+          currentAudioRef.current = null;
+          if (activeCallRef.current) {
+            setAgentStatus('listening');
+            setStatusMessage('🎤 Boliye, sun rahe hain...');
+            if (onEndCallback) {
+              onEndCallback();
+            } else {
+              startListeningRef.current();
+            }
+          } else {
+            setAgentStatus('idle');
+            setStatusMessage('');
+          }
+        };
+
+        audio.onerror = () => {
+          fallbackBrowserSpeak(cleanText, onEndCallback);
+        };
+
+        await audio.play();
+      } catch (_err) {
+        fallbackBrowserSpeak(cleanText, onEndCallback);
+      }
+    },
+    [fallbackBrowserSpeak, stopSpeaking]
+  );
+
+  // Knowledge Matching Algorithm (Al-Dahr Receptionist Source of Truth in smooth conversational Hinglish)
   const findAnswer = useCallback(
     (query: string): string => {
       const q = query.toLowerCase().trim();
@@ -193,7 +372,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         }
       }
 
-      // 2. Fee inquiries
+      // 2. Fee inquiries (Conversational, no data tables)
       if (
         q.includes('fee') ||
         q.includes('fees') ||
@@ -203,16 +382,10 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('rate') ||
         q.includes('charge')
       ) {
-        const sampleClass = classes[0];
-        const resFee = sampleClass?.feeResidential || 4500;
-        const fullFee = sampleClass?.feeFullTime || 2000;
-        const shortFee = sampleClass?.feeShortTime || 1000;
-        const admFee = admissionFeeConfig.admissionFee || 1500;
-
-        return `Al-Dahr Academy ki Monthly Fees: Residential Program ki fees ₹${resFee} rupaye mahana hai jismein rahna, khana, Hifz aur school shamil hai. Day School ₹${fullFee} mahana hai, aur Short-Time ₹${shortFee} mahana hai. Admission fee ek baar ₹${admFee} hai. Yateem aur zarooratmand bacchon ke liye scholarship bhi maujood hai.`;
+        return 'Hostel mein rehna, 3-time taza khana aur padhai sab mila kar lagbhag 4,500 rupaye mahina hai bhai. Aur agar sirf din mein aana chahein toh 2,000 rupaye hai. Aap hostel ke liye dekh rahe hain ya day school?';
       }
 
-      // 3. Admission inquiries
+      // 3. Admission inquiries (Conversational, no session dates)
       if (
         q.includes('admission') ||
         q.includes('dakhla') ||
@@ -221,7 +394,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('seat') ||
         q.includes('registration')
       ) {
-        return `Al-Dahr Academy mein Academic Session 2025-26 ke liye Class 1 se Class 8 tak Admissions OPEN hain. Aap website par online form bhar sakte hain ya hamare helpline number ${settings.phone} par seedha call kar sakte hain.`;
+        return 'Haan ji bilkul bhai, admissions abhi open hain! Aapka bachha kaun si class mein padhega?';
       }
 
       // 4. Location & Address
@@ -234,7 +407,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('pata') ||
         q.includes('jagah')
       ) {
-        return `Al-Dahr Academy ka campus ${settings.address} mein sthit hai. Patna, Bihar. Aap subah 9 baje se sham 5 baje tak campus visit kar sakte hain. Call karein ${settings.phone}.`;
+        return 'Hamara campus Phulwari Sharif, Patna mein hai. Aap aaram se Monday se Saturday kisi bhi din aakar dekh sakte hain. Kya aap Patna se hi hain?';
       }
 
       // 5. Hostel & Khana (Food)
@@ -247,7 +420,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('mess') ||
         q.includes('stay')
       ) {
-        return `Hamare Residential Hostel mein 3 time taza, 100% halaal aur hygienic khana diya jata hai. Saaf-suthre havadar kamre, RO purified water, aur 24 ghante asatizah ki dekh-rekh rehti hai.`;
+        return 'Hostel facility ekdum safe aur clean hai bhai, 3 time taza halal khana milta hai aur 24 ghante teachers ki dekh-rekh rehti hai. Aur kuch janna chahte hain?';
       }
 
       // 6. Syllabus & Padhai (Curriculum)
@@ -260,13 +433,13 @@ export const FloatingVoiceAgent: React.FC = () => {
         q.includes('math') ||
         q.includes('subject')
       ) {
-        return `Al-Dahr Academy mein Deen aur Duniya dono ki taleem sath chalti hai. Hifz-e-Quran, Tajweed aur Deeniyat ke sath-sath English Spoken, Mathematics, Science aur Computer ki behtareen padhai hoti hai.`;
+        return 'Yahan Deeni taleem aur Hifz ke sath-sath CBSE pattern par English, Math, Science aur Computer sab padhaya jata hai. Aapka bachha kis class mein hai?';
       }
 
       // 7. Polite fallback
-      return `Ji, is baare mein mazeed jaankari ke liye aap hamare helpline number ${settings.phone} par call kar sakte hain. Aur kya jaanna chahte hain aap?`;
+      return 'Aap chahein toh screen par diye helpline button se directly call kar sakte hain. Aur kuch janna hai bhai?';
     },
-    [voiceKnowledge, classes, admissionFeeConfig, settings]
+    [voiceKnowledge]
   );
 
   // Stop microphone listening
@@ -280,30 +453,93 @@ export const FloatingVoiceAgent: React.FC = () => {
     }
   }, []);
 
-  // Handle transcribed user voice query
+  // Handle transcribed user voice query via Gemini AI API
   const handleUserVoiceQuery = useCallback(
-    (query: string) => {
+    async (query: string) => {
       if (!activeCallRef.current) return;
       stopListening();
       setAgentStatus('processing');
       setStatusMessage(`Sun liya: "${query.slice(0, 30)}..."`);
 
-      const answer = findAnswer(query);
+      try {
+        // Send all queries to Gemini AI for natural, fluent Hinglish conversation
+        const res = await fetch('/api/voice-query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, voice: 'Puck' }),
+        });
 
+        if (res.ok) {
+          const data = await res.json();
+          if (data.answer) {
+            if (!activeCallRef.current) return;
+            setStatusMessage('Jawab de rahe hain...');
+
+            if (data.audioUrl) {
+              stopSpeaking();
+              const audio = new Audio(data.audioUrl);
+              currentAudioRef.current = audio;
+              audio.onplay = () => {
+                isSpeakingRef.current = true;
+                setAgentStatus('speaking');
+                setStatusMessage('AI Receptionist bol rahe hain...');
+              };
+              audio.onended = () => {
+                isSpeakingRef.current = false;
+                currentAudioRef.current = null;
+                if (activeCallRef.current) {
+                  setAgentStatus('listening');
+                  setStatusMessage('🎤 Boliye, sun rahe hain...');
+                  startListeningRef.current();
+                } else {
+                  setAgentStatus('idle');
+                }
+              };
+              audio.onerror = () => {
+                speakText(data.answer, () => {
+                  if (activeCallRef.current) {
+                    setAgentStatus('listening');
+                    setStatusMessage('🎤 Boliye, sun rahe hain...');
+                    startListeningRef.current();
+                  }
+                });
+              };
+              await audio.play();
+              return;
+            } else {
+              speakText(data.answer, () => {
+                if (activeCallRef.current) {
+                  setAgentStatus('listening');
+                  setStatusMessage('🎤 Boliye, sun rahe hain...');
+                  startListeningRef.current();
+                }
+              });
+              return;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Voice query request notice:', err);
+      }
+
+      // Fallback only if offline/network failure
+      const localAnswer = findAnswer(query);
       setTimeout(() => {
         if (!activeCallRef.current) return;
         setStatusMessage('Jawab de rahe hain...');
-        speakText(answer, () => {
+        speakText(localAnswer, () => {
           if (activeCallRef.current) {
-            startListening();
+            setAgentStatus('listening');
+            setStatusMessage('🎤 Boliye, sun rahe hain...');
+            startListeningRef.current();
           }
         });
-      }, 400);
+      }, 150);
     },
-    [findAnswer, speakText, stopListening]
+    [findAnswer, speakText, stopListening, stopSpeaking]
   );
 
-  // Start microphone recognition
+  // Start microphone recognition with continuous conversation loop
   const startListening = useCallback(() => {
     if (!activeCallRef.current) return;
     stopSpeaking();
@@ -326,7 +562,7 @@ export const FloatingVoiceAgent: React.FC = () => {
 
     try {
       const recognition = new SpeechRecognition();
-      recognition.continuous = false;
+      recognition.continuous = true;
       recognition.interimResults = false;
       recognition.lang = 'hi-IN';
 
@@ -340,30 +576,29 @@ export const FloatingVoiceAgent: React.FC = () => {
       };
 
       recognition.onresult = (event: any) => {
-        const transcript = event.results?.[0]?.[0]?.transcript;
-        if (transcript) {
-          handleUserVoiceQuery(transcript);
+        const lastResultIndex = event.results.length - 1;
+        const transcript = event.results[lastResultIndex]?.[0]?.transcript;
+        if (transcript && transcript.trim()) {
+          handleUserVoiceQuery(transcript.trim());
         }
       };
 
       recognition.onerror = (event: any) => {
         if (!activeCallRef.current) return;
-        if (event.error === 'no-speech') {
-          setStatusMessage('🎤 Kuchh boliye, sun rahe hain...');
-          // Retry listening automatically
+        if (event.error === 'no-speech' || event.error === 'network' || event.error === 'aborted') {
           setTimeout(() => {
-            if (activeCallRef.current && agentStatus !== 'speaking') {
-              startListening();
+            if (activeCallRef.current && !isSpeakingRef.current) {
+              startListeningRef.current();
             }
-          }, 800);
+          }, 400);
         } else {
           setAgentStatus('listening');
         }
       };
 
       recognition.onend = () => {
-        if (activeCallRef.current && agentStatus === 'listening') {
-          // Keep listening loop alive while call is active
+        // Keep listening loop continuously alive while call is active
+        if (activeCallRef.current && !isSpeakingRef.current) {
           setTimeout(() => {
             if (activeCallRef.current && !isSpeakingRef.current) {
               try {
@@ -372,7 +607,7 @@ export const FloatingVoiceAgent: React.FC = () => {
                 // ignore
               }
             }
-          }, 500);
+          }, 300);
         }
       };
 
@@ -381,7 +616,12 @@ export const FloatingVoiceAgent: React.FC = () => {
     } catch (err) {
       console.warn('Speech recognition start failed:', err);
     }
-  }, [handleUserVoiceQuery, stopSpeaking, agentStatus]);
+  }, [handleUserVoiceQuery, stopSpeaking]);
+
+  // Keep startListeningRef updated
+  useEffect(() => {
+    startListeningRef.current = startListening;
+  }, [startListening]);
 
   // Main Action: START or END CALL
   // "is button per type karne se sirf iska color change hona chahie aur billink karna chahie uske andar ka koi bhi page Khulna nahin chahie"
@@ -567,6 +807,7 @@ export const FloatingVoiceAgent: React.FC = () => {
         )}
 
         <button
+          id="aldahr-voice-call-button"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
