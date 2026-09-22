@@ -85,6 +85,34 @@ export const HomePage: React.FC = () => {
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
             {t('home_pathways_desc', 'Whether you need comprehensive 24/7 residential boarding, full-day modern schooling with Islamic studies, or focused Arabic-Urdu language modules, Al-Dahr Academy caters to your specific needs.')}
           </p>
+
+          {/* Action Buttons Shifted Here Just Below Heading Text */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5 sm:gap-4">
+            <button
+              onClick={() => setIsAdmissionModalOpen(true)}
+              className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs sm:text-sm shadow-xl shadow-amber-950/40 transition active:scale-95 flex items-center justify-center gap-2 uppercase tracking-wider text-center"
+            >
+              <span>{t('btn_apply_now', 'Admission 2025–26')}</span>
+              <ArrowRight className="w-4 h-4 shrink-0" />
+            </button>
+
+            <button
+              onClick={() => navigateTo('residential-program')}
+              className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm border border-slate-700/80 hover:border-sky-400/50 shadow-lg backdrop-blur-md transition active:scale-95 flex items-center justify-center gap-2 uppercase tracking-wider text-center"
+            >
+              <span>{t('nav_programs', 'Explore Programs')}</span>
+              <ArrowRight className="w-4 h-4 text-sky-400 shrink-0" />
+            </button>
+
+            <button
+              onClick={() => setIsFeeCalculatorOpen(true)}
+              className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-sky-950/80 hover:bg-sky-900/90 text-sky-300 font-semibold text-xs sm:text-sm border border-sky-800/60 shadow-lg transition flex items-center justify-center gap-2 shrink-0 active:scale-95"
+              title="Calculate School & Residential Fees"
+            >
+              <Calculator className="w-4 h-4 text-sky-400 shrink-0" />
+              <span>{t('calc_badge', 'Fee Calculator')}</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">

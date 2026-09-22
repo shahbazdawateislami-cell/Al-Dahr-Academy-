@@ -118,54 +118,26 @@ export const HeroCarousel: React.FC = () => {
           );
         })}
 
-        {/* Carousel Content Container - Positioned at bottom-left corner */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 lg:pb-14 pt-16 sm:pt-24 lg:pt-28 w-full">
-          <div className="max-w-3xl space-y-3 sm:space-y-4 text-left p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-[#03091e]/75 backdrop-blur-md border border-white/10 shadow-2xl">
-            {/* Top Welcome Badge (Like the Eduka / Academy Welcome in screenshot) */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-[10px] sm:text-xs font-bold tracking-wider uppercase shadow-lg backdrop-blur-md animate-in fade-in">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+        {/* Carousel Content Container - Compact & fitted at bottom-left corner */}
+        <div className="relative z-20 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-4 sm:pb-6 pt-10 w-full">
+          <div className="max-w-xl space-y-1.5 sm:space-y-2 text-left p-3 sm:p-4.5 rounded-xl sm:rounded-2xl bg-[#03091e]/80 backdrop-blur-md border border-white/10 shadow-2xl">
+            {/* Top Welcome Badge - Compact */}
+            <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase shadow-sm">
+              <Sparkles className="w-3 h-3 text-amber-400" />
               <span>
                 {currentSlide.badge || 'WELCOME TO AL-DAHR ACADEMY'}
               </span>
             </div>
 
-            {/* Main Headline - Refined proportional size for mobile and laptop */}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight font-['Cinzel',serif] leading-tight drop-shadow-md">
+            {/* Main Headline - Compact text size (~60% smaller) */}
+            <h1 className="text-sm sm:text-lg lg:text-xl font-bold text-white tracking-tight font-['Cinzel',serif] leading-tight drop-shadow-sm">
               {currentSlide.title}
             </h1>
 
-            {/* Subtitle / Paragraph */}
-            <p className="text-xs sm:text-sm lg:text-base text-slate-200 leading-relaxed font-medium max-w-2xl drop-shadow line-clamp-3 sm:line-clamp-none">
+            {/* Subtitle / Paragraph - Compact */}
+            <p className="text-[10px] sm:text-xs text-slate-200 leading-snug font-normal max-w-lg drop-shadow line-clamp-2">
               {currentSlide.subtitle}
             </p>
-
-            {/* Action Buttons */}
-            <div className="pt-2 sm:pt-3 flex flex-wrap items-center gap-2 sm:gap-3.5">
-              <button
-                onClick={() => handleAction(currentSlide.primaryBtnAction || 'admission')}
-                className="flex-1 sm:flex-initial h-9 sm:h-auto px-3.5 sm:px-7 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-[11px] sm:text-sm shadow-xl shadow-amber-950/40 transition active:scale-98 flex items-center justify-center gap-1.5 uppercase tracking-wider text-center min-w-0"
-              >
-                <span className="truncate">{currentSlide.primaryBtnText || t('btn_apply_now', 'Admission 2025–26')}</span>
-                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-              </button>
-
-              <button
-                onClick={() => handleAction(currentSlide.secondaryBtnAction || 'programs')}
-                className="flex-1 sm:flex-initial h-9 sm:h-auto px-3.5 sm:px-7 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white font-bold text-[11px] sm:text-sm border border-slate-700/80 hover:border-sky-400/50 shadow-lg backdrop-blur-md transition active:scale-98 flex items-center justify-center gap-1.5 uppercase tracking-wider text-center min-w-0"
-              >
-                <span className="truncate">{currentSlide.secondaryBtnText || t('nav_programs', 'Explore Programs')}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-              </button>
-
-              <button
-                onClick={() => setIsFeeCalculatorOpen(true)}
-                className="h-9 sm:h-auto px-3 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 font-semibold text-[11px] sm:text-xs border border-sky-800/60 shadow-lg transition flex items-center justify-center gap-1.5 shrink-0 min-w-0"
-                title="Calculate School & Residential Fees"
-              >
-                <Calculator className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 shrink-0" />
-                <span className="truncate">{t('calc_badge', 'Fee Calc')}</span>
-              </button>
-            </div>
           </div>
         </div>
 
