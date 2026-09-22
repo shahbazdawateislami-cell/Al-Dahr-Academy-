@@ -109,21 +109,18 @@ export const HeroCarousel: React.FC = () => {
               <img
                 src={slide.imageUrl}
                 alt={slide.title}
-                className="w-full h-full object-cover object-center scale-105 transition-transform duration-10000 ease-out"
+                className="w-full h-full object-cover object-center transition-transform duration-10000 ease-out"
                 style={{
                   transform: isActive ? 'scale(1.03)' : 'scale(1.0)',
                 }}
               />
-              {/* Deep cinematic overlay matching the dark elegant tone & securing readability at bottom left */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#03091e]/95 via-[#061438]/85 to-[#050e26]/50" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#03091e] via-[#050e26]/60 to-transparent" />
             </div>
           );
         })}
 
         {/* Carousel Content Container - Positioned at bottom-left corner */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 lg:pb-14 pt-16 sm:pt-24 lg:pt-28 w-full">
-          <div className="max-w-3xl space-y-3 sm:space-y-4 text-left">
+          <div className="max-w-3xl space-y-3 sm:space-y-4 text-left p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-[#03091e]/75 backdrop-blur-md border border-white/10 shadow-2xl">
             {/* Top Welcome Badge (Like the Eduka / Academy Welcome in screenshot) */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-[10px] sm:text-xs font-bold tracking-wider uppercase shadow-lg backdrop-blur-md animate-in fade-in">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
