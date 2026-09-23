@@ -27,6 +27,7 @@ import {
   getLocalizedFacility,
 } from '../data/localizedData';
 import { HeroCarousel } from '../components/HeroCarousel';
+import { EducationStructureWheel } from '../components/EducationStructureWheel';
 import { parseVideoUrl } from '../utils/videoUtils';
 import { VideoModal } from '../components/VideoModal';
 import { VideoMediaItem } from '../types';
@@ -78,6 +79,9 @@ export const HomePage: React.FC = () => {
     <div className="space-y-16 sm:space-y-24">
       {/* Dynamic Hero Carousel matching user screenshot */}
       <HeroCarousel />
+
+      {/* Official Academy Education Structure Wheel matching user template */}
+      <EducationStructureWheel />
 
       {/* 3 Core Academic Pathways */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

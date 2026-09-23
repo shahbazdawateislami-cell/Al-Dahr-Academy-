@@ -8,18 +8,18 @@ import { WebSocketServer, WebSocket } from 'ws';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
 // Lazy Google GenAI Client
 let aiClient: GoogleGenAI | null = null;
-function getAi(): GoogleGenAI {
+function getAi(): GoogleGenAI | null {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
+  if (!apiKey) {
+    return null;
+  }
   if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY is not configured.');
-    }
     aiClient = new GoogleGenAI({
       apiKey,
       httpOptions: {
@@ -135,40 +135,42 @@ async function synthesizeWithGemini(text: string, voice: string = 'Fenrir'): Pro
   }
 
   const ai = getAi();
-  const ttsModels = ['gemini-2.5-flash-preview-tts', 'gemini-3.1-flash-tts-preview'];
+  if (ai) {
+    const ttsModels = ['gemini-2.5-flash-preview-tts', 'gemini-3.1-flash-tts-preview'];
 
-  // Try Gemini TTS first if quota is available
-  for (const model of ttsModels) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: [{ parts: [{ text: cleaned }] }],
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: voice || 'Fenrir' },
+    // Try Gemini TTS first if quota is available
+    for (const model of ttsModels) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: [{ parts: [{ text: cleaned }] }],
+          config: {
+            responseModalities: [Modality.AUDIO],
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: { voiceName: voice || 'Fenrir' },
+              },
             },
           },
-        },
-      });
+        });
 
-      const rawPcmBase64 = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-      if (rawPcmBase64) {
-        const pcmBuffer = Buffer.from(rawPcmBase64, 'base64');
-        const wavBuffer = pcmToWav(pcmBuffer, 24000, 1, 16);
-        const wavBase64 = wavBuffer.toString('base64');
-        const audioUrl = `data:audio/wav;base64,${wavBase64}`;
+        const rawPcmBase64 = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        if (rawPcmBase64) {
+          const pcmBuffer = Buffer.from(rawPcmBase64, 'base64');
+          const wavBuffer = pcmToWav(pcmBuffer, 24000, 1, 16);
+          const wavBase64 = wavBuffer.toString('base64');
+          const audioUrl = `data:audio/wav;base64,${wavBase64}`;
 
-        if (ttsAudioCache.size > 200) {
-          const firstKey = ttsAudioCache.keys().next().value;
-          if (firstKey) ttsAudioCache.delete(firstKey);
+          if (ttsAudioCache.size > 200) {
+            const firstKey = ttsAudioCache.keys().next().value;
+            if (firstKey) ttsAudioCache.delete(firstKey);
+          }
+          ttsAudioCache.set(cacheKey, audioUrl);
+          return audioUrl;
         }
-        ttsAudioCache.set(cacheKey, audioUrl);
-        return audioUrl;
+      } catch (_err: any) {
+        // Quota exhausted or busy, seamlessly fall through to high-speed cloud speech audio
       }
-    } catch (_err: any) {
-      // Quota exhausted or busy, seamlessly fall through to high-speed cloud speech audio
     }
   }
 
@@ -281,21 +283,23 @@ If asked who you are:
 
 STRICT RULE: Do NOT use markdown tables, bullet points, asterisks, or robotic formatting. Speak only plain, natural, respectful conversational sentences.`;
 
-    // Attempt generation with gemini-3.8-live and gemini models for real-time conversational voice responses
-    const textModels = ['gemini-3.8-live', 'gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'];
-    for (const model of textModels) {
-      try {
-        const promptResponse = await ai.models.generateContent({
-          model,
-          contents: query,
-          config: { systemInstruction: systemPrompt },
-        });
-        if (promptResponse.text?.trim()) {
-          answerText = promptResponse.text.trim();
-          break;
+    if (ai) {
+      // Attempt generation with gemini-3.8-live and gemini models for real-time conversational voice responses
+      const textModels = ['gemini-3.8-live', 'gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'];
+      for (const model of textModels) {
+        try {
+          const promptResponse = await ai.models.generateContent({
+            model,
+            contents: query,
+            config: { systemInstruction: systemPrompt },
+          });
+          if (promptResponse.text?.trim()) {
+            answerText = promptResponse.text.trim();
+            break;
+          }
+        } catch (err: any) {
+          console.warn(`Text generation with ${model} notice:`, err?.message?.slice(0, 100) || err);
         }
-      } catch (err: any) {
-        console.warn(`Text generation with ${model} notice:`, err?.message?.slice(0, 100) || err);
       }
     }
 
@@ -348,6 +352,12 @@ async function start() {
 
     try {
       const ai = getAi();
+      if (!ai) {
+        if (clientWs.readyState === WebSocket.OPEN) {
+          clientWs.send(JSON.stringify({ error: 'AI client unavailable' }));
+        }
+        return;
+      }
       session = await ai.live.connect({
         model: 'gemini-3.8-live',
         config: {
