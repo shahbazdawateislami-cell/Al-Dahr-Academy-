@@ -241,7 +241,7 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
       {/* SUB TAB 1: MODERN EDUCATION */}
       {activeSubTab === 'modern' && (
         <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-sky-300 uppercase mb-1">Section Title</label>
               <input
@@ -259,6 +259,17 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
                 onChange={(e) => setFormData({ ...formData, modernBadge: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-bold focus:border-sky-400 outline-none"
               />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-emerald-400 uppercase mb-1">Pillar Status Badge</label>
+              <select
+                value={formData.modernStatus || 'active'}
+                onChange={(e) => setFormData({ ...formData, modernStatus: e.target.value as any })}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-emerald-300 text-xs font-bold focus:border-emerald-400 outline-none"
+              >
+                <option value="active">Active (🟢 Show Green Active Badge)</option>
+                <option value="coming-soon">Coming Soon (🟡 Show Coming Soon Badge)</option>
+              </select>
             </div>
           </div>
 
@@ -324,7 +335,7 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
       {/* SUB TAB 2: ISLAMIC EDUCATION & HIFZ */}
       {activeSubTab === 'islamic' && (
         <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-emerald-300 uppercase mb-1">Section Title</label>
               <input
@@ -342,6 +353,17 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
                 onChange={(e) => setFormData({ ...formData, islamicBadge: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-bold focus:border-emerald-400 outline-none"
               />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-emerald-400 uppercase mb-1">Pillar Status Badge</label>
+              <select
+                value={formData.islamicStatus || 'active'}
+                onChange={(e) => setFormData({ ...formData, islamicStatus: e.target.value as any })}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-emerald-300 text-xs font-bold focus:border-emerald-400 outline-none"
+              >
+                <option value="active">Active (🟢 Show Green Active Badge)</option>
+                <option value="coming-soon">Coming Soon (🟡 Show Coming Soon Badge)</option>
+              </select>
             </div>
           </div>
 
@@ -418,7 +440,7 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
       {/* SUB TAB 3: AI MASTER CLASS */}
       {activeSubTab === 'ai' && (
         <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-sky-300 uppercase mb-1">Section Title</label>
               <input
@@ -436,6 +458,17 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
                 onChange={(e) => setFormData({ ...formData, aiBadge: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-bold focus:border-sky-400 outline-none"
               />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-amber-400 uppercase mb-1">Pillar Status Badge</label>
+              <select
+                value={formData.aiStatus || 'coming-soon'}
+                onChange={(e) => setFormData({ ...formData, aiStatus: e.target.value as any })}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-amber-300 text-xs font-bold focus:border-amber-400 outline-none"
+              >
+                <option value="coming-soon">Coming Soon (🟡 Show Coming Soon Badge)</option>
+                <option value="active">Active (🟢 Show Green Active Badge)</option>
+              </select>
             </div>
           </div>
 
@@ -527,7 +560,7 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
       {/* SUB TAB 4: SOCIAL MEDIA MASTER CLASS */}
       {activeSubTab === 'social' && (
         <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-amber-300 uppercase mb-1">Section Title</label>
               <input
@@ -545,6 +578,17 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
                 onChange={(e) => setFormData({ ...formData, socialBadge: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-bold focus:border-amber-400 outline-none"
               />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-amber-400 uppercase mb-1">Pillar Status Badge</label>
+              <select
+                value={formData.socialStatus || 'coming-soon'}
+                onChange={(e) => setFormData({ ...formData, socialStatus: e.target.value as any })}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-amber-300 text-xs font-bold focus:border-amber-400 outline-none"
+              >
+                <option value="coming-soon">Coming Soon (🟡 Show Coming Soon Badge)</option>
+                <option value="active">Active (🟢 Show Green Active Badge)</option>
+              </select>
             </div>
           </div>
 

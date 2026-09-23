@@ -204,24 +204,28 @@ export interface EducationStructureData {
   modernBadge: string;
   modernDescription: string;
   modernSubjects: EducationSubjectPill[];
-  
+  modernStatus?: 'active' | 'coming-soon' | string;
+
   islamicTitle: string;
   islamicBadge: string;
   islamicDescription: string;
   islamicSubjects: EducationSubjectPill[];
-  
+  islamicStatus?: 'active' | 'coming-soon' | string;
+
   aiTitle: string;
   aiBadge: string;
   aiDescription: string;
   aiImageUrl: string;
   aiSkills: string[];
-  
+  aiStatus?: 'active' | 'coming-soon' | string;
+
   socialTitle: string;
   socialBadge: string;
   socialDescription: string;
   socialImageUrl: string;
   socialSkills: string[];
-  
+  socialStatus?: 'active' | 'coming-soon' | string;
+
   secondaryPillars: EducationPillarSegment[];
 }
 

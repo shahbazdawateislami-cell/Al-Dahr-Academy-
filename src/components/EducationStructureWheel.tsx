@@ -13,10 +13,39 @@ import {
   Home,
   HelpCircle,
   BookOpen,
+  Clock,
+  CheckCircle2,
 } from 'lucide-react';
 
 import defaultAiHandImage from '../assets/images/ai_hand_control_banner_1790176146501.jpg';
 import defaultSocialPhoneImage from '../assets/images/phone_social_media_burst_banner_1790176164727.jpg';
+
+const StatusBadge: React.FC<{ status?: string; defaultStatus: 'active' | 'coming-soon' }> = ({
+  status,
+  defaultStatus,
+}) => {
+  const currentStatus = status || defaultStatus;
+  const isActive = currentStatus === 'active';
+
+  if (isActive) {
+    return (
+      <div className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full bg-emerald-500/20 border-2 border-emerald-400 text-emerald-300 text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(16,185,129,0.4)] backdrop-blur-md">
+        <span className="relative flex h-2.5 w-2.5 shrink-0">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+        </span>
+        <span>ACTIVE</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/30 via-orange-500/30 to-amber-500/30 border-2 border-amber-400/90 text-amber-200 text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.5)] backdrop-blur-md animate-pulse">
+      <Clock className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+      <span>COMING SOON</span>
+    </div>
+  );
+};
 
 const ScrollReveal: React.FC<{
   children: React.ReactNode;
@@ -212,7 +241,7 @@ export const EducationStructureWheel: React.FC = () => {
             <ScrollReveal direction="left" delayMs={100}>
               <div className="-mx-6 -mt-6 sm:-mx-8 sm:-mt-8 mb-6 px-6 py-4 bg-gradient-to-r from-[#031536] via-[#092257] to-[#031536] border-b-2 border-amber-400/60 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-b from-sky-900 to-blue-950 border-2 border-sky-400 flex items-center justify-center shadow-md">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-b from-sky-900 to-blue-950 border-2 border-sky-400 flex items-center justify-center shadow-md shrink-0">
                     <div className="flex flex-col items-center -space-y-1">
                       <div className="w-7 h-1.5 bg-red-500 rounded-sm shadow-sm" />
                       <div className="w-8 h-1.5 bg-sky-400 rounded-sm shadow-sm" />
@@ -229,7 +258,10 @@ export const EducationStructureWheel: React.FC = () => {
                     </h3>
                   </div>
                 </div>
-                <GraduationCap className="w-8 h-8 text-sky-300 hidden sm:block opacity-80" />
+                <div className="flex items-center gap-3 shrink-0">
+                  <StatusBadge status={structureData?.modernStatus} defaultStatus="active" />
+                  <GraduationCap className="w-8 h-8 text-sky-300 hidden sm:block opacity-80" />
+                </div>
               </div>
             </ScrollReveal>
 
@@ -267,7 +299,7 @@ export const EducationStructureWheel: React.FC = () => {
             <ScrollReveal direction="left" delayMs={100}>
               <div className="-mx-6 -mt-6 sm:-mx-8 sm:-mt-8 mb-6 px-6 py-4 bg-gradient-to-r from-[#031536] via-[#092257] to-[#031536] border-b-2 border-amber-400/60 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-b from-emerald-900 to-teal-950 border-2 border-emerald-400 flex items-center justify-center shadow-md">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-b from-emerald-900 to-teal-950 border-2 border-emerald-400 flex items-center justify-center shadow-md shrink-0">
                     <svg className="w-7 h-7 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
@@ -283,8 +315,11 @@ export const EducationStructureWheel: React.FC = () => {
                     </h3>
                   </div>
                 </div>
-                <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black">
-                  <span>Deeni Taleem</span>
+                <div className="flex items-center gap-3 shrink-0">
+                  <StatusBadge status={structureData?.islamicStatus} defaultStatus="active" />
+                  <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black">
+                    <span>Deeni Taleem</span>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -344,9 +379,12 @@ export const EducationStructureWheel: React.FC = () => {
               <div className="relative z-10 p-6 sm:p-8 space-y-6 flex flex-col justify-between h-full">
                 {/* Floating Header Badge & Title */}
                 <div className="space-y-3">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-950/80 border border-purple-400/70 text-purple-200 text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-lg animate-float">
-                    <Cpu className="w-4 h-4 text-sky-400 animate-pulse-glow" />
-                    <span>Futuristic Tech & AI Skills</span>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-950/80 border border-purple-400/70 text-purple-200 text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-lg animate-float">
+                      <Cpu className="w-4 h-4 text-sky-400 animate-pulse-glow" />
+                      <span>Futuristic Tech & AI Skills</span>
+                    </div>
+                    <StatusBadge status={structureData?.aiStatus} defaultStatus="coming-soon" />
                   </div>
 
                   <h3 className="text-3xl sm:text-5xl font-black text-white font-['Cinzel',serif] tracking-wider drop-shadow-[0_4px_16px_rgba(0,0,0,1)] leading-tight">
@@ -413,9 +451,12 @@ export const EducationStructureWheel: React.FC = () => {
               <div className="relative z-10 p-6 sm:p-8 space-y-6 flex flex-col justify-between h-full">
                 {/* Floating Header Badge & Title */}
                 <div className="space-y-3">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-950/80 border border-amber-400/70 text-amber-200 text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-lg animate-float">
-                    <Youtube className="w-4 h-4 text-amber-400 animate-pulse-glow" />
-                    <span>Digital Media & Strategy</span>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-950/80 border border-amber-400/70 text-amber-200 text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-lg animate-float">
+                      <Youtube className="w-4 h-4 text-amber-400 animate-pulse-glow" />
+                      <span>Digital Media & Strategy</span>
+                    </div>
+                    <StatusBadge status={structureData?.socialStatus} defaultStatus="coming-soon" />
                   </div>
 
                   <h3 className="text-3xl sm:text-5xl font-black text-white font-['Cinzel',serif] tracking-wider drop-shadow-[0_4px_16px_rgba(0,0,0,1)] leading-tight">

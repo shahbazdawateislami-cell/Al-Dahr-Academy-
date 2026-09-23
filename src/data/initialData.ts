@@ -806,6 +806,7 @@ export const initialVoiceKnowledge: VoiceKnowledgeItem[] = [
 export const initialEducationStructureData = {
   modernTitle: 'MODERN EDUCATION (CBSE PATTERN)',
   modernBadge: '★ Primary Modern Education Pillar',
+  modernStatus: 'active',
   modernDescription: 'Comprehensive NCERT & CBSE Syllabus for Class 1 to Class 8 with strong foundation in core subjects:',
   modernSubjects: [
     { title: 'English', desc: 'Reading, Writing, Speaking', color: 'border-blue-400/70 bg-[#030d29]/90 text-blue-200' },
@@ -819,6 +820,7 @@ export const initialEducationStructureData = {
 
   islamicTitle: "ISLAMIC EDUCATION & HIFZ-E-QUR'AN",
   islamicBadge: "★ Core Deeni & Qur'anic Tarbiyat Pillar",
+  islamicStatus: 'active',
   islamicDescription: "Complete Deeni Taleem, Tajweed, Nazira & Step-by-step Hifz-e-Qur'an Curriculum:",
   islamicSubjects: [
     { title: "Hifz-e-Qur'an", desc: 'Step-by-step System', badge: 'Hifz' },
@@ -833,6 +835,7 @@ export const initialEducationStructureData = {
 
   aiTitle: 'ADVANCED AI MASTER CLASS',
   aiBadge: 'Futuristic Tech & AI Skills',
+  aiStatus: 'coming-soon',
   aiDescription: 'Master AI workflows, ChatGPT, Gemini, DeepSeek, Claude, prompt engineering & automation.',
   aiImageUrl: '',
   aiSkills: [
@@ -848,6 +851,7 @@ export const initialEducationStructureData = {
 
   socialTitle: 'SOCIAL MEDIA MASTER CLASS',
   socialBadge: 'Digital Media & Strategy',
+  socialStatus: 'coming-soon',
   socialDescription: 'Positive content creation, video editing, social media growth, branding & Islamic media ethics.',
   socialImageUrl: '',
   socialSkills: [
