@@ -29,6 +29,7 @@ import {
 import { HeroCarousel } from '../components/HeroCarousel';
 import { EducationStructureWheel } from '../components/EducationStructureWheel';
 import { parseVideoUrl } from '../utils/videoUtils';
+import { getMapEmbedUrl, getMapDirectUrl } from '../utils/mapUtils';
 import { VideoModal } from '../components/VideoModal';
 import { VideoMediaItem } from '../types';
 
@@ -542,6 +543,15 @@ export const HomePage: React.FC = () => {
                   {t('home_schedule_visit', 'Schedule Campus Visit')}
                 </button>
                 <a
+                  href={getMapDirectUrl(settings.googleMapsUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-lg"
+                >
+                  <MapPin className="w-4 h-4" />
+                  <span>Open Google Maps</span>
+                </a>
+                <a
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -557,7 +567,7 @@ export const HomePage: React.FC = () => {
             <div className="rounded-2xl overflow-hidden border border-blue-700/60 shadow-2xl h-72 sm:h-80 bg-slate-950">
               <iframe
                 title="Al-Dahr Academy Location"
-                src={settings.googleMapsUrl}
+                src={getMapEmbedUrl(settings.googleMapsUrl)}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

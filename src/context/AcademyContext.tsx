@@ -112,7 +112,7 @@ interface AcademyContextType {
   resetAllToDefaults: () => Promise<void>;
 }
 
-const CURRENT_CACHE_VER = 'v3_2026_09_22';
+const CURRENT_CACHE_VER = 'v4_2026_09_23';
 if (typeof window !== 'undefined') {
   try {
     const savedVer = localStorage.getItem('aldahr_cache_ver');
@@ -362,7 +362,27 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         collection(db, 'videos'),
         (snapshot) => {
           if (!snapshot.empty) {
-            const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as VideoMediaItem));
+            let items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as VideoMediaItem));
+            items = items.map((item) => {
+              if (item.id === 'vid-insta-1' && (item.url.includes('dummy') || item.url.includes('C8_dummy') || item.url !== 'https://www.instagram.com/reel/DcUPRfRsEij/')) {
+                const updatedItem: VideoMediaItem = {
+                  ...item,
+                  title: 'Al-Dahr Academy Official Reel - Deen & Modern Education',
+                  type: 'instagram',
+                  url: 'https://www.instagram.com/reel/DcUPRfRsEij/',
+                  videoId: 'DcUPRfRsEij',
+                  thumbnail: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?w=600&auto=format&fit=crop&q=80',
+                  description: 'Al-Dahr Academy Phulwari Sharif Patna - Empowering young minds with Quran Tajweed, Islamic Tarbiyah & Modern CBSE Education. Watch our signature Instagram Reel highlighting student excellence.',
+                  category: 'Instagram Reel',
+                  isFeatured: true,
+                  active: true,
+                  order: 3,
+                };
+                setDoc(doc(db, 'videos', 'vid-insta-1'), updatedItem).catch(() => {});
+                return updatedItem;
+              }
+              return item;
+            });
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setVideos(items);
             localStorage.setItem('aldahr_videos', JSON.stringify(items));

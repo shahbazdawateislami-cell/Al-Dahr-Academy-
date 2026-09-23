@@ -13,6 +13,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { getLocalizedClass, getLocalizedProgram } from '../data/localizedData';
+import { getMapEmbedUrl, getMapDirectUrl } from '../utils/mapUtils';
 
 export const ContactPage: React.FC = () => {
   const { settings, submitEnquiry, classes, programs } = useAcademy();
@@ -318,7 +319,7 @@ export const ContactPage: React.FC = () => {
             <p className="text-[11px] text-amber-400">{settings.address}</p>
           </div>
           <a
-            href="https://maps.google.com/?q=Phulwari+Sharif+Patna"
+            href={getMapDirectUrl(settings.googleMapsUrl)}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-sky-400 hover:underline font-semibold"
@@ -329,7 +330,7 @@ export const ContactPage: React.FC = () => {
         <div className="h-80 sm:h-96 w-full">
           <iframe
             title="Al-Dahr Academy Map Location"
-            src={settings.googleMapsUrl}
+            src={getMapEmbedUrl(settings.googleMapsUrl)}
             width="100%"
             height="100%"
             style={{ border: 0 }}

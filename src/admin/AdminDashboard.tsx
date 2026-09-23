@@ -1020,14 +1020,18 @@ export const AdminDashboard: React.FC = () => {
 
             <div className="sm:col-span-2">
               <label className="block font-semibold text-slate-300 mb-1">
-                Google Maps Embed URL
+                Google Maps Location URL or Shortlink (e.g. https://maps.app.goo.gl/k8eLVpmjJw17Txmk7)
               </label>
               <input
                 type="text"
                 value={settingsForm.googleMapsUrl}
                 onChange={(e) => setSettingsForm({ ...settingsForm, googleMapsUrl: e.target.value })}
+                placeholder="https://maps.app.goo.gl/k8eLVpmjJw17Txmk7"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-[11px]"
               />
+              <p className="text-[10px] text-slate-400 mt-1">
+                Aap directly Google Maps ka share link (e.g. maps.app.goo.gl) ya embed code paste kar sakte hain. System ise automatic clean karke error-free dikhayega.
+              </p>
             </div>
 
             <div className="sm:col-span-2">

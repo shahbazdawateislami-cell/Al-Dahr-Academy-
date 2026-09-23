@@ -393,11 +393,8 @@ export const EducationStructureWheel: React.FC = () => {
                 <span className="px-3 py-1.5 rounded-xl bg-blue-600/90 text-white text-xs font-black flex items-center gap-1.5 shadow-xl border border-blue-300/60 animate-float">
                   <Facebook className="w-4 h-4" /> Facebook
                 </span>
-                <span className="px-3 py-1.5 rounded-xl bg-black/90 text-white text-xs font-black shadow-xl border border-slate-700 animate-float-reverse">
-                  TikTok
-                </span>
                 <span className="px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-black shadow-xl border border-slate-700 animate-float">
-                  X
+                  X (Twitter)
                 </span>
               </div>
 
