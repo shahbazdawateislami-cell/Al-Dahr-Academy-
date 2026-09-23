@@ -47,9 +47,12 @@ import {
   X,
   Edit2,
   Bot,
+  Play,
 } from 'lucide-react';
 import { HeroSlidesManager } from './HeroSlidesManager';
 import { VoiceAgentManager } from './VoiceAgentManager';
+import { parseVideoUrl } from '../utils/videoUtils';
+import { VideoModal } from '../components/VideoModal';
 
 export const AdminDashboard: React.FC = () => {
   const {
@@ -148,6 +151,7 @@ export const AdminDashboard: React.FC = () => {
   const [newVideoTitle, setNewVideoTitle] = useState('');
   const [newVideoType, setNewVideoType] = useState<'youtube' | 'shorts' | 'instagram'>('youtube');
   const [newVideoCat, setNewVideoCat] = useState('Academics');
+  const [adminVideoToPlay, setAdminVideoToPlay] = useState<VideoMediaItem | null>(null);
 
   // Enquiries search & filter
   const [enquirySearch, setEnquirySearch] = useState('');
@@ -157,6 +161,7 @@ export const AdminDashboard: React.FC = () => {
   const heroFileInputRef = useRef<HTMLInputElement>(null);
   const galleryFileInputRef = useRef<HTMLInputElement>(null);
   const logoAdminFileInputRef = useRef<HTMLInputElement>(null);
+  const programFileInputRef = useRef<HTMLInputElement>(null);
 
   // Helper to read and optimize selected photo from gallery
   const processImageFile = (file: File, callback: (base64Url: string) => void) => {
@@ -1155,96 +1160,172 @@ export const AdminDashboard: React.FC = () => {
                 Academic Programs Management
               </h2>
               <p className="text-xs text-slate-400">
-                Residential, Full-Time, and Short-Time offerings.
+                Residential, Full-Time, and Short-Time offerings. Upload/Change photos, title, fee notes, or descriptions for all 3 programs.
               </p>
             </div>
           </div>
+
+          {/* Hidden device file input for program photos */}
+          <input
+            type="file"
+            ref={programFileInputRef}
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file && editingProgram) {
+                processImageFile(file, (dataUrl) => {
+                  setEditingProgram((prev) => (prev ? { ...prev, imageUrl: dataUrl } : null));
+                });
+              }
+              e.target.value = '';
+            }}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {programs.map((prog) => (
               <div
                 key={prog.id}
-                className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3"
+                className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 flex flex-col justify-between"
               >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-white font-['Cinzel',serif]">{prog.name}</h3>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 text-amber-400">
-                    {prog.code}
-                  </span>
+                <div className="space-y-3">
+                  {/* Program Image Display */}
+                  <div className="relative h-40 rounded-xl overflow-hidden bg-slate-900 border border-slate-800 group">
+                    <img
+                      src={prog.imageUrl}
+                      alt={prog.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-slate-950/80 text-amber-400 text-[10px] font-bold uppercase border border-slate-700">
+                      {prog.code}
+                    </div>
+                  </div>
+
+                  <h3 className="font-bold text-white font-['Cinzel',serif] text-base">{prog.name}</h3>
+                  <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">{prog.description}</p>
+                  <p className="text-xs font-bold text-amber-400">{prog.feeNote}</p>
                 </div>
 
-                <p className="text-xs text-slate-300 line-clamp-3">{prog.description}</p>
-                <p className="text-xs font-bold text-amber-400">{prog.feeNote}</p>
-
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+                <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
                   <button
                     onClick={() => setEditingProgram(prog)}
-                    className="text-xs text-sky-400 hover:underline font-semibold"
+                    className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer shadow"
                   >
-                    Edit Program
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Change Photo & Details</span>
                   </button>
                 </div>
               </div>
             ))}
           </div>
 
+          {/* Program Edit Modal / Box */}
           {editingProgram && (
-            <div className="p-6 rounded-2xl bg-slate-950 border border-amber-500/40 space-y-4">
-              <h3 className="text-lg font-bold font-['Cinzel',serif] text-white">
-                Edit: {editingProgram.name}
-              </h3>
+            <div className="p-6 rounded-2xl bg-slate-950 border border-amber-500/50 space-y-5 shadow-2xl animate-in fade-in">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 className="text-lg font-bold font-['Cinzel',serif] text-white flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5 text-amber-400" />
+                  <span>Edit {editingProgram.name} Photo & Details</span>
+                </h3>
+                <button
+                  onClick={() => setEditingProgram(null)}
+                  className="p-1 text-slate-400 hover:text-white rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Photo preview & upload section */}
+              <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center gap-4">
+                <img
+                  src={editingProgram.imageUrl}
+                  alt={editingProgram.name}
+                  className="w-36 h-28 object-cover rounded-xl border border-slate-700 shrink-0 shadow-lg"
+                />
+                <div className="space-y-2 flex-1 text-xs">
+                  <span className="font-bold text-amber-400 uppercase text-[10px]">Program Photo Options</span>
+                  <p className="text-slate-300">Apne phone ya gallery se nayi photo select karein ya niche photo URL paste karein:</p>
+                  <button
+                    type="button"
+                    onClick={() => programFileInputRef.current?.click()}
+                    className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2 shadow transition cursor-pointer active:scale-95"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>📱 Gallery Se Nayi Photo Chunein</span>
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Name</label>
+                  <label className="block font-semibold text-slate-300 mb-1">Program Name</label>
                   <input
                     type="text"
                     value={editingProgram.name}
                     onChange={(e) =>
                       setEditingProgram({ ...editingProgram, name: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-medium"
                   />
                 </div>
+
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Fee Note</label>
+                  <label className="block font-semibold text-slate-300 mb-1">Fee Note / Pricing Text</label>
                   <input
                     type="text"
                     value={editingProgram.feeNote}
                     onChange={(e) =>
                       setEditingProgram({ ...editingProgram, feeNote: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-medium"
                   />
                 </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block font-semibold text-slate-300 mb-1">Photo Image URL / Data</label>
+                  <input
+                    type="text"
+                    value={editingProgram.imageUrl}
+                    onChange={(e) =>
+                      setEditingProgram({ ...editingProgram, imageUrl: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-[11px]"
+                    placeholder="https://images.unsplash.com/... or data:image/..."
+                  />
+                </div>
+
                 <div className="sm:col-span-2">
                   <label className="block font-semibold text-slate-300 mb-1">Description</label>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={editingProgram.description}
                     onChange={(e) =>
                       setEditingProgram({ ...editingProgram, description: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white leading-relaxed"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-2 justify-end">
+              <div className="flex gap-3 justify-end pt-3 border-t border-slate-800">
                 <button
+                  type="button"
                   onClick={() => setEditingProgram(null)}
-                  className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-semibold"
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={async () => {
                     await saveProgram(editingProgram);
                     setEditingProgram(null);
-                    showToast('Program updated successfully');
+                    showToast(`${editingProgram.name} photo and details saved successfully!`);
                   }}
-                  className="px-5 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs"
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg transition cursor-pointer"
                 >
-                  Save Program
+                  <Save className="w-4 h-4" />
+                  <span>Save Program Photo & Details</span>
                 </button>
               </div>
             </div>
@@ -1864,96 +1945,178 @@ export const AdminDashboard: React.FC = () => {
               Videos, YouTube Shorts & Instagram Reels Manager
             </h2>
             <p className="text-xs text-slate-400">
-              Add YouTube videos, short recitations, and social media reels.
+              Paste ANY YouTube video/shorts or Instagram Reel link. System automatically parses IDs, generates thumbnails, and plays in-app!
             </p>
           </div>
 
           {/* Add video form */}
-          <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+          <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
             <h3 className="text-sm font-bold text-amber-400 flex items-center gap-1.5">
               <Plus className="w-4 h-4" />
-              <span>Add New Video / Short</span>
+              <span>Add New Video / Reel Link</span>
             </h3>
+
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
               <input
                 type="text"
-                placeholder="Video Title"
+                placeholder="Video Title (e.g. Quran Tajweed Class)"
                 value={newVideoTitle}
                 onChange={(e) => setNewVideoTitle(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white sm:col-span-2"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white sm:col-span-2 font-medium"
               />
               <select
                 value={newVideoType}
                 onChange={(e) => setNewVideoType(e.target.value as any)}
-                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white"
               >
                 <option value="youtube">YouTube Video</option>
-                <option value="shorts">YouTube Short</option>
-                <option value="instagram">Instagram Reel</option>
+                <option value="shorts">YouTube Short (⚡ Vertical)</option>
+                <option value="instagram">Instagram Reel (📷 Reel)</option>
               </select>
               <input
                 type="text"
-                placeholder="Category (e.g. Quran)"
+                placeholder="Category (e.g. Campus Life, Recitation)"
                 value={newVideoCat}
                 onChange={(e) => setNewVideoCat(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white"
               />
               <input
                 type="text"
-                placeholder="Video or Reel URL (e.g. https://youtube.com/watch?v=...)"
+                placeholder="Paste Video or Reel URL (e.g. https://youtube.com/watch?v=... or https://instagram.com/reel/...)"
                 value={newVideoUrl}
                 onChange={(e) => setNewVideoUrl(e.target.value)}
-                className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white sm:col-span-4 font-mono text-[11px]"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white sm:col-span-4 font-mono text-[11px]"
               />
             </div>
+
+            {/* Live URL Auto-Parse Preview */}
+            {newVideoUrl && (() => {
+              const parsed = parseVideoUrl(newVideoUrl, newVideoType);
+              return (
+                <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-3">
+                    {parsed.thumbnailUrl && (
+                      <img src={parsed.thumbnailUrl} alt="Thumbnail" className="w-14 h-10 object-cover rounded-lg border border-slate-700" />
+                    )}
+                    <div>
+                      <span className="font-bold text-amber-400 uppercase text-[10px]">
+                        Auto Detected: {parsed.type} {parsed.videoId ? `(ID: ${parsed.videoId})` : ''}
+                      </span>
+                      <p className="text-[11px] text-slate-300 font-mono truncate max-w-md">{parsed.embedUrl}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAdminVideoToPlay({
+                        id: 'preview',
+                        title: newVideoTitle || 'Video Preview',
+                        type: parsed.type === 'direct' ? newVideoType : parsed.type,
+                        url: parsed.cleanUrl || newVideoUrl,
+                        description: newVideoTitle,
+                        category: newVideoCat,
+                        isFeatured: true,
+                        active: true,
+                        order: 1,
+                      });
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-sky-950 text-sky-300 hover:text-white border border-sky-800 text-[11px] font-bold flex items-center gap-1 shrink-0"
+                  >
+                    <Play className="w-3.5 h-3.5" />
+                    <span>Test In-App Play</span>
+                  </button>
+                </div>
+              );
+            })()}
+
             <button
               onClick={async () => {
-                if (!newVideoTitle || !newVideoUrl) return;
+                if (!newVideoTitle || !newVideoUrl) {
+                  showToast('Please enter both Video Title and URL');
+                  return;
+                }
+                const parsed = parseVideoUrl(newVideoUrl, newVideoType);
                 await saveVideoItem({
                   id: 'vid-' + Date.now(),
                   title: newVideoTitle,
-                  type: newVideoType,
-                  url: newVideoUrl,
+                  type: parsed.type === 'direct' ? newVideoType : parsed.type,
+                  url: parsed.cleanUrl || newVideoUrl,
+                  thumbnail: parsed.thumbnailUrl || '',
+                  videoId: parsed.videoId,
                   description: newVideoTitle,
-                  category: newVideoCat,
+                  category: newVideoCat || 'Campus',
                   isFeatured: true,
                   active: true,
                   order: videos.length + 1,
                 });
                 setNewVideoTitle('');
                 setNewVideoUrl('');
-                showToast('Video added to website!');
+                showToast('Video published successfully to website!');
               }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-lg transition cursor-pointer active:scale-95"
             >
               <Plus className="w-4 h-4" />
-              <span>Publish Video</span>
+              <span>Publish Video to Website</span>
             </button>
           </div>
 
           {/* Current Videos List */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {videos.map((v) => (
-              <div
-                key={v.id}
-                className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2 text-xs"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-amber-400 uppercase text-[10px]">
-                    {v.type}
-                  </span>
+            {videos.map((v) => {
+              const parsed = parseVideoUrl(v.url, v.type);
+              const thumb = v.thumbnail || parsed.thumbnailUrl;
+
+              return (
+                <div
+                  key={v.id}
+                  className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 text-xs flex flex-col justify-between"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-amber-400 uppercase text-[10px] px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                        {v.type}
+                      </span>
+                      <button
+                        onClick={() => deleteVideoItem(v.id)}
+                        className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-500/10 transition"
+                        title="Delete video"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    {thumb && (
+                      <div className="relative h-28 rounded-xl overflow-hidden bg-slate-900 border border-slate-800 group cursor-pointer" onClick={() => setAdminVideoToPlay(v)}>
+                        <img src={thumb} alt={v.title} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center">
+                          <div className="w-9 h-9 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow">
+                            <Play className="w-4 h-4 ml-0.5 fill-slate-950" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <h4 className="font-bold text-white line-clamp-2">{v.title}</h4>
+                    <p className="text-[10px] text-slate-400 font-mono truncate">{v.url}</p>
+                  </div>
+
                   <button
-                    onClick={() => deleteVideoItem(v.id)}
-                    className="text-red-400 hover:text-red-300"
+                    onClick={() => setAdminVideoToPlay(v)}
+                    className="w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-sky-300 hover:text-white font-bold text-[11px] border border-slate-700 transition flex items-center justify-center gap-1.5"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Play className="w-3.5 h-3.5" />
+                    <span>Play In-App</span>
                   </button>
                 </div>
-                <h4 className="font-bold text-white line-clamp-2">{v.title}</h4>
-                <p className="text-[11px] text-slate-400 font-mono truncate">{v.url}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
+          {/* Admin Video Modal */}
+          <VideoModal
+            video={adminVideoToPlay}
+            onClose={() => setAdminVideoToPlay(null)}
+          />
         </div>
       )}
 

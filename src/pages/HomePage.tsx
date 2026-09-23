@@ -27,6 +27,9 @@ import {
   getLocalizedFacility,
 } from '../data/localizedData';
 import { HeroCarousel } from '../components/HeroCarousel';
+import { parseVideoUrl } from '../utils/videoUtils';
+import { VideoModal } from '../components/VideoModal';
+import { VideoMediaItem } from '../types';
 
 export const HomePage: React.FC = () => {
   const {
@@ -42,6 +45,9 @@ export const HomePage: React.FC = () => {
     setEnquiryPrefill,
   } = useAcademy();
   const { t, language } = useLanguage();
+
+  // Active video modal state
+  const [activeVideoToPlay, setActiveVideoToPlay] = useState<VideoMediaItem | null>(null);
 
   // Fold / Unfold state for classes (Default folded: only class name + arrow visible)
   const [unfoldedClassIds, setUnfoldedClassIds] = useState<Record<string, boolean>>({});
@@ -546,58 +552,70 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredVideos.map((vid) => (
-              <div
-                key={vid.id}
-                className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-sky-400/60 transition shadow-lg"
-              >
-                <div className="relative h-48 bg-slate-950">
-                  {vid.thumbnail ? (
-                    <img
-                      src={vid.thumbnail}
-                      alt={vid.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-950">
-                      <Play className="w-12 h-12 text-slate-700" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover:bg-slate-950/20 transition">
-                    <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xl group-hover:scale-110 transition">
-                      <Play className="w-5 h-5 ml-0.5" />
-                    </div>
-                  </div>
-                  <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-slate-950/80 rounded text-[10px] font-bold text-white uppercase">
-                    {vid.type}
-                  </div>
-                </div>
+            {featuredVideos.map((vid) => {
+              const parsed = parseVideoUrl(vid.url, vid.type);
+              const thumb = vid.thumbnail || parsed.thumbnailUrl;
 
-                <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-sm font-bold text-white line-clamp-2 group-hover:text-sky-300 transition">
-                      {vid.title}
-                    </h3>
-                    <p className="text-xs text-slate-300 mt-1 line-clamp-2">
-                      {vid.description}
-                    </p>
+              return (
+                <div
+                  key={vid.id}
+                  onClick={() => setActiveVideoToPlay(vid)}
+                  className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-amber-500/50 transition duration-300 shadow-lg cursor-pointer"
+                >
+                  <div className="relative h-48 bg-slate-950 overflow-hidden">
+                    {thumb ? (
+                      <img
+                        src={thumb}
+                        alt={vid.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 gap-2">
+                        <Play className="w-10 h-10 text-amber-400" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover:bg-slate-950/20 transition">
+                      <div className="w-12 h-12 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-xl group-hover:scale-110 transition font-bold">
+                        <Play className="w-5 h-5 ml-0.5 fill-slate-950" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-slate-950/90 rounded text-[10px] font-bold text-amber-400 border border-slate-700 uppercase">
+                      {vid.type === 'youtube' ? 'YouTube' : vid.type === 'shorts' ? 'Shorts' : 'Instagram Reel'}
+                    </div>
                   </div>
 
-                  <a
-                    href={vid.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="pt-2 text-xs font-semibold text-sky-400 hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>{t('home_watch_on', 'Watch on')} {vid.type === 'youtube' ? 'YouTube' : vid.type === 'shorts' ? 'YouTube Shorts' : 'Instagram'}</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </a>
+                  <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-sm font-bold text-white line-clamp-2 group-hover:text-amber-400 transition">
+                        {vid.title}
+                      </h3>
+                      <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+                        {vid.description}
+                      </p>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between border-t border-blue-900/60">
+                      <span className="text-xs font-bold text-amber-400 hover:underline inline-flex items-center gap-1">
+                        <Play className="w-3 h-3" />
+                        <span>Play In-App</span>
+                      </span>
+                      <span className="text-[10px] text-sky-400 font-semibold">
+                        {vid.category}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}
+
+      {/* Video Modal Player Popup */}
+      <VideoModal
+        video={activeVideoToPlay}
+        onClose={() => setActiveVideoToPlay(null)}
+      />
 
       {/* Location & Quick Contact Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
