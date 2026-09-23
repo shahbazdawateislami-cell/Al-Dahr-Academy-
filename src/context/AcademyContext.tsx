@@ -13,6 +13,7 @@ import {
   VideoMediaItem,
   VoiceKnowledgeItem,
   WebsiteSettings,
+  EducationStructureData,
 } from '../types';
 import {
   initialSettings,
@@ -26,6 +27,7 @@ import {
   initialVideos,
   initialHeroSlides,
   initialVoiceKnowledge,
+  initialEducationStructureData,
 } from '../data/initialData';
 import {
   db,
@@ -56,6 +58,7 @@ interface AcademyContextType {
   videos: VideoMediaItem[];
   heroSlides: HeroSlideItem[];
   voiceKnowledge: VoiceKnowledgeItem[];
+  structureData: EducationStructureData;
   enquiries: AdmissionEnquiry[];
   
   // Navigation
@@ -102,6 +105,7 @@ interface AcademyContextType {
   deleteHeroSlide: (id: string) => Promise<void>;
   saveVoiceKnowledge: (item: VoiceKnowledgeItem) => Promise<void>;
   deleteVoiceKnowledge: (id: string) => Promise<void>;
+  updateEducationStructure: (data: EducationStructureData) => Promise<void>;
   submitEnquiry: (enquiry: Omit<AdmissionEnquiry, 'id' | 'createdAt' | 'status'>) => Promise<boolean>;
   updateEnquiryStatus: (id: string, status: AdmissionEnquiry['status']) => Promise<void>;
   deleteEnquiry: (id: string) => Promise<void>;
@@ -211,6 +215,11 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [voiceKnowledge, setVoiceKnowledge] = useState<VoiceKnowledgeItem[]>(() => {
     const cached = localStorage.getItem('aldahr_voice_knowledge');
     return cached ? JSON.parse(cached) : initialVoiceKnowledge;
+  });
+
+  const [structureData, setStructureData] = useState<EducationStructureData>(() => {
+    const cached = localStorage.getItem('aldahr_structure_data');
+    return cached ? JSON.parse(cached) : initialEducationStructureData;
   });
 
   const [enquiries, setEnquiries] = useState<AdmissionEnquiry[]>(() => {
@@ -413,6 +422,26 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       unsubs.push(unsub);
     } catch (e) {
       console.warn('Could not attach voiceAgentKnowledge listener', e);
+    }
+
+    // Structure Data listener
+    try {
+      const unsub = onSnapshot(
+        doc(db, 'structure', 'current'),
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data() as EducationStructureData;
+            setStructureData(data);
+            localStorage.setItem('aldahr_structure_data', JSON.stringify(data));
+          } else {
+            setDoc(doc(db, 'structure', 'current'), initialEducationStructureData).catch(() => {});
+          }
+        },
+        (err) => handleFirestoreError(err, OperationType.GET, 'structure/current')
+      );
+      unsubs.push(unsub);
+    } catch (e) {
+      console.warn('Could not attach structure listener', e);
     }
 
     return () => {
@@ -746,6 +775,16 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const updateEducationStructure = async (data: EducationStructureData) => {
+    setStructureData(data);
+    localStorage.setItem('aldahr_structure_data', JSON.stringify(data));
+    try {
+      await setDoc(doc(db, 'structure', 'current'), data);
+    } catch (e) {
+      handleFirestoreError(e, OperationType.UPDATE, 'structure/current');
+    }
+  };
+
   const submitEnquiry = async (
     data: Omit<AdmissionEnquiry, 'id' | 'createdAt' | 'status'>
   ): Promise<boolean> => {
@@ -833,6 +872,7 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         videos,
         heroSlides,
         voiceKnowledge,
+        structureData,
         enquiries,
         currentPage,
         setCurrentPage,
@@ -873,6 +913,7 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         deleteHeroSlide,
         saveVoiceKnowledge,
         deleteVoiceKnowledge,
+        updateEducationStructure,
         submitEnquiry,
         updateEnquiryStatus,
         deleteEnquiry,

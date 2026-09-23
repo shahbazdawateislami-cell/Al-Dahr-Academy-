@@ -96,7 +96,7 @@ export const HeroCarousel: React.FC = () => {
     >
       {/* Main Carousel Viewport - flex items-end to position text at bottom-left corner */}
       <div className="relative min-h-[400px] sm:min-h-[480px] lg:min-h-[540px] overflow-hidden flex items-end">
-        {/* Background Image Carousel Slides */}
+        {/* Background Image Carousel Slides with Floating Breating effect */}
         {activeSlides.map((slide, idx) => {
           const isActive = idx === currentIndex;
           return (
@@ -109,63 +109,65 @@ export const HeroCarousel: React.FC = () => {
               <img
                 src={slide.imageUrl}
                 alt={slide.title}
-                className="w-full h-full object-cover object-center transition-transform duration-10000 ease-out"
+                className="w-full h-full object-cover object-center transition-transform duration-10000 ease-out animate-float-slow filter contrast-105 saturate-110"
                 style={{
-                  transform: isActive ? 'scale(1.03)' : 'scale(1.0)',
+                  transform: isActive ? 'scale(1.05)' : 'scale(1.0)',
                 }}
               />
+              {/* Lighter Gradient Overlay for high image clarity */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#020817]/90 via-[#030d29]/40 to-transparent" />
             </div>
           );
         })}
 
-        {/* Carousel Content Container - Compact & fitted at bottom-left corner */}
-        <div className="relative z-20 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-4 sm:pb-6 pt-10 w-full">
-          <div className="max-w-xl space-y-1.5 sm:space-y-2 text-left p-3 sm:p-4.5 rounded-xl sm:rounded-2xl bg-[#03091e]/80 backdrop-blur-md border border-white/10 shadow-2xl">
-            {/* Top Welcome Badge - Compact */}
-            <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-[9px] sm:text-[10px] font-bold tracking-wider uppercase shadow-sm">
-              <Sparkles className="w-3 h-3 text-amber-400" />
+        {/* Carousel Content Container - Floating animation on content box */}
+        <div className="relative z-20 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-4 sm:pb-6 pt-10 w-full animate-float">
+          <div className="max-w-xl space-y-2 text-left p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-[#03091e]/85 backdrop-blur-md border-2 border-sky-400/50 shadow-[0_0_30px_rgba(14,165,233,0.3)] hover:border-amber-400/70 transition-all duration-500">
+            {/* Top Welcome Badge - Floating Glow */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/60 text-sky-300 text-[9px] sm:text-[11px] font-extrabold tracking-wider uppercase shadow-md animate-float-reverse">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse-glow" />
               <span>
                 {currentSlide.badge || 'WELCOME TO AL-DAHR ACADEMY'}
               </span>
             </div>
 
-            {/* Main Headline - Compact text size (~60% smaller) */}
-            <h1 className="text-sm sm:text-lg lg:text-xl font-bold text-white tracking-tight font-['Cinzel',serif] leading-tight drop-shadow-sm">
+            {/* Main Headline */}
+            <h1 className="text-base sm:text-xl lg:text-2xl font-black text-white tracking-tight font-['Cinzel',serif] leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               {currentSlide.title}
             </h1>
 
-            {/* Subtitle / Paragraph - Compact */}
-            <p className="text-[10px] sm:text-xs text-slate-200 leading-snug font-normal max-w-lg drop-shadow line-clamp-2">
+            {/* Subtitle / Paragraph */}
+            <p className="text-[10px] sm:text-xs text-sky-100 leading-snug font-medium max-w-lg drop-shadow line-clamp-2">
               {currentSlide.subtitle}
             </p>
           </div>
         </div>
 
-        {/* Left Arrow Button (screenshot style circular floating button) */}
+        {/* Left Arrow Button with Floating animation */}
         {activeSlides.length > 1 && (
           <button
             onClick={handlePrev}
             aria-label="Previous slide"
-            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-slate-950/60 hover:bg-amber-500 text-white hover:text-slate-950 border border-white/20 hover:border-amber-400 flex items-center justify-center transition-all duration-300 shadow-xl backdrop-blur-sm group"
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-slate-950/70 hover:bg-amber-500 text-white hover:text-slate-950 border-2 border-amber-400/60 hover:border-amber-400 flex items-center justify-center transition-all duration-300 shadow-2xl backdrop-blur-md group animate-float"
           >
             <ChevronLeft className="w-6 h-6 transition-transform group-hover:-translate-x-0.5" />
           </button>
         )}
 
-        {/* Right Arrow Button (screenshot style circular floating button) */}
+        {/* Right Arrow Button with Floating animation */}
         {activeSlides.length > 1 && (
           <button
             onClick={handleNext}
             aria-label="Next slide"
-            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-slate-950/60 hover:bg-amber-500 text-white hover:text-slate-950 border border-white/20 hover:border-amber-400 flex items-center justify-center transition-all duration-300 shadow-xl backdrop-blur-sm group"
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-slate-950/70 hover:bg-amber-500 text-white hover:text-slate-950 border-2 border-amber-400/60 hover:border-amber-400 flex items-center justify-center transition-all duration-300 shadow-2xl backdrop-blur-md group animate-float-reverse"
           >
             <ChevronRight className="w-6 h-6 transition-transform group-hover:translate-x-0.5" />
           </button>
         )}
 
-        {/* Slide Indicator Dots (Bottom Right to keep bottom-left text area clear) */}
+        {/* Slide Indicator Dots (Bottom Right) with Floating animation */}
         {activeSlides.length > 1 && (
-          <div className="absolute bottom-5 sm:bottom-7 right-6 sm:right-12 z-30 flex items-center gap-2 bg-slate-950/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 shadow-xl">
+          <div className="absolute bottom-5 sm:bottom-7 right-6 sm:right-12 z-30 flex items-center gap-2 bg-slate-950/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-sky-400/40 shadow-xl animate-float">
             {activeSlides.map((_, idx) => (
               <button
                 key={idx}
@@ -173,7 +175,7 @@ export const HeroCarousel: React.FC = () => {
                 aria-label={`Go to slide ${idx + 1}`}
                 className={`h-2.5 rounded-full transition-all duration-300 ${
                   idx === currentIndex
-                    ? 'w-7 sm:w-8 bg-amber-400 shadow-md shadow-amber-500/50'
+                    ? 'w-7 sm:w-8 bg-amber-400 shadow-md shadow-amber-500/50 animate-pulse'
                     : 'w-2.5 bg-white/40 hover:bg-white/70'
                 }`}
               />

@@ -265,7 +265,7 @@ export const HomePage: React.FC = () => {
                     : 'bg-[#071330]/90 border-blue-900/60 hover:border-sky-500/50 hover:bg-[#0a1945]'
                 }`}
               >
-                {/* Folded Header (In fold state: ONLY class name and an arrow, uniform height and line-height) */}
+                {/* Folded Header */}
                 <button
                   type="button"
                   onClick={() => toggleClassFold(cls.id)}
@@ -286,7 +286,7 @@ export const HomePage: React.FC = () => {
                   </div>
                 </button>
 
-                {/* Unfolded Details (Visible ONLY when unfolded) */}
+                {/* Unfolded Details */}
                 {isUnfolded && (
                   <div className="px-4 pb-4 pt-1 space-y-3.5 border-t border-blue-900/50 animate-in fade-in duration-200 flex-1 flex flex-col justify-between">
                     <div className="space-y-3">
@@ -351,119 +351,6 @@ export const HomePage: React.FC = () => {
               </div>
             );
           })}
-        </div>
-      </section>
-
-      {/* Balanced Education: Islamic & Modern Split */}
-      <section className="bg-[#050e26] border-y border-blue-900/60 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12 space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider">
-              {t('home_synthesis_badge', 'Holistic Philosophy')}
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white font-['Cinzel',serif]">
-              {t('home_synthesis_title', 'The Harmonious Synthesis of Deen and Modernity')}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300">
-              {t('home_synthesis_desc', 'We eliminate the false divide between worldly competence and spiritual uprightness.')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Islamic Column */}
-            <div className="p-8 rounded-2xl bg-[#071330] border border-sky-500/40 space-y-6 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white font-['Cinzel',serif]">
-                    {t('sec_islamic_title', 'Islamic Education')}
-                  </h3>
-                  <p className="text-xs text-sky-300 font-semibold">
-                    {t('sec_islamic_subtitle', 'Faith, Character, and Sacred Knowledge')}
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                {t('sec_islamic_desc', 'Taught by devoted scholars and Asatizah with structured recitation, proper Tajweed articulation, daily congregational prayer routines, and profound understanding of prophetic traditions.')}
-              </p>
-
-              <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
-                <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>{t('about_pillar4', "Qur'an & Tajweed from Noorani Qaida to fluent recitation")}</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>{t('hero_stat_hifz', 'Hifz-e-Qur\'an track with certified Hafiz supervision')}</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>{t('sec_islamic_subtitle', 'Hadith, Sunnah, and 6 Kalimas memorization')}</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>{t('about_pillar1', 'Daily Masnoon Duas and Islamic Manners (Adab & Akhlaq)')}</span>
-                </li>
-              </ul>
-
-              <button
-                onClick={() => navigateTo('islamic-education')}
-                className="w-full py-3 rounded-xl bg-blue-950 hover:bg-blue-900 text-sky-300 font-bold text-xs border border-sky-500/30 transition flex items-center justify-center gap-2"
-              >
-                <span>{t('home_read_islamic', 'Read Islamic Education Details →')}</span>
-              </button>
-            </div>
-
-            {/* Modern Academic Column */}
-            <div className="p-8 rounded-2xl bg-[#071330] border border-blue-700/50 space-y-6 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-blue-600/20 text-sky-400 flex items-center justify-center">
-                  <GraduationCap className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white font-['Cinzel',serif]">
-                    {t('sec_modern_title', 'Modern Education')}
-                  </h3>
-                  <p className="text-xs text-sky-300 font-semibold">
-                    {t('sec_modern_subtitle', 'Scientific Temper, Literacy, and Digital Skills')}
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                {t('sec_modern_desc', 'Standard academic education covering the complete state and national curriculum, preparing children to excel in board examinations, higher studies, and global careers.')}
-              </p>
-
-              <ul className="space-y-3 text-xs sm:text-sm text-slate-300">
-                <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>{t('about_pillar3', 'English Language, Grammar, Phonics & Spoken communication')}</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>{t('about_pillar2', 'Mathematics: Arithmetic, logic, geometry, and algebra')}</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>{t('modern_page_subtitle', 'General Science with hands-on experiment demonstrations')}</span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span>{t('sec_modern_desc', 'Social Studies, Urdu literature, and Computer foundations')}</span>
-                </li>
-              </ul>
-
-              <button
-                onClick={() => navigateTo('modern-education')}
-                className="w-full py-3 rounded-xl bg-blue-950 hover:bg-blue-900 text-sky-300 font-bold text-xs border border-sky-500/30 transition flex items-center justify-center gap-2"
-              >
-                <span>{t('home_read_modern', 'Read Modern Education Details →')}</span>
-              </button>
-            </div>
-          </div>
         </div>
       </section>
 

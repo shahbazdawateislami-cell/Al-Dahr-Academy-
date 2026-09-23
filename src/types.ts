@@ -183,6 +183,48 @@ export interface WebsiteSettings {
   customVoiceAgentEmbedScript?: string;
 }
 
+export interface EducationSubjectPill {
+  id?: string;
+  title: string;
+  desc: string;
+  color?: string;
+  badge?: string;
+}
+
+export interface EducationPillarSegment {
+  id: string;
+  title: string;
+  taglineDeen?: string;
+  taglineDuniya?: string;
+  bullets: string[];
+}
+
+export interface EducationStructureData {
+  modernTitle: string;
+  modernBadge: string;
+  modernDescription: string;
+  modernSubjects: EducationSubjectPill[];
+  
+  islamicTitle: string;
+  islamicBadge: string;
+  islamicDescription: string;
+  islamicSubjects: EducationSubjectPill[];
+  
+  aiTitle: string;
+  aiBadge: string;
+  aiDescription: string;
+  aiImageUrl: string;
+  aiSkills: string[];
+  
+  socialTitle: string;
+  socialBadge: string;
+  socialDescription: string;
+  socialImageUrl: string;
+  socialSkills: string[];
+  
+  secondaryPillars: EducationPillarSegment[];
+}
+
 export type PageRoute =
   | 'home'
   | 'about'

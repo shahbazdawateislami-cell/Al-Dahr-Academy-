@@ -803,3 +803,117 @@ export const initialVoiceKnowledge: VoiceKnowledgeItem[] = [
   },
 ];
 
+export const initialEducationStructureData = {
+  modernTitle: 'MODERN EDUCATION (CBSE PATTERN)',
+  modernBadge: '★ Primary Modern Education Pillar',
+  modernDescription: 'Comprehensive NCERT & CBSE Syllabus for Class 1 to Class 8 with strong foundation in core subjects:',
+  modernSubjects: [
+    { title: 'English', desc: 'Reading, Writing, Speaking', color: 'border-blue-400/70 bg-[#030d29]/90 text-blue-200' },
+    { title: 'Maths', desc: 'Concept-based', color: 'border-emerald-400/70 bg-[#031818]/90 text-emerald-200' },
+    { title: 'Science', desc: 'Practical + Theory', color: 'border-purple-400/70 bg-[#12082b]/90 text-purple-200' },
+    { title: 'SST', desc: 'Social Studies', color: 'border-amber-400/70 bg-[#261704]/90 text-amber-200' },
+    { title: 'Hindi', desc: 'Grammar & Literature', color: 'border-rose-400/70 bg-[#240611]/90 text-rose-200' },
+    { title: 'Urdu', desc: 'Reading & Writing', color: 'border-teal-400/70 bg-[#041d1e]/90 text-teal-200' },
+    { title: 'Islamic GK', desc: 'General Knowledge', color: 'border-indigo-400/70 bg-[#0b0c2a]/90 text-indigo-200' },
+  ],
+
+  islamicTitle: "ISLAMIC EDUCATION & HIFZ-E-QUR'AN",
+  islamicBadge: "★ Core Deeni & Qur'anic Tarbiyat Pillar",
+  islamicDescription: "Complete Deeni Taleem, Tajweed, Nazira & Step-by-step Hifz-e-Qur'an Curriculum:",
+  islamicSubjects: [
+    { title: "Hifz-e-Qur'an", desc: 'Step-by-step System', badge: 'Hifz' },
+    { title: "Qur'an with Tajweed", desc: 'Correct Makharij & Recitation', badge: 'Tajweed' },
+    { title: "Nazira Qur'an", desc: 'Fluent Reading & Tilawat', badge: 'Nazira' },
+    { title: 'Arabic Qaida', desc: 'Alphabet & Pronunciation', badge: 'Qaida' },
+    { title: 'Diniyat, Hadees & Sunnat', desc: 'Masnoon Ahadith & Practice', badge: 'Diniyat' },
+    { title: 'Kalima & Daily Duas', desc: '6 Kalimas & Daily Supplications', badge: 'Duas' },
+    { title: 'Seerat (Life of Prophet ﷺ)', desc: 'Life Lessons & Seerat-e-Nabi', badge: 'Seerat' },
+    { title: 'Islamic Habits & Training', desc: 'Daily Tarbiyat & Sunnah Lifestyle', badge: 'Tarbiyat' },
+  ],
+
+  aiTitle: 'ADVANCED AI MASTER CLASS',
+  aiBadge: 'Futuristic Tech & AI Skills',
+  aiDescription: 'Master AI workflows, ChatGPT, Gemini, DeepSeek, Claude, prompt engineering & automation.',
+  aiImageUrl: '',
+  aiSkills: [
+    'AI Image Creation 📷',
+    'AI UGC & Videos 🎬',
+    'AI Podcast & Audio 🎙️',
+    'AI Monetization 💰',
+    'Google & Meta Ads 📈',
+    'Prompt Engineering ⚡',
+    'ChatGPT & Gemini 🧠',
+    'DeepSeek & Claude 🤖',
+  ],
+
+  socialTitle: 'SOCIAL MEDIA MASTER CLASS',
+  socialBadge: 'Digital Media & Strategy',
+  socialDescription: 'Positive content creation, video editing, social media growth, branding & Islamic media ethics.',
+  socialImageUrl: '',
+  socialSkills: [
+    'Positive Content Creation 📱',
+    'Video Editing & Reels ✂️',
+    'Channel Growth Strategy 🚀',
+    'Ethical Islamic Media 🌙',
+    'Digital Marketing & Ads 🎯',
+    'Graphic Design & Banner 🎨',
+    'Audience Engagement 💬',
+    'Monetization & Branding 💎',
+  ],
+
+  secondaryPillars: [
+    {
+      id: 'character',
+      title: 'CHARACTER BUILDING',
+      bullets: [
+        'Discipline',
+        'Good Manners',
+        'Leadership Skills',
+        'Islamic Lifestyle',
+        'Confidence Building',
+      ],
+    },
+    {
+      id: 'physical',
+      title: 'PHYSICAL & MENTAL DEVELOPMENT',
+      bullets: [
+        'Sports & Outdoor Activities',
+        'Health & Fitness Care',
+        'Creative Activities',
+        'Time Management',
+      ],
+    },
+    {
+      id: 'hostel',
+      title: 'COMFORTABLE HOSTEL FACILITY',
+      bullets: [
+        'Safe & Secure Environment',
+        'Nutritious & Hygienic Food',
+        'Clean Rooms',
+        '24/7 Care & Supervision',
+      ],
+    },
+    {
+      id: 'support',
+      title: 'EXTRA SUPPORT',
+      bullets: [
+        'Homework help',
+        'Exam preparation',
+        'Weak students support',
+        'Regular parent updates',
+      ],
+    },
+    {
+      id: 'values',
+      title: 'ISLAMIC & MODERN VALUES TOGETHER',
+      taglineDeen: 'Deen se Roshni',
+      taglineDuniya: 'Duniya mein Kamyabi',
+      bullets: [
+        'Deen se Roshni',
+        'Duniya mein Kamyabi',
+      ],
+    },
+  ],
+};
+
+

@@ -51,6 +51,7 @@ import {
 } from 'lucide-react';
 import { HeroSlidesManager } from './HeroSlidesManager';
 import { VoiceAgentManager } from './VoiceAgentManager';
+import { EducationStructureManager } from './EducationStructureManager';
 import { parseVideoUrl } from '../utils/videoUtils';
 import { VideoModal } from '../components/VideoModal';
 
@@ -101,6 +102,7 @@ export const AdminDashboard: React.FC = () => {
     | 'enquiries'
     | 'settings'
     | 'slides'
+    | 'structure'
     | 'voice'
     | 'programs'
     | 'classes'
@@ -414,6 +416,16 @@ export const AdminDashboard: React.FC = () => {
         >
           <ImageIcon className="w-4 h-4" />
           <span>Hero Carousel ({heroSlides.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('structure')}
+          className={`px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+            activeTab === 'structure' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>Education Structure Sections</span>
         </button>
 
         <button
@@ -2386,6 +2398,11 @@ export const AdminDashboard: React.FC = () => {
       {/* TAB CONTENT: HERO CAROUSEL SLIDES */}
       {activeTab === 'slides' && (
         <HeroSlidesManager showToast={showToast} />
+      )}
+
+      {/* TAB CONTENT: EDUCATION STRUCTURE MANAGER */}
+      {activeTab === 'structure' && (
+        <EducationStructureManager showToast={showToast} />
       )}
 
       {/* TAB CONTENT: VOICE AI AGENT KNOWLEDGE BASE */}
