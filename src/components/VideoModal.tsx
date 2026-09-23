@@ -65,7 +65,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({ video, onClose }) => {
         </div>
 
         {/* Video Player Container */}
-        <div className="relative bg-black w-full flex-1 flex items-center justify-center overflow-hidden min-h-[280px]">
+        <div className="relative bg-black w-full flex-1 flex items-center justify-center overflow-hidden min-h-[300px]">
           {parsed.type === 'direct' ? (
             <video
               src={parsed.embedUrl}
@@ -74,24 +74,25 @@ export const VideoModal: React.FC<VideoModalProps> = ({ video, onClose }) => {
               playsInline
               className="w-full h-full max-h-[70vh] object-contain"
             />
-          ) : parsed.type === 'instagram' ? (
-            <div className="w-full h-full min-h-[480px] max-h-[70vh] flex items-center justify-center bg-black">
+          ) : parsed.type === 'instagram' && parsed.videoId ? (
+            <div className="w-full h-full min-h-[480px] max-h-[72vh] flex items-center justify-center bg-black overflow-hidden">
               <iframe
-                src={parsed.embedUrl}
-                className="w-full h-full border-0 min-h-[480px]"
+                src={`https://www.instagram.com/reel/${parsed.videoId}/embed/`}
+                className="w-full h-full border-0 min-h-[480px] min-w-[320px]"
                 title={video.title}
-                allowTransparency
                 allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allowFullScreen
               />
             </div>
           ) : parsed.videoId || parsed.embedUrl ? (
-            <div className={`relative w-full ${isShortOrReel ? 'aspect-[9/16] max-h-[70vh]' : 'aspect-video'}`}>
+            <div className={`relative w-full ${isShortOrReel ? 'aspect-[9/16] max-h-[72vh]' : 'aspect-video'}`}>
               <iframe
                 className="absolute inset-0 w-full h-full border-0"
-                src={parsed.embedUrl || `https://www.youtube.com/embed/${parsed.videoId}?autoplay=1&rel=0`}
+                src={`https://www.youtube-nocookie.com/embed/${parsed.videoId || ''}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
                 title={video.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allowFullScreen
               />
             </div>
@@ -103,20 +104,15 @@ export const VideoModal: React.FC<VideoModalProps> = ({ video, onClose }) => {
           )}
         </div>
 
-        {/* Footer info & Direct option */}
+        {/* Footer info & In-App Security Note */}
         <div className="p-4 bg-[#050e26] border-t border-blue-900/80 flex items-center justify-between gap-3 shrink-0">
           <p className="text-xs text-slate-300 line-clamp-1 max-w-lg">
             {video.description || video.title}
           </p>
-          <a
-            href={video.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-3 py-1.5 rounded-lg bg-blue-950 hover:bg-blue-900 border border-blue-800 text-sky-300 hover:text-white text-[11px] font-bold flex items-center gap-1 shrink-0 transition"
-          >
-            <span>External Link</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
+          <div className="px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-600/60 text-emerald-300 text-[11px] font-bold flex items-center gap-1.5 shrink-0">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>Al-Dahr Academy Player</span>
+          </div>
         </div>
       </div>
     </div>

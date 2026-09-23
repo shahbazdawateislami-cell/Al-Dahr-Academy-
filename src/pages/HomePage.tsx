@@ -451,27 +451,52 @@ export const HomePage: React.FC = () => {
               return (
                 <div
                   key={vid.id}
-                  onClick={() => setActiveVideoToPlay(vid)}
-                  className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-amber-500/50 transition duration-300 shadow-lg cursor-pointer"
+                  className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-amber-500/50 transition duration-300 shadow-lg"
                 >
-                  <div className="relative h-48 bg-slate-950 overflow-hidden">
-                    {thumb ? (
-                      <img
-                        src={thumb}
-                        alt={vid.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  {/* Direct Live Video Frame / Preview */}
+                  <div className="relative h-60 sm:h-64 bg-black overflow-hidden">
+                    {parsed.type === 'instagram' && parsed.videoId ? (
+                      <iframe
+                        src={`https://www.instagram.com/reel/${parsed.videoId}/embed/`}
+                        className="w-full h-full border-0 min-h-[240px]"
+                        title={vid.title}
+                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                        sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
+                        scrolling="no"
+                      />
+                    ) : parsed.videoId ? (
+                      <iframe
+                        className="w-full h-full border-0"
+                        src={`https://www.youtube-nocookie.com/embed/${parsed.videoId}?rel=0&modestbranding=1&playsinline=1`}
+                        title={vid.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
+                        allowFullScreen
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 gap-2">
-                        <Play className="w-10 h-10 text-amber-400" />
+                      <div
+                        onClick={() => setActiveVideoToPlay(vid)}
+                        className="relative w-full h-full cursor-pointer group/thumb"
+                      >
+                        {thumb ? (
+                          <img
+                            src={thumb}
+                            alt={vid.title}
+                            className="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 gap-2">
+                            <Play className="w-10 h-10 text-amber-400" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover/thumb:bg-slate-950/20 transition">
+                          <div className="w-12 h-12 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-xl font-bold">
+                            <Play className="w-5 h-5 ml-0.5 fill-slate-950" />
+                          </div>
+                        </div>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover:bg-slate-950/20 transition">
-                      <div className="w-12 h-12 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-xl group-hover:scale-110 transition font-bold">
-                        <Play className="w-5 h-5 ml-0.5 fill-slate-950" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-slate-950/90 rounded text-[10px] font-bold text-amber-400 border border-slate-700 uppercase">
+                    <div className="absolute top-2 right-2 px-2 py-0.5 bg-slate-950/90 rounded text-[10px] font-bold text-amber-400 border border-slate-700 uppercase pointer-events-none">
                       {vid.type === 'youtube' ? 'YouTube' : vid.type === 'shorts' ? 'Shorts' : 'Instagram Reel'}
                     </div>
                   </div>
@@ -487,12 +512,15 @@ export const HomePage: React.FC = () => {
                     </div>
 
                     <div className="pt-2 flex items-center justify-between border-t border-blue-900/60">
-                      <span className="text-xs font-bold text-amber-400 hover:underline inline-flex items-center gap-1">
-                        <Play className="w-3 h-3" />
-                        <span>Play In-App</span>
-                      </span>
-                      <span className="text-[10px] text-sky-400 font-semibold">
-                        {vid.category}
+                      <button
+                        onClick={() => setActiveVideoToPlay(vid)}
+                        className="text-xs font-bold text-amber-400 hover:text-amber-300 inline-flex items-center gap-1.5 cursor-pointer active:scale-95 transition"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-amber-400" />
+                        <span>Expand Fullscreen</span>
+                      </button>
+                      <span className="text-[10px] text-sky-300 font-semibold px-2 py-0.5 rounded bg-blue-950 border border-blue-800">
+                        {vid.category || 'Al-Dahr Media'}
                       </span>
                     </div>
                   </div>
