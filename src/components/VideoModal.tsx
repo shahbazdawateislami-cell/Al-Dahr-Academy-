@@ -65,7 +65,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({ video, onClose }) => {
         </div>
 
         {/* Video Player Container */}
-        <div className="relative bg-black w-full flex-1 flex items-center justify-center overflow-hidden min-h-[300px]">
+        <div className="relative bg-black w-full flex-1 flex items-center justify-center overflow-hidden min-h-[320px]">
           {parsed.type === 'direct' ? (
             <video
               src={parsed.embedUrl}
@@ -75,24 +75,22 @@ export const VideoModal: React.FC<VideoModalProps> = ({ video, onClose }) => {
               className="w-full h-full max-h-[70vh] object-contain"
             />
           ) : parsed.type === 'instagram' && parsed.videoId ? (
-            <div className="w-full h-full min-h-[480px] max-h-[72vh] flex items-center justify-center bg-black overflow-hidden">
+            <div className="w-full h-full min-h-[480px] max-h-[72vh] flex items-center justify-center bg-black overflow-hidden py-2">
               <iframe
                 src={`https://www.instagram.com/reel/${parsed.videoId}/embed/`}
-                className="w-full h-full border-0 min-h-[480px] min-w-[320px]"
+                className="w-full h-full border-0 min-h-[480px] max-w-[420px]"
                 title={video.title}
                 allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allowFullScreen
               />
             </div>
           ) : parsed.videoId || parsed.embedUrl ? (
-            <div className={`relative w-full ${isShortOrReel ? 'aspect-[9/16] max-h-[72vh]' : 'aspect-video'}`}>
+            <div className={`relative w-full ${isShortOrReel ? 'aspect-[9/16] max-h-[72vh] max-w-[400px] mx-auto' : 'aspect-video'}`}>
               <iframe
                 className="absolute inset-0 w-full h-full border-0"
                 src={`https://www.youtube-nocookie.com/embed/${parsed.videoId || ''}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
                 title={video.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
                 allowFullScreen
               />
             </div>

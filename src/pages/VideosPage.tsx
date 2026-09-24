@@ -96,69 +96,57 @@ export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' })
           return (
             <div
               key={vid.id}
-              className="rounded-3xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-amber-500/40 transition duration-300 shadow-xl"
+              onClick={() => setActiveVideoToPlay(vid)}
+              className="rounded-3xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-amber-500/80 transition duration-300 shadow-xl cursor-pointer"
             >
-              {/* Direct Live Video Player Frame */}
+              {/* Video Card Preview & Thumbnail */}
               <div
                 className={`relative ${
                   vid.type === 'shorts' || vid.type === 'instagram' ? 'h-80 sm:h-96' : 'h-56 sm:h-64'
-                } overflow-hidden bg-black`}
+                } overflow-hidden bg-slate-950 group/thumb`}
               >
-                {parsed.type === 'instagram' && parsed.videoId ? (
-                  <iframe
-                    src={`https://www.instagram.com/reel/${parsed.videoId}/embed/`}
-                    className="w-full h-full border-0 min-h-[300px]"
-                    title={vid.title}
-                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                    sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-                    scrolling="no"
-                  />
-                ) : parsed.videoId ? (
-                  <iframe
-                    className="w-full h-full border-0"
-                    src={`https://www.youtube-nocookie.com/embed/${parsed.videoId}?rel=0&modestbranding=1&playsinline=1`}
-                    title={vid.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-                    allowFullScreen
+                {thumb ? (
+                  <img
+                    src={thumb}
+                    alt={vid.title}
+                    className="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
                   />
                 ) : (
-                  <div
-                    onClick={() => setActiveVideoToPlay(vid)}
-                    className="relative w-full h-full cursor-pointer group/thumb"
-                  >
-                    {thumb ? (
-                      <img
-                        src={thumb}
-                        alt={vid.title}
-                        className="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
-                      />
+                  <div className={`w-full h-full flex flex-col items-center justify-center p-6 text-center gap-3 ${
+                    vid.type === 'instagram'
+                      ? 'bg-gradient-to-tr from-amber-600 via-pink-600 to-purple-800'
+                      : 'bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900'
+                  }`}>
+                    {vid.type === 'instagram' ? (
+                      <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
+                        <Play className="w-10 h-10 text-white fill-white" />
+                      </div>
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 gap-2">
-                        {vid.type === 'instagram' ? (
-                          <Instagram className="w-10 h-10 text-pink-400" />
-                        ) : (
-                          <Youtube className="w-10 h-10 text-red-500" />
-                        )}
-                        <span className="text-[10px] text-slate-400 font-bold uppercase">Click to Play</span>
+                      <div className="p-3 rounded-2xl bg-red-600/30 border border-red-500/50">
+                        <Play className="w-10 h-10 text-red-400 fill-red-400" />
                       </div>
                     )}
-
-                    <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover/thumb:bg-slate-950/20 transition">
-                      <div
-                        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition ${
-                          vid.type === 'instagram'
-                            ? 'bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white'
-                            : 'bg-red-600 text-white'
-                        }`}
-                      >
-                        <Play className="w-6 h-6 ml-0.5" />
-                      </div>
-                    </div>
+                    <span className="text-xs font-bold text-white tracking-wide drop-shadow line-clamp-1">
+                      {vid.title}
+                    </span>
                   </div>
                 )}
 
-                <div className="absolute top-3 left-3 px-2.5 py-0.5 rounded-md bg-slate-950/90 text-[10px] font-bold uppercase tracking-wider text-amber-400 border border-slate-700 pointer-events-none">
+                {/* Glowing Center Play Overlay */}
+                <div className="absolute inset-0 bg-slate-950/40 group-hover/thumb:bg-slate-950/20 transition duration-300 flex items-center justify-center">
+                  <div
+                    className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition transform group-hover/thumb:scale-110 ${
+                      vid.type === 'instagram'
+                        ? 'bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white'
+                        : 'bg-amber-500 text-slate-950'
+                    }`}
+                  >
+                    <Play className={`w-6 h-6 ml-0.5 ${vid.type === 'instagram' ? 'fill-white' : 'fill-slate-950'}`} />
+                  </div>
+                </div>
+
+                {/* Badge Top Left */}
+                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/90 text-[10px] font-extrabold uppercase tracking-wider text-amber-400 border border-amber-400/40 shadow-lg pointer-events-none">
                   {vid.type === 'youtube'
                     ? 'YouTube Video'
                     : vid.type === 'shorts'
@@ -167,7 +155,7 @@ export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' })
                 </div>
 
                 {vid.category && (
-                  <div className="absolute bottom-3 right-3 px-2.5 py-0.5 rounded-md bg-slate-950/80 text-[10px] text-slate-300 font-medium pointer-events-none">
+                  <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-slate-950/90 text-[10px] text-sky-300 font-bold border border-blue-800/80 pointer-events-none">
                     {vid.category}
                   </div>
                 )}
@@ -179,22 +167,19 @@ export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' })
                   <h3 className="text-base font-bold text-white font-['Cinzel',serif] group-hover:text-amber-400 transition line-clamp-2">
                     {vid.title}
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">
                     {vid.description}
                   </p>
                 </div>
 
                 <div className="pt-3 border-t border-blue-900/60 flex items-center justify-between">
-                  <button
-                    onClick={() => setActiveVideoToPlay(vid)}
-                    className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer active:scale-95"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-slate-950" />
-                    <span>Expand Fullscreen</span>
-                  </button>
+                  <div className="text-xs font-bold text-amber-400 group-hover:text-amber-300 inline-flex items-center gap-1.5">
+                    <Play className="w-3.5 h-3.5 fill-amber-400" />
+                    <span>Click to Play Video</span>
+                  </div>
 
                   <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
-                    <span>In-App Secured</span>
+                    <span>In-App Player</span>
                   </span>
                 </div>
               </div>

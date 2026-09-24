@@ -25,7 +25,7 @@ body {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-8px) rotate(1.5deg);
+    transform: translateY(-4px) rotate(0.8deg);
   }
 }
 
@@ -34,7 +34,7 @@ body {
     transform: translateY(0px) scale(1);
   }
   50% {
-    transform: translateY(-10px) scale(1.04);
+    transform: translateY(-5px) scale(1.02);
   }
 }
 
@@ -43,7 +43,7 @@ body {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(8px) rotate(-1.5deg);
+    transform: translateY(4px) rotate(-0.8deg);
   }
 }
 
@@ -59,15 +59,15 @@ body {
 }
 
 .animate-float {
-  animation: float 4s ease-in-out infinite;
+  animation: float 8s ease-in-out infinite;
 }
 
 .animate-float-slow {
-  animation: float-slow 7s ease-in-out infinite;
+  animation: float-slow 14s ease-in-out infinite;
 }
 
 .animate-float-reverse {
-  animation: float-reverse 5s ease-in-out infinite;
+  animation: float-reverse 10s ease-in-out infinite;
 }
 
 .animate-pulse-glow {

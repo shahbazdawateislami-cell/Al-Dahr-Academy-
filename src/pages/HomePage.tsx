@@ -451,75 +451,68 @@ export const HomePage: React.FC = () => {
               return (
                 <div
                   key={vid.id}
-                  className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-amber-500/50 transition duration-300 shadow-lg"
+                  onClick={() => setActiveVideoToPlay(vid)}
+                  className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-amber-500/80 transition duration-300 shadow-lg cursor-pointer"
                 >
-                  {/* Direct Live Video Frame / Preview */}
-                  <div className="relative h-60 sm:h-64 bg-black overflow-hidden">
-                    {parsed.type === 'instagram' && parsed.videoId ? (
-                      <iframe
-                        src={`https://www.instagram.com/reel/${parsed.videoId}/embed/`}
-                        className="w-full h-full border-0 min-h-[240px]"
-                        title={vid.title}
-                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                        sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-                        scrolling="no"
-                      />
-                    ) : parsed.videoId ? (
-                      <iframe
-                        className="w-full h-full border-0"
-                        src={`https://www.youtube-nocookie.com/embed/${parsed.videoId}?rel=0&modestbranding=1&playsinline=1`}
-                        title={vid.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"
-                        allowFullScreen
+                  {/* Interactive Video Card Preview & Thumbnail */}
+                  <div className="relative h-60 sm:h-64 bg-slate-950 overflow-hidden group/thumb">
+                    {thumb ? (
+                      <img
+                        src={thumb}
+                        alt={vid.title}
+                        className="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
                       />
                     ) : (
-                      <div
-                        onClick={() => setActiveVideoToPlay(vid)}
-                        className="relative w-full h-full cursor-pointer group/thumb"
-                      >
-                        {thumb ? (
-                          <img
-                            src={thumb}
-                            alt={vid.title}
-                            className="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
-                          />
+                      <div className={`w-full h-full flex flex-col items-center justify-center p-6 text-center gap-3 ${
+                        vid.type === 'instagram'
+                          ? 'bg-gradient-to-tr from-amber-600 via-pink-600 to-purple-800'
+                          : 'bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900'
+                      }`}>
+                        {vid.type === 'instagram' ? (
+                          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
+                            <Play className="w-10 h-10 text-white fill-white" />
+                          </div>
                         ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 gap-2">
-                            <Play className="w-10 h-10 text-amber-400" />
+                          <div className="p-3 rounded-2xl bg-red-600/30 border border-red-500/50">
+                            <Play className="w-10 h-10 text-red-400 fill-red-400" />
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-center group-hover/thumb:bg-slate-950/20 transition">
-                          <div className="w-12 h-12 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-xl font-bold">
-                            <Play className="w-5 h-5 ml-0.5 fill-slate-950" />
-                          </div>
-                        </div>
+                        <span className="text-xs font-bold text-white tracking-wide drop-shadow line-clamp-1">
+                          {vid.title}
+                        </span>
                       </div>
                     )}
-                    <div className="absolute top-2 right-2 px-2 py-0.5 bg-slate-950/90 rounded text-[10px] font-bold text-amber-400 border border-slate-700 uppercase pointer-events-none">
-                      {vid.type === 'youtube' ? 'YouTube' : vid.type === 'shorts' ? 'Shorts' : 'Instagram Reel'}
+
+                    {/* Glowing Center Play Overlay */}
+                    <div className="absolute inset-0 bg-slate-950/40 group-hover/thumb:bg-slate-950/20 transition-all duration-300 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-2xl transition transform group-hover/thumb:scale-110">
+                        <Play className="w-6 h-6 ml-1 fill-slate-950" />
+                      </div>
+                    </div>
+
+                    {/* Top Right Platform Badge */}
+                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-slate-950/90 backdrop-blur-md rounded-lg text-[10px] font-extrabold text-amber-400 border border-amber-400/40 uppercase shadow-lg pointer-events-none">
+                      {vid.type === 'youtube' ? 'YouTube' : vid.type === 'shorts' ? '⚡ Shorts' : '📷 Instagram Reel'}
                     </div>
                   </div>
 
-                  <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                  {/* Card Details */}
+                  <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-white line-clamp-2 group-hover:text-amber-400 transition">
+                      <h3 className="text-sm font-bold text-white line-clamp-2 group-hover:text-amber-400 transition font-['Cinzel',serif]">
                         {vid.title}
                       </h3>
-                      <p className="text-xs text-slate-300 mt-1 line-clamp-2">
+                      <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">
                         {vid.description}
                       </p>
                     </div>
 
                     <div className="pt-2 flex items-center justify-between border-t border-blue-900/60">
-                      <button
-                        onClick={() => setActiveVideoToPlay(vid)}
-                        className="text-xs font-bold text-amber-400 hover:text-amber-300 inline-flex items-center gap-1.5 cursor-pointer active:scale-95 transition"
-                      >
+                      <div className="text-xs font-bold text-amber-400 group-hover:text-amber-300 inline-flex items-center gap-1.5">
                         <Play className="w-3.5 h-3.5 fill-amber-400" />
-                        <span>Expand Fullscreen</span>
-                      </button>
-                      <span className="text-[10px] text-sky-300 font-semibold px-2 py-0.5 rounded bg-blue-950 border border-blue-800">
+                        <span>Click to Play Video</span>
+                      </div>
+                      <span className="text-[10px] text-sky-300 font-semibold px-2.5 py-0.5 rounded-full bg-blue-950 border border-blue-800/80">
                         {vid.category || 'Al-Dahr Media'}
                       </span>
                     </div>
