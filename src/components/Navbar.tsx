@@ -8,7 +8,6 @@ import {
   Menu,
   X,
   GraduationCap,
-  Sparkles,
   ChevronDown,
   ShieldCheck,
   Building,
@@ -290,7 +289,6 @@ export const Navbar: React.FC = () => {
                 onClick={() => setIsAdmissionModalOpen(true)}
                 className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-400 via-blue-500 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-sky-500/25 transition transform active:scale-95"
               >
-                <Sparkles className="w-4 h-4 text-slate-950" />
                 <span>{t('nav_admission', 'Admission 2025')}</span>
               </button>
 

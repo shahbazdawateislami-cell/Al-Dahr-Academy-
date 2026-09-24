@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAcademy } from '../context/AcademyContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getLocalizedHeroSlide } from '../data/localizedData';
 import {
   ChevronLeft,
   ChevronRight,
-  Sparkles,
   ArrowRight,
   Calculator,
 } from 'lucide-react';
@@ -51,8 +51,8 @@ export const HeroCarousel: React.FC = () => {
     setCurrentIndex((prev) => (prev + 1) % activeSlides.length);
   };
 
-  const currentSlide = activeSlides[currentIndex] || {
-    id: 'default',
+  const rawSlide = activeSlides[currentIndex] || {
+    id: 'slide-1',
     badge: 'WELCOME TO AL-DAHR ACADEMY',
     title: 'Start Your Beautiful And Bright Future',
     subtitle: 'Nurturing sacred Islamic Tarbiyah, Hifz-e-Quran, and modern school academics in Phulwari Sharif, Patna. Enrolling Classes 1 to 8.',
@@ -62,6 +62,8 @@ export const HeroCarousel: React.FC = () => {
     secondaryBtnText: 'Explore Programs',
     secondaryBtnAction: 'programs',
   };
+
+  const currentSlide = getLocalizedHeroSlide(rawSlide, language);
 
   const handleAction = (action?: string) => {
     if (action === 'admission') {
@@ -122,7 +124,6 @@ export const HeroCarousel: React.FC = () => {
           <div className="max-w-xl space-y-2 text-left p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-[#03091e]/45 backdrop-blur-sm border border-sky-400/40 shadow-[0_0_20px_rgba(14,165,233,0.2)] hover:border-amber-400/60 transition-all duration-500">
             {/* Top Welcome Badge - Stable */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/50 text-sky-300 text-[9px] sm:text-[11px] font-extrabold tracking-wider uppercase shadow-md">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>
                 {currentSlide.badge || 'WELCOME TO AL-DAHR ACADEMY'}
               </span>

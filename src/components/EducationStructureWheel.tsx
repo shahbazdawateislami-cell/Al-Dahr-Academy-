@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import {
   Youtube,
   Instagram,
   Facebook,
   Cpu,
-  Sparkles,
   ChevronRight,
   GraduationCap,
   Users,
@@ -24,6 +24,7 @@ const StatusBadge: React.FC<{ status?: string; defaultStatus: 'active' | 'coming
   status,
   defaultStatus,
 }) => {
+  const { t } = useLanguage();
   const currentStatus = status || defaultStatus;
   const isActive = currentStatus === 'active';
 
@@ -34,7 +35,7 @@ const StatusBadge: React.FC<{ status?: string; defaultStatus: 'active' | 'coming
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
         </span>
-        <span>ACTIVE</span>
+        <span>{t('badge_active', 'ACTIVE')}</span>
       </div>
     );
   }
@@ -42,7 +43,7 @@ const StatusBadge: React.FC<{ status?: string; defaultStatus: 'active' | 'coming
   return (
     <div className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/30 via-orange-500/30 to-amber-500/30 border-2 border-amber-400/90 text-amber-200 text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.5)] backdrop-blur-md animate-pulse">
       <Clock className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-      <span>COMING SOON</span>
+      <span>{t('badge_coming_soon', 'COMING SOON')}</span>
     </div>
   );
 };
@@ -94,6 +95,7 @@ const ScrollReveal: React.FC<{
 
 export const EducationStructureWheel: React.FC = () => {
   const { structureData } = useAcademy();
+  const { t } = useLanguage();
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const aiHandImage = structureData?.aiImageUrl || defaultAiHandImage;
@@ -103,7 +105,7 @@ export const EducationStructureWheel: React.FC = () => {
   const secondarySegments = [
     {
       id: 'character',
-      title: 'CHARACTER BUILDING',
+      title: t('structure_char_title', 'CHARACTER BUILDING'),
       bgGradient: 'from-[#071330] via-[#0a1b42] to-[#040e26]',
       borderClass: 'border-amber-400/80',
       glowShadow: 'shadow-amber-500/30',
@@ -122,7 +124,7 @@ export const EducationStructureWheel: React.FC = () => {
     },
     {
       id: 'physical',
-      title: 'PHYSICAL & MENTAL DEVELOPMENT',
+      title: t('structure_phys_title', 'PHYSICAL & MENTAL DEVELOPMENT'),
       bgGradient: 'from-[#071330] via-[#0e173e] to-[#040e26]',
       borderClass: 'border-purple-400/80',
       glowShadow: 'shadow-purple-500/30',
@@ -144,7 +146,7 @@ export const EducationStructureWheel: React.FC = () => {
     },
     {
       id: 'hostel',
-      title: 'COMFORTABLE HOSTEL FACILITY',
+      title: t('structure_hostel_title', 'COMFORTABLE HOSTEL FACILITY'),
       bgGradient: 'from-[#071330] via-[#07243c] to-[#040e26]',
       borderClass: 'border-cyan-400/80',
       glowShadow: 'shadow-cyan-500/30',
@@ -168,7 +170,7 @@ export const EducationStructureWheel: React.FC = () => {
     },
     {
       id: 'support',
-      title: 'EXTRA SUPPORT',
+      title: t('structure_support_title', 'EXTRA SUPPORT'),
       bgGradient: 'from-[#071330] via-[#1a1b38] to-[#040e26]',
       borderClass: 'border-orange-400/80',
       glowShadow: 'shadow-orange-500/30',
@@ -190,13 +192,13 @@ export const EducationStructureWheel: React.FC = () => {
     },
     {
       id: 'values',
-      title: 'ISLAMIC & MODERN VALUES TOGETHER',
+      title: t('structure_values_title', 'ISLAMIC & MODERN VALUES TOGETHER'),
       bgGradient: 'from-[#071330] via-[#13223f] to-[#040e26]',
       borderClass: 'border-amber-400/90',
       glowShadow: 'shadow-amber-500/40',
       isSpecialValue: true,
-      taglineDeen: 'Deen se Roshni',
-      taglineDuniya: 'Duniya mein Kamyabi',
+      taglineDeen: t('structure_values_deen', 'Deen se Roshni'),
+      taglineDuniya: t('structure_values_duniya', 'Duniya mein Kamyabi'),
       icon: (
         <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center shadow-md">
           <svg className="w-5 h-5 text-emerald-300" viewBox="0 0 24 24" fill="currentColor">
@@ -206,8 +208,8 @@ export const EducationStructureWheel: React.FC = () => {
         </div>
       ),
       bullets: [
-        'Deen se Roshni',
-        'Duniya mein Kamyabi',
+        t('structure_values_deen', 'Deen se Roshni'),
+        t('structure_values_duniya', 'Duniya mein Kamyabi'),
       ],
     },
   ];
@@ -220,14 +222,13 @@ export const EducationStructureWheel: React.FC = () => {
         <ScrollReveal direction="down" delayMs={0}>
           <div className="text-center max-w-3xl mx-auto space-y-2">
             <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-gradient-to-r from-amber-500/20 via-amber-400/30 to-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-bold uppercase tracking-widest shadow-lg">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span>Official Academic Structure</span>
+              <span>{t('structure_official_badge', 'Official Academic Structure')}</span>
             </div>
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white font-['Cinzel',serif] tracking-tight drop-shadow-lg">
-              AL-DAHR ACADEMY STRUCTURE
+              {t('structure_title', 'AL-DAHR ACADEMY STRUCTURE')}
             </h2>
             <p className="text-xs sm:text-sm text-sky-200/90 max-w-xl mx-auto">
-              Modern CBSE Education, Islamic Taleem & Hifz-e-Qur'an, AI & Social Media Master Class, and Character Building.
+              {t('structure_subtitle', 'Modern CBSE Education, Islamic Taleem & Hifz-e-Qur\'an, AI & Social Media Master Class, and Character Building.')}
             </p>
           </div>
         </ScrollReveal>
@@ -251,10 +252,10 @@ export const EducationStructureWheel: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-[10px] font-black uppercase text-sky-300 tracking-widest">
-                      ★ Primary Modern Education Pillar
+                      {t('structure_modern_pillar', '★ Primary Modern Education Pillar')}
                     </span>
                     <h3 className="text-lg sm:text-2xl font-black text-white font-['Cinzel',serif] tracking-wide">
-                      MODERN EDUCATION (CBSE PATTERN)
+                      {t('structure_modern_title', 'MODERN EDUCATION (CBSE PATTERN)')}
                     </h3>
                   </div>
                 </div>
@@ -267,7 +268,7 @@ export const EducationStructureWheel: React.FC = () => {
 
             <ScrollReveal direction="up" delayMs={150}>
               <p className="text-xs sm:text-sm font-semibold text-sky-200/90 mb-4">
-                {structureData?.modernDescription || 'Comprehensive NCERT & CBSE Syllabus for Class 1 to Class 8 with strong foundation in core subjects:'}
+                {structureData?.modernDescription || t('structure_modern_desc', 'Comprehensive NCERT & CBSE Syllabus for Class 1 to Class 8 with strong foundation in core subjects:')}
               </p>
             </ScrollReveal>
 
@@ -308,17 +309,17 @@ export const EducationStructureWheel: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-[10px] font-black uppercase text-amber-300 tracking-widest">
-                      ★ Core Deeni & Qur'anic Tarbiyat Pillar
+                      {t('structure_islamic_pillar', '★ Sacred Deeni Education Pillar')}
                     </span>
                     <h3 className="text-lg sm:text-2xl font-black text-white font-['Cinzel',serif] tracking-wide">
-                      ISLAMIC EDUCATION & HIFZ-E-QUR'AN
+                      {t('structure_islamic_title', 'ISLAMIC EDUCATION & HIFZ-E-QURAN')}
                     </h3>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <StatusBadge status={structureData?.islamicStatus} defaultStatus="active" />
                   <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black">
-                    <span>Deeni Taleem</span>
+                    <span>{t('nav_islamic', 'Islamic Education')}</span>
                   </div>
                 </div>
               </div>
@@ -326,7 +327,7 @@ export const EducationStructureWheel: React.FC = () => {
 
             <ScrollReveal direction="up" delayMs={150}>
               <p className="text-xs sm:text-sm font-semibold text-emerald-200/90 mb-4">
-                {structureData?.islamicDescription || "Complete Deeni Taleem, Tajweed, Nazira & Step-by-step Hifz-e-Qur'an Curriculum:"}
+                {structureData?.islamicDescription || t('structure_islamic_desc', 'Comprehensive Islamic learning under qualified Ulama for Class 1 to Class 8:')}
               </p>
             </ScrollReveal>
 
@@ -418,7 +419,6 @@ export const EducationStructureWheel: React.FC = () => {
                       className={`px-3 py-2 rounded-xl bg-slate-950/80 border-2 border-sky-400/60 text-white text-xs font-black backdrop-blur-md flex items-center gap-2 shadow-xl hover:scale-105 transition transform ${idx % 2 === 0 ? 'animate-float' : 'animate-float-reverse'}`}
                       style={{ animationDelay: `${idx * 0.2}s` }}
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-sky-400 shrink-0 animate-pulse" />
                       <span className="drop-shadow-sm">{skillText}</span>
                     </div>
                   ))}
@@ -506,7 +506,6 @@ export const EducationStructureWheel: React.FC = () => {
                       className={`px-3 py-2 rounded-xl bg-slate-950/80 border-2 border-amber-400/60 text-white text-xs font-black backdrop-blur-md flex items-center gap-2 shadow-xl hover:scale-105 transition transform ${idx % 2 === 0 ? 'animate-float' : 'animate-float-reverse'}`}
                       style={{ animationDelay: `${idx * 0.2}s` }}
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 animate-pulse" />
                       <span className="drop-shadow-sm">{skillText}</span>
                     </div>
                   ))}

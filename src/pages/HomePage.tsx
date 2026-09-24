@@ -3,7 +3,6 @@ import { useAcademy } from '../context/AcademyContext';
 import { useLanguage } from '../context/LanguageContext';
 import { PageRoute } from '../types';
 import {
-  Sparkles,
   Phone,
   MessageCircle,
   Calculator,

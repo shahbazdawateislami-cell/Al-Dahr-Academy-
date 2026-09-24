@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import { GalleryMediaItem } from '../types';
 import { X, Sparkles, Camera, ZoomIn } from 'lucide-react';
 
 export const GalleryPage: React.FC = () => {
   const { gallery } = useAcademy();
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeImage, setActiveImage] = useState<GalleryMediaItem | null>(null);
 
@@ -15,18 +17,28 @@ export const GalleryPage: React.FC = () => {
       ? gallery
       : gallery.filter((g) => g.category === selectedCategory);
 
+  const getCategoryLabel = (cat: string) => {
+    if (cat === 'All') return t('gallery_cat_all', 'All Photos');
+    if (cat === 'Academic') return t('gallery_cat_academic', 'Academic');
+    if (cat === 'Residential') return t('gallery_cat_residential', 'Residential');
+    if (cat === 'Events') return t('gallery_cat_events', 'Events');
+    if (cat === 'Campus') return t('gallery_cat_campus', 'Campus');
+    if (cat === 'Sports') return t('gallery_cat_sports', 'Sports');
+    return cat;
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 text-white">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider">
-          Visual Memories
+          {t('gallery_badge', 'Visual Memories')}
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold font-['Cinzel',serif] tracking-tight">
-          Academy Photo Gallery
+          {t('gallery_title', 'Academy Photo Gallery')}
         </h1>
         <p className="text-sm sm:text-base text-slate-300">
-          A glimpse into life at Al-Dahr Academy — from early morning Quranic halqahs to lively science labs and sports grounds.
+          {t('gallery_subtitle', 'A glimpse into life at Al-Dahr Academy — from early morning Quranic halqahs to lively science labs and sports grounds.')}
         </p>
       </div>
 
@@ -42,7 +54,7 @@ export const GalleryPage: React.FC = () => {
                 : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700'
             }`}
           >
-            {cat}
+            {getCategoryLabel(cat)}
           </button>
         ))}
       </div>

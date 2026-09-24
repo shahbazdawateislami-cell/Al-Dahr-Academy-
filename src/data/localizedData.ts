@@ -1,5 +1,5 @@
 import { AppLanguage } from './translations';
-import { ProgramItem, SchoolClassItem, FacilityItem, SubjectItem, CurriculumItem } from '../types';
+import { ProgramItem, SchoolClassItem, FacilityItem, SubjectItem, CurriculumItem, HeroSlideItem } from '../types';
 import { initialPrograms, initialClasses, initialFacilities, initialSubjects, initialCurriculum } from './initialData';
 
 export interface LocalizedProgramContent {
@@ -510,5 +510,45 @@ export function getLocalizedCurriculum(cur: CurriculumItem, lang: AppLanguage): 
     title: loc.title,
     description: loc.description,
     topics: loc.topics,
+  };
+}
+
+export const HERO_SLIDE_LOCALIZATIONS: Record<string, Record<AppLanguage, { badge: string; title: string; subtitle: string; primaryBtnText: string; secondaryBtnText: string }>> = {
+  'slide-1': {
+    en: { badge: 'WELCOME TO AL-DAHR ACADEMY', title: 'Start Your Beautiful And Bright Future', subtitle: 'Nurturing sacred Islamic Tarbiyah, Hifz-e-Quran, and modern school academics in Phulwari Sharif, Patna. Enrolling Classes 1 to 8.', primaryBtnText: 'Admission 2025–26', secondaryBtnText: 'Explore Programs' },
+    roman: { badge: 'AL-DAHR ACADEMY MEIN KHUSH-AAMDEED', title: 'Apne Bachhe Ka Roshan Aur Shandar Mustaqbil Shuru Karein', subtitle: 'Phulwari Sharif, Patna mein Quran Hifz, Tajweed, Deeni Tarbiyah aur CBSE Level Modern Education. Class 1 se 8 tak Dakhle Shuru.', primaryBtnText: 'Admission 2025–26', secondaryBtnText: 'Programs Dekhein' },
+    ur: { badge: 'الداھر اکیڈمی میں خوش آمدید', title: 'اپنے بچوں کا روشن اور شاندار مستقبل شروع کریں', subtitle: 'پھلواری شریف، پٹنہ میں حفظِ قرآن، تجوید، دینی تربیت اور معیاری عصری اسکولنگ۔ کلاس 1 تا 8 کے داخلے جاری ہیں۔', primaryBtnText: 'آن لائن داخلہ 2025–26', secondaryBtnText: 'پروگرامز دیکھیں' },
+    hi: { badge: 'अल-दहर एकेडमी में हार्दिक स्वागत है', title: 'अपने बच्चे का उज्ज्वल व सुंदर भविष्य शुरू करें', subtitle: 'फुलवारी शरीफ, पटना में पवित्र कुरआन हिफ़्ज़, तजवीद, दीनी तरबियत व आधुनिक सीबीएसई शिक्षा। कक्षा 1 से 8 में प्रवेश प्रारंभ।', primaryBtnText: 'प्रवेश 2025–26', secondaryBtnText: 'प्रोग्राम देखें' },
+  },
+  'slide-2': {
+    en: { badge: 'ISLAMIC EDUCATION & HIFZ-E-QURAN', title: 'Rooted In The Holy Qur’an, Tajweed & Sunnah', subtitle: 'Experienced certified Asatizah providing step-by-step Quran memorization, Arabic language, and 5-time prayer discipline in our peaceful Musalla.', primaryBtnText: 'Islamic Syllabus', secondaryBtnText: 'Campus Facilities' },
+    roman: { badge: 'ISLAMI TALEEM AUR HIFZ-E-QURAN', title: 'Quran-o-Sunnat Aur Tajweed Ki Roshni', subtitle: 'Sanad-yafta Asatiza ki dekhbhal mein Quran Hifz, Arabic zaban aur 5 waqt ki ba-jamaat namaz ki tarbiyah.', primaryBtnText: 'Islami Nisab', secondaryBtnText: 'Campus Sahuliyat' },
+    ur: { badge: 'اسلامی تعلیم اور حفظِ قرآن کریم', title: 'قرآن و سنت، تجوید اور اخلاقی تربیت کا مرکز', subtitle: 'سند یافتہ اساتذہ کی زیر نگرانی حفظِ قرآن، عربی زبان اور پانچوں وقت کی باجماعت نماز کا باضابطہ اہتمام۔', primaryBtnText: 'اسلامی نصاب', secondaryBtnText: 'کیمپس سہولیات' },
+    hi: { badge: 'इस्लामिक शिक्षा व हिफ़्ज़-ए-कुरआन', title: 'पवित्र कुरआन, तजवीद व सुन्नत पर आधारित शिक्षा', subtitle: 'प्रमाणित हाफ़िज़ शिक्षकों की देखरेख में कुरआन हिफ़्ज़, अरबी भाषा व 5 समय की बाज़मात नमाज़ का प्रशिक्षण।', primaryBtnText: 'इस्लामिक पाठ्यक्रम', secondaryBtnText: 'कैंपस सुविधाएं' },
+  },
+  'slide-3': {
+    en: { badge: 'MODERN EDUCATION & SCIENTIFIC TEMPER', title: 'Equipping Young Minds With English, Science & Math', subtitle: 'Comprehensive CBSE-standard academic curriculum, spoken English workshops, computer technology, and smart classroom pedagogy for grades 1 to 8.', primaryBtnText: 'View Academic Subjects', secondaryBtnText: 'Fee Calculator' },
+    roman: { badge: 'MODERN TALEEM AUR SCIENCE', title: 'English, Science Aur Maths Mein Aala Kamyaabi', subtitle: 'CBSE standard school syllabus, Spoken English, Computer technology aur smart classrooms class 1 se 8 tak.', primaryBtnText: 'Subjects Dekhein', secondaryBtnText: 'Fee Calculator' },
+    ur: { badge: 'جدید عصری تعلیم و سائنسی علوم', title: 'انگریزی، سائنس اور ریاضی میں اعلیٰ تعلیمی معیار', subtitle: 'سی بی ایس ای نصاب کے مطابق عصری اسکولنگ، اسپوکن انگلش، کمپیوٹر اور اسمارٹ کلاس رومز درجہ اول تا ہشتم۔', primaryBtnText: 'تعلیمی مضامین دیکھیں', secondaryBtnText: 'فیس کیلکولیٹر' },
+    hi: { badge: 'आधुनिक शिक्षा व वैज्ञानिक दृष्टिकोण', title: 'अंग्रेजी, गणित व विज्ञान में उच्च कोटि की दक्षता', subtitle: 'सीबीएसई मानक पाठ्यक्रम, स्पोकन इंग्लिश वर्कशॉप, कंप्यूटर तकनीक व स्मार्ट क्लासरूम शिक्षण कक्षा 1 से 8 तक।', primaryBtnText: 'विषय देखें', secondaryBtnText: 'फीस कैलकुलेटर' },
+  },
+  'slide-4': {
+    en: { badge: 'HOLISTIC RESIDENTIAL BOARDING', title: 'A Safe, Disciplined & Loving Campus Home', subtitle: '24/7 dedicated mentors, clean hygienic dormitories, nutritious halal dining, Tahajjud awakenings, and regular evening sports activities.', primaryBtnText: 'Apply For Residential', secondaryBtnText: 'Contact Office' },
+    roman: { badge: 'RESIDENTIAL HOSTEL SAHULAT', title: 'Mehfooz, Ba-Zabt Aur Shafiq Boarding Home', subtitle: '24 ghante asatiza ki dekhbhal, saaf suthra hostel, lazeez halal khana, Tahajjud aur sham ke sports.', primaryBtnText: 'Hostel Admission Form', secondaryBtnText: 'Rabta Karein' },
+    ur: { badge: 'مکمل اقامتی ہاسٹل سہولت', title: 'محفوظ، باضابطہ اور شفقت سے بھرپور تعلیمی گھر', subtitle: '24 گھنٹے اساتذہ کی سرپرستی، صاف ستھرا ہاسٹل، غذائیت سے بھرپور حلال کھانا، تہجد کا اہتمام اور شام کے کھیل۔', primaryBtnText: 'اقامتی داخلہ فارم', secondaryBtnText: 'دفتر سے رابطہ کریں' },
+    hi: { badge: 'संपूर्ण आवासीय छात्रावास (हॉस्टल)', title: 'सुरक्षित, अनुशासित व स्नेही कैंपस वातावरण', subtitle: '24 घंटे शिक्षकों का मार्गदर्शन, स्वच्छ हॉस्टल, पौष्टिक हलाल भोजन, तहज्जुद का अभ्यास व शाम के खेलकूद।', primaryBtnText: 'आवासीय प्रवेश फॉर्म', secondaryBtnText: 'कार्यालय से संपर्क' },
+  },
+};
+
+export function getLocalizedHeroSlide(slide: HeroSlideItem, lang: AppLanguage): HeroSlideItem {
+  const loc = HERO_SLIDE_LOCALIZATIONS[slide.id]?.[lang];
+  if (!loc) return slide;
+  return {
+    ...slide,
+    badge: loc.badge,
+    title: loc.title,
+    subtitle: loc.subtitle,
+    primaryBtnText: loc.primaryBtnText,
+    secondaryBtnText: loc.secondaryBtnText,
   };
 }

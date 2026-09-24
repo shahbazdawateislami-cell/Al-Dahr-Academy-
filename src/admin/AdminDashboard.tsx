@@ -255,20 +255,20 @@ export const AdminDashboard: React.FC = () => {
           >
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Admin Email / Passcode
+                Admin Password
               </label>
               <input
-                type="text"
+                type="password"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                placeholder="Enter aldahracademy@gmail.com"
+                placeholder="Enter Your Admin Password"
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-500 font-medium"
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck={false}
               />
               <p className="text-[11px] text-slate-400 mt-1">
-                Enter <code className="text-amber-400 font-mono font-semibold">aldahracademy@gmail.com</code> to log in
+                Enter your authorized admin password to log in
               </p>
             </div>
 

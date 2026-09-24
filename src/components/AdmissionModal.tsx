@@ -5,7 +5,7 @@ import { createGoogleMeetSpace } from '../services/googleWorkspace';
 import { getLocalizedClass, getLocalizedProgram } from '../data/localizedData';
 import {
   X,
-  Sparkles,
+  GraduationCap,
   CheckCircle2,
   Phone,
   MessageCircle,
@@ -109,7 +109,7 @@ export const AdmissionModal: React.FC = () => {
         <div className="bg-gradient-to-r from-[#050e26] via-[#0B1E4F] to-[#050e26] px-6 py-5 border-b border-blue-900/60 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 shadow-inner">
-              <Sparkles className="w-5 h-5" />
+              <GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-white font-['Cinzel',serif]">

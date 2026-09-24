@@ -519,7 +519,7 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       sessionStorage.setItem('aldahr_admin_session', 'active');
       return true;
     }
-    setAdminLoginError('Invalid credential. Please enter aldahracademy@gmail.com or passcode.');
+    setAdminLoginError('Invalid password. Please enter your authorized admin password.');
     return false;
   };
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAcademy } from '../context/AcademyContext';
+import { useLanguage } from '../context/LanguageContext';
 import { VideoMediaItem } from '../types';
 import {
   Play,
@@ -16,6 +17,7 @@ interface VideosPageProps {
 
 export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' }) => {
   const { videos } = useAcademy();
+  const { t } = useLanguage();
   const [filter, setFilter] = useState<'all' | 'youtube' | 'shorts' | 'instagram'>(initialFilter);
   const [activeVideoToPlay, setActiveVideoToPlay] = useState<VideoMediaItem | null>(null);
 
@@ -28,13 +30,13 @@ export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' })
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wider">
-          Media Hub
+          {t('videos_badge', 'Media Hub')}
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold font-['Cinzel',serif] tracking-tight">
-          Academy Videos, Shorts & Reels
+          {t('videos_title', 'Academy Videos, Shorts & Reels')}
         </h1>
         <p className="text-sm sm:text-base text-slate-300">
-          Watch campus walkthroughs, student Quran recitations, classroom activities, and admissions announcements directly in-app.
+          {t('videos_subtitle', 'Watch campus walkthroughs, student Quran recitations, classroom activities, and admissions announcements directly in-app.')}
         </p>
       </div>
 
@@ -48,7 +50,7 @@ export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' })
               : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700'
           }`}
         >
-          All Media ({videos.filter((v) => v.active).length})
+          {t('videos_tab_all', 'All Media')} ({videos.filter((v) => v.active).length})
         </button>
 
         <button
@@ -60,7 +62,7 @@ export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' })
           }`}
         >
           <Youtube className="w-4 h-4" />
-          <span>YouTube Videos ({videos.filter((v) => v.active && v.type === 'youtube').length})</span>
+          <span>{t('videos_tab_youtube', 'YouTube Videos')} ({videos.filter((v) => v.active && v.type === 'youtube').length})</span>
         </button>
 
         <button
@@ -71,7 +73,7 @@ export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' })
               : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700'
           }`}
         >
-          <span>⚡ YouTube Shorts ({videos.filter((v) => v.active && v.type === 'shorts').length})</span>
+          <span>⚡ {t('videos_tab_shorts', 'YouTube Shorts')} ({videos.filter((v) => v.active && v.type === 'shorts').length})</span>
         </button>
 
         <button
@@ -83,7 +85,7 @@ export const VideosPage: React.FC<VideosPageProps> = ({ initialFilter = 'all' })
           }`}
         >
           <Instagram className="w-4 h-4" />
-          <span>Instagram Videos ({videos.filter((v) => v.active && v.type === 'instagram').length})</span>
+          <span>{t('videos_tab_reels', 'Instagram Reels')} ({videos.filter((v) => v.active && v.type === 'instagram').length})</span>
         </button>
       </div>
 

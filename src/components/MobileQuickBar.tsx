@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAcademy } from '../context/AcademyContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Phone, MessageCircle, Sparkles, Calculator } from 'lucide-react';
+import { Phone, MessageCircle, Calculator } from 'lucide-react';
 
 export const MobileQuickBar: React.FC = () => {
   const { settings, setIsAdmissionModalOpen, setIsFeeCalculatorOpen } = useAcademy();
@@ -35,7 +35,6 @@ export const MobileQuickBar: React.FC = () => {
         onClick={() => setIsAdmissionModalOpen(true)}
         className="flex-1 h-9 px-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 flex items-center justify-center gap-1 text-[11px] font-extrabold min-w-0 shadow-sm active:scale-95 transition"
       >
-        <Sparkles className="w-3.5 h-3.5 shrink-0" />
         <span className="truncate">{t('nav_apply_now', 'Apply')}</span>
       </button>
 
