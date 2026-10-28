@@ -8,12 +8,25 @@ import {
 import { getLocalizedSubject } from '../data/localizedData';
 
 export const ModernEducationPage: React.FC = () => {
-  const { subjects, setIsAdmissionModalOpen } = useAcademy();
+  const { subjects, structureData, setIsAdmissionModalOpen } = useAcademy();
   const { t, language } = useLanguage();
 
-  const modernSubjects = subjects
+  const primaryModernSubjects = subjects
     .filter((s) => s.type === 'modern')
     .map((s) => getLocalizedSubject(s, language));
+
+  const structureModernSubjects = (structureData?.modernSubjects || [])
+    .filter((s) => !primaryModernSubjects.some((p) => p.title.toLowerCase() === s.title.toLowerCase()))
+    .map((s, idx) => ({
+      id: 'struct-modern-' + idx,
+      title: s.title,
+      description: s.desc,
+      type: 'modern' as const,
+      iconName: 'GraduationCap',
+      order: 100 + idx,
+    }));
+
+  const modernSubjects = [...primaryModernSubjects, ...structureModernSubjects];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16 text-white">

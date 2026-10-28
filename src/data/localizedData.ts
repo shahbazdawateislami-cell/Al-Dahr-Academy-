@@ -460,56 +460,81 @@ export const CURRICULUM_LOCALIZATIONS: Record<string, Record<AppLanguage, { titl
 };
 
 export function getLocalizedProgram(prog: ProgramItem, lang: AppLanguage): ProgramItem {
+  if (lang === 'en') return prog;
+  const initialProg = initialPrograms.find((p) => p.id === prog.id);
+  if (initialProg && (initialProg.name !== prog.name || initialProg.description !== prog.description)) {
+    return prog;
+  }
   const loc = PROGRAM_LOCALIZATIONS[prog.id]?.[lang];
   if (!loc) return prog;
   return {
     ...prog,
-    name: loc.name,
-    classes: loc.classes,
-    feeNote: loc.feeNote,
-    description: loc.description,
-    features: loc.features,
+    name: loc.name || prog.name,
+    classes: loc.classes || prog.classes,
+    feeNote: loc.feeNote || prog.feeNote,
+    description: loc.description || prog.description,
+    features: (loc.features && loc.features.length > 0) ? loc.features : prog.features,
   };
 }
 
 export function getLocalizedClass(cls: SchoolClassItem, lang: AppLanguage): SchoolClassItem {
+  if (lang === 'en') return cls;
+  const initialCls = initialClasses.find((c) => c.gradeNumber === cls.gradeNumber);
+  if (initialCls && (initialCls.name !== cls.name || initialCls.description !== cls.description)) {
+    return cls;
+  }
   const loc = CLASS_LOCALIZATIONS[cls.gradeNumber]?.[lang];
   if (!loc) return cls;
   return {
     ...cls,
-    name: loc.name,
-    description: loc.description,
+    name: loc.name || cls.name,
+    description: loc.description || cls.description,
   };
 }
 
 export function getLocalizedFacility(fac: FacilityItem, lang: AppLanguage): FacilityItem {
+  if (lang === 'en') return fac;
+  const initialFac = initialFacilities.find((f) => f.id === fac.id);
+  if (initialFac && (initialFac.title !== fac.title || initialFac.description !== fac.description)) {
+    return fac;
+  }
   const loc = FACILITY_LOCALIZATIONS[fac.id]?.[lang];
   if (!loc) return fac;
   return {
     ...fac,
-    title: loc.title,
-    description: loc.description,
+    title: loc.title || fac.title,
+    description: loc.description || fac.description,
   };
 }
 
 export function getLocalizedSubject(subj: SubjectItem, lang: AppLanguage): SubjectItem {
+  if (lang === 'en') return subj;
+  const initialSubj = initialSubjects.find((s) => s.id === subj.id);
+  if (initialSubj && (initialSubj.title !== subj.title || initialSubj.description !== subj.description)) {
+    return subj;
+  }
   const loc = SUBJECT_LOCALIZATIONS[subj.id]?.[lang];
   if (!loc) return subj;
   return {
     ...subj,
-    title: loc.title,
-    description: loc.description,
+    title: loc.title || subj.title,
+    description: loc.description || subj.description,
   };
 }
 
 export function getLocalizedCurriculum(cur: CurriculumItem, lang: AppLanguage): CurriculumItem {
+  if (lang === 'en') return cur;
+  const initialCur = initialCurriculum.find((c) => c.id === cur.id);
+  if (initialCur && (initialCur.title !== cur.title || initialCur.description !== cur.description)) {
+    return cur;
+  }
   const loc = CURRICULUM_LOCALIZATIONS[cur.id]?.[lang];
   if (!loc) return cur;
   return {
     ...cur,
-    title: loc.title,
-    description: loc.description,
-    topics: loc.topics,
+    title: loc.title || cur.title,
+    description: loc.description || cur.description,
+    topics: (loc.topics && loc.topics.length > 0) ? loc.topics : cur.topics,
   };
 }
 

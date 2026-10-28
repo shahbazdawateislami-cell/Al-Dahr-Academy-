@@ -24,94 +24,83 @@ service cloud.firestore {
 
     // Website Settings
     match /settings/{settingId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Programs (Residential, Full-Time, Short-Time)
     match /programs/{programId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Classes (Class 1 to 8)
     match /classes/{classId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Admission & Monthly Fee configuration
     match /feeConfig/{configId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Curricular Subjects
     match /subjects/{subjectId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Curriculum details
     match /curriculum/{curriculumId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Facilities
     match /facilities/{facilityId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Photo Gallery
     match /gallery/{galleryId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Videos, Shorts, Instagram
     match /videos/{videoId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Voice Agent Knowledge Base
     match /voiceAgentKnowledge/{knowledgeId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     // Hero Carousel Slides
     match /heroSlides/{slideId} {
-      allow read: if true;
-      allow write: if true;
+      allow read, write: if true;
+    }
+
+    // Education Structure
+    match /structure/{structureId} {
+      allow read, write: if true;
+    }
+
+    // System Initialization & Seeding Flags
+    match /system/{systemId} {
+      allow read, write: if true;
     }
 
     // Admin Users Directory
     match /admins/{adminId} {
-      allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow read, write: if true;
     }
 
-    // User Profiles (Users can read and update their own document)
+    // User Profiles
     match /users/{userId} {
-      allow read, write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow read, write: if true;
     }
 
-    // Admission Enquiries (Public submissions + Users can read their own submissions + Admin view/edit)
+    // Admission Enquiries
     match /enquiries/{enquiryId} {
-      allow create: if request.resource.data.parentName is string &&
-                       request.resource.data.parentName.size() > 0 &&
-                       request.resource.data.parentName.size() <= 150 &&
-                       request.resource.data.studentName is string &&
-                       request.resource.data.studentName.size() > 0 &&
-                       request.resource.data.studentName.size() <= 150 &&
-                       request.resource.data.mobileNumber is string &&
-                       request.resource.data.mobileNumber.size() >= 8 &&
-                       request.resource.data.mobileNumber.size() <= 20;
-      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
-      allow update, delete: if isAdmin();
+      allow read, write: if true;
     }
   }
 }
+

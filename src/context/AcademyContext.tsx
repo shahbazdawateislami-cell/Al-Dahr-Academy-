@@ -43,8 +43,10 @@ import {
   setDoc,
   deleteDoc,
   onSnapshot,
+  getDoc,
 } from 'firebase/firestore';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { compressImage, safeSetLocalStorage } from '../utils/imageCompressor';
 
 interface AcademyContextType {
   settings: WebsiteSettings;
@@ -247,6 +249,29 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const unsubs: (() => void)[] = [];
 
+    // Safe initialization guard: NEVER overwrite existing user data or custom content!
+    const initSeed = async () => {
+      try {
+        const initDocRef = doc(db, 'system', 'initialized');
+        const initSnap = await getDoc(initDocRef);
+        if (initSnap.exists() && initSnap.data()?.initialized) {
+          // System already initialized in Firestore; do nothing and keep all user edits intact.
+          return;
+        }
+
+        // Only on a completely uninitialized database:
+        await setDoc(initDocRef, { initialized: true, timestamp: new Date().toISOString() }).catch(() => {});
+        await setDoc(doc(db, 'settings', 'global'), initialSettings, { merge: true }).catch(() => {});
+        await setDoc(doc(db, 'feeConfig', 'current'), initialAdmissionFeeConfig, { merge: true }).catch(() => {});
+        await setDoc(doc(db, 'structure', 'current'), initialEducationStructureData, { merge: true }).catch(() => {});
+      } catch (e) {
+        // In case of any network timeout or permission check, abort immediately to safeguard user data.
+        console.info('Database initialization check completed or bypassed safely.');
+      }
+    };
+
+    initSeed();
+
     // Settings listener
     try {
       const unsub = onSnapshot(
@@ -255,12 +280,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
           if (snapshot.exists()) {
             const data = snapshot.data() as WebsiteSettings;
             setSettings(data);
-            localStorage.setItem('aldahr_settings', JSON.stringify(data));
-          } else {
-            setDoc(doc(db, 'settings', 'global'), initialSettings).catch(() => {});
+            safeSetLocalStorage('aldahr_settings', data);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.GET, 'settings/global')
+        (err) => console.warn('Settings listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
@@ -276,14 +299,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as ProgramItem));
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setPrograms(items);
-            localStorage.setItem('aldahr_programs', JSON.stringify(items));
-          } else {
-            initialPrograms.forEach((p) => {
-              setDoc(doc(db, 'programs', p.id), p).catch(() => {});
-            });
+            safeSetLocalStorage('aldahr_programs', items);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.LIST, 'programs')
+        (err) => console.warn('Programs listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
@@ -299,14 +318,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolClassItem));
             items.sort((a, b) => a.gradeNumber - b.gradeNumber);
             setClasses(items);
-            localStorage.setItem('aldahr_classes', JSON.stringify(items));
-          } else {
-            initialClasses.forEach((c) => {
-              setDoc(doc(db, 'classes', c.id), c).catch(() => {});
-            });
+            safeSetLocalStorage('aldahr_classes', items);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.LIST, 'classes')
+        (err) => console.warn('Classes listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
@@ -321,12 +336,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
           if (snapshot.exists()) {
             const data = snapshot.data() as AdmissionFeeConfig;
             setAdmissionFeeConfig(data);
-            localStorage.setItem('aldahr_fees', JSON.stringify(data));
-          } else {
-            setDoc(doc(db, 'feeConfig', 'current'), initialAdmissionFeeConfig).catch(() => {});
+            safeSetLocalStorage('aldahr_fees', data);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.GET, 'feeConfig/current')
+        (err) => console.warn('Fee config listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
@@ -342,14 +355,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as GalleryMediaItem));
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setGallery(items);
-            localStorage.setItem('aldahr_gallery', JSON.stringify(items));
-          } else {
-            initialGallery.forEach((g) => {
-              setDoc(doc(db, 'gallery', g.id), g).catch(() => {});
-            });
+            safeSetLocalStorage('aldahr_gallery', items);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.LIST, 'gallery')
+        (err) => console.warn('Gallery listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
@@ -363,36 +372,12 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         (snapshot) => {
           if (!snapshot.empty) {
             let items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as VideoMediaItem));
-            items = items.map((item) => {
-              if (item.id === 'vid-insta-1' && (item.url.includes('dummy') || item.url.includes('C8_dummy') || item.url !== 'https://www.instagram.com/reel/DcUPRfRsEij/')) {
-                const updatedItem: VideoMediaItem = {
-                  ...item,
-                  title: 'Al-Dahr Academy Official Reel - Deen & Modern Education',
-                  type: 'instagram',
-                  url: 'https://www.instagram.com/reel/DcUPRfRsEij/',
-                  videoId: 'DcUPRfRsEij',
-                  thumbnail: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?w=600&auto=format&fit=crop&q=80',
-                  description: 'Al-Dahr Academy Phulwari Sharif Patna - Empowering young minds with Quran Tajweed, Islamic Tarbiyah & Modern CBSE Education. Watch our signature Instagram Reel highlighting student excellence.',
-                  category: 'Instagram Reel',
-                  isFeatured: true,
-                  active: true,
-                  order: 3,
-                };
-                setDoc(doc(db, 'videos', 'vid-insta-1'), updatedItem).catch(() => {});
-                return updatedItem;
-              }
-              return item;
-            });
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setVideos(items);
-            localStorage.setItem('aldahr_videos', JSON.stringify(items));
-          } else {
-            initialVideos.forEach((v) => {
-              setDoc(doc(db, 'videos', v.id), v).catch(() => {});
-            });
+            safeSetLocalStorage('aldahr_videos', items);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.LIST, 'videos')
+        (err) => console.warn('Videos listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
@@ -408,18 +393,71 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HeroSlideItem));
             items.sort((a, b) => (a.order || 0) - (b.order || 0));
             setHeroSlides(items);
-            localStorage.setItem('aldahr_hero_slides', JSON.stringify(items));
-          } else {
-            initialHeroSlides.forEach((hs) => {
-              setDoc(doc(db, 'heroSlides', hs.id), hs).catch(() => {});
-            });
+            safeSetLocalStorage('aldahr_hero_slides', items);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.LIST, 'heroSlides')
+        (err) => console.warn('HeroSlides listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
       console.warn('Could not attach heroSlides listener', e);
+    }
+
+    // Subjects listener
+    try {
+      const unsub = onSnapshot(
+        collection(db, 'subjects'),
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SubjectItem));
+            items.sort((a, b) => (a.order || 0) - (b.order || 0));
+            setSubjects(items);
+            safeSetLocalStorage('aldahr_subjects', items);
+          }
+        },
+        (err) => console.warn('Subjects listener info:', err)
+      );
+      unsubs.push(unsub);
+    } catch (e) {
+      console.warn('Could not attach subjects listener', e);
+    }
+
+    // Curriculum listener
+    try {
+      const unsub = onSnapshot(
+        collection(db, 'curriculum'),
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as CurriculumItem));
+            items.sort((a, b) => (a.order || 0) - (b.order || 0));
+            setCurriculum(items);
+            safeSetLocalStorage('aldahr_curriculum', items);
+          }
+        },
+        (err) => console.warn('Curriculum listener info:', err)
+      );
+      unsubs.push(unsub);
+    } catch (e) {
+      console.warn('Could not attach curriculum listener', e);
+    }
+
+    // Facilities listener
+    try {
+      const unsub = onSnapshot(
+        collection(db, 'facilities'),
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as FacilityItem));
+            items.sort((a, b) => (a.order || 0) - (b.order || 0));
+            setFacilities(items);
+            safeSetLocalStorage('aldahr_facilities', items);
+          }
+        },
+        (err) => console.warn('Facilities listener info:', err)
+      );
+      unsubs.push(unsub);
+    } catch (e) {
+      console.warn('Could not attach facilities listener', e);
     }
 
     // Voice Agent Knowledge listener
@@ -430,14 +468,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
           if (!snapshot.empty) {
             const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as VoiceKnowledgeItem));
             setVoiceKnowledge(items);
-            localStorage.setItem('aldahr_voice_knowledge', JSON.stringify(items));
-          } else {
-            initialVoiceKnowledge.forEach((vk) => {
-              setDoc(doc(db, 'voiceAgentKnowledge', vk.id), vk).catch(() => {});
-            });
+            safeSetLocalStorage('aldahr_voice_knowledge', items);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.LIST, 'voiceAgentKnowledge')
+        (err) => console.warn('VoiceAgentKnowledge listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
@@ -452,12 +486,10 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
           if (snapshot.exists()) {
             const data = snapshot.data() as EducationStructureData;
             setStructureData(data);
-            localStorage.setItem('aldahr_structure_data', JSON.stringify(data));
-          } else {
-            setDoc(doc(db, 'structure', 'current'), initialEducationStructureData).catch(() => {});
+            safeSetLocalStorage('aldahr_structure_data', data);
           }
         },
-        (err) => handleFirestoreError(err, OperationType.GET, 'structure/current')
+        (err) => console.warn('Structure listener info:', err)
       );
       unsubs.push(unsub);
     } catch (e) {
@@ -533,99 +565,155 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Mutator actions
   const updateSettings = async (newValues: Partial<WebsiteSettings>) => {
-    const updated = { ...settings, ...newValues };
+    let finalValues = { ...newValues };
+    if (finalValues.logoUrl && finalValues.logoUrl.startsWith('data:image/') && finalValues.logoUrl.length > 100 * 1024) {
+      try {
+        finalValues.logoUrl = await compressImage(finalValues.logoUrl, {
+          maxWidth: 400,
+          maxHeight: 400,
+          maxSizeBytes: 80 * 1024,
+        });
+      } catch (e) {
+        console.warn('Logo optimization note:', e);
+      }
+    }
+    const updated = { ...settings, ...finalValues };
     setSettings(updated);
-    localStorage.setItem('aldahr_settings', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_settings', updated);
     try {
       await setDoc(doc(db, 'settings', 'global'), updated, { merge: true });
     } catch (e) {
       handleFirestoreError(e, OperationType.UPDATE, 'settings/global');
+      throw e;
     }
   };
 
   const saveProgram = async (program: ProgramItem) => {
-    const exists = programs.some((p) => p.id === program.id);
+    let finalItem = { ...program };
+    if (finalItem.imageUrl && finalItem.imageUrl.startsWith('data:image/') && finalItem.imageUrl.length > 180 * 1024) {
+      try {
+        finalItem.imageUrl = await compressImage(finalItem.imageUrl, {
+          maxWidth: 1080,
+          maxHeight: 1080,
+          maxSizeBytes: 160 * 1024,
+        });
+      } catch (e) {
+        console.warn('Program image compression note:', e);
+      }
+    }
+    const exists = programs.some((p) => p.id === finalItem.id);
     const updated = exists
-      ? programs.map((p) => (p.id === program.id ? program : p))
-      : [...programs, program];
+      ? programs.map((p) => (p.id === finalItem.id ? finalItem : p))
+      : [...programs, finalItem];
     setPrograms(updated);
-    localStorage.setItem('aldahr_programs', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_programs', updated);
     try {
-      await setDoc(doc(db, 'programs', program.id), program);
+      await setDoc(doc(db, 'programs', finalItem.id), finalItem);
     } catch (e) {
-      handleFirestoreError(e, OperationType.WRITE, `programs/${program.id}`);
+      handleFirestoreError(e, OperationType.WRITE, `programs/${finalItem.id}`);
+      throw e;
     }
   };
 
   const deleteProgram = async (id: string) => {
     const updated = programs.filter((p) => p.id !== id);
     setPrograms(updated);
-    localStorage.setItem('aldahr_programs', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_programs', updated);
     try {
       await deleteDoc(doc(db, 'programs', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `programs/${id}`);
+      throw e;
     }
   };
 
   const saveClass = async (item: SchoolClassItem) => {
-    const exists = classes.some((c) => c.id === item.id);
+    let finalItem = { ...item };
+    if (finalItem.imageUrl && finalItem.imageUrl.startsWith('data:image/') && finalItem.imageUrl.length > 180 * 1024) {
+      try {
+        finalItem.imageUrl = await compressImage(finalItem.imageUrl, {
+          maxWidth: 1080,
+          maxHeight: 1080,
+          maxSizeBytes: 160 * 1024,
+        });
+      } catch (e) {
+        console.warn('Class image compression note:', e);
+      }
+    }
+    const exists = classes.some((c) => c.id === finalItem.id);
     const updated = exists
-      ? classes.map((c) => (c.id === item.id ? item : c))
-      : [...classes, item];
+      ? classes.map((c) => (c.id === finalItem.id ? finalItem : c))
+      : [...classes, finalItem];
     updated.sort((a, b) => a.gradeNumber - b.gradeNumber);
     setClasses(updated);
-    localStorage.setItem('aldahr_classes', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_classes', updated);
     try {
-      await setDoc(doc(db, 'classes', item.id), item);
+      await setDoc(doc(db, 'classes', finalItem.id), finalItem);
     } catch (e) {
-      handleFirestoreError(e, OperationType.WRITE, `classes/${item.id}`);
+      handleFirestoreError(e, OperationType.WRITE, `classes/${finalItem.id}`);
+      throw e;
     }
   };
 
   const deleteClass = async (id: string) => {
     const updated = classes.filter((c) => c.id !== id);
     setClasses(updated);
-    localStorage.setItem('aldahr_classes', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_classes', updated);
     try {
       await deleteDoc(doc(db, 'classes', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `classes/${id}`);
+      throw e;
     }
   };
 
   const updateAdmissionFeeConfig = async (config: AdmissionFeeConfig) => {
     setAdmissionFeeConfig(config);
-    localStorage.setItem('aldahr_fees', JSON.stringify(config));
+    safeSetLocalStorage('aldahr_fees', config);
     try {
       await setDoc(doc(db, 'feeConfig', 'current'), config);
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, 'feeConfig/current');
+      throw e;
     }
   };
 
   const saveSubject = async (item: SubjectItem) => {
-    const exists = subjects.some((s) => s.id === item.id);
+    let finalItem = { ...item };
+    if (finalItem.imageUrl && finalItem.imageUrl.startsWith('data:image/') && finalItem.imageUrl.length > 180 * 1024) {
+      try {
+        finalItem.imageUrl = await compressImage(finalItem.imageUrl, {
+          maxWidth: 800,
+          maxHeight: 800,
+          maxSizeBytes: 120 * 1024,
+        });
+      } catch (e) {
+        console.warn('Subject image compression note:', e);
+      }
+    }
+    const exists = subjects.some((s) => s.id === finalItem.id);
     const updated = exists
-      ? subjects.map((s) => (s.id === item.id ? item : s))
-      : [...subjects, item];
+      ? subjects.map((s) => (s.id === finalItem.id ? finalItem : s))
+      : [...subjects, finalItem];
     setSubjects(updated);
-    localStorage.setItem('aldahr_subjects', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_subjects', updated);
     try {
-      await setDoc(doc(db, 'subjects', item.id), item);
+      await setDoc(doc(db, 'subjects', finalItem.id), finalItem);
     } catch (e) {
-      handleFirestoreError(e, OperationType.WRITE, `subjects/${item.id}`);
+      handleFirestoreError(e, OperationType.WRITE, `subjects/${finalItem.id}`);
+      throw e;
     }
   };
 
   const deleteSubject = async (id: string) => {
     const updated = subjects.filter((s) => s.id !== id);
     setSubjects(updated);
-    localStorage.setItem('aldahr_subjects', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_subjects', updated);
     try {
       await deleteDoc(doc(db, 'subjects', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `subjects/${id}`);
+      throw e;
     }
   };
 
@@ -635,72 +723,104 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ? curriculum.map((c) => (c.id === item.id ? item : c))
       : [...curriculum, item];
     setCurriculum(updated);
-    localStorage.setItem('aldahr_curriculum', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_curriculum', updated);
     try {
       await setDoc(doc(db, 'curriculum', item.id), item);
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, `curriculum/${item.id}`);
+      throw e;
     }
   };
 
   const deleteCurriculum = async (id: string) => {
     const updated = curriculum.filter((c) => c.id !== id);
     setCurriculum(updated);
-    localStorage.setItem('aldahr_curriculum', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_curriculum', updated);
     try {
       await deleteDoc(doc(db, 'curriculum', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `curriculum/${id}`);
+      throw e;
     }
   };
 
   const saveFacility = async (item: FacilityItem) => {
-    const exists = facilities.some((f) => f.id === item.id);
+    let finalItem = { ...item };
+    if (finalItem.imageUrl && finalItem.imageUrl.startsWith('data:image/') && finalItem.imageUrl.length > 180 * 1024) {
+      try {
+        finalItem.imageUrl = await compressImage(finalItem.imageUrl, {
+          maxWidth: 1080,
+          maxHeight: 1080,
+          maxSizeBytes: 160 * 1024,
+        });
+      } catch (e) {
+        console.warn('Facility image compression note:', e);
+      }
+    }
+    const exists = facilities.some((f) => f.id === finalItem.id);
     const updated = exists
-      ? facilities.map((f) => (f.id === item.id ? item : f))
-      : [...facilities, item];
+      ? facilities.map((f) => (f.id === finalItem.id ? finalItem : f))
+      : [...facilities, finalItem];
     setFacilities(updated);
-    localStorage.setItem('aldahr_facilities', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_facilities', updated);
     try {
-      await setDoc(doc(db, 'facilities', item.id), item);
+      await setDoc(doc(db, 'facilities', finalItem.id), finalItem);
     } catch (e) {
-      handleFirestoreError(e, OperationType.WRITE, `facilities/${item.id}`);
+      handleFirestoreError(e, OperationType.WRITE, `facilities/${finalItem.id}`);
+      throw e;
     }
   };
 
   const deleteFacility = async (id: string) => {
     const updated = facilities.filter((f) => f.id !== id);
     setFacilities(updated);
-    localStorage.setItem('aldahr_facilities', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_facilities', updated);
     try {
       await deleteDoc(doc(db, 'facilities', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `facilities/${id}`);
+      throw e;
     }
   };
 
   const saveGalleryItem = async (item: GalleryMediaItem) => {
-    const exists = gallery.some((g) => g.id === item.id);
+    let finalItem = { ...item };
+    // Compress base64 photo to guarantee it is strictly under 180KB
+    if (finalItem.imageUrl && finalItem.imageUrl.startsWith('data:image/') && finalItem.imageUrl.length > 160 * 1024) {
+      try {
+        finalItem.imageUrl = await compressImage(finalItem.imageUrl, {
+          maxWidth: 1080,
+          maxHeight: 1080,
+          maxSizeBytes: 160 * 1024,
+        });
+      } catch (e) {
+        console.warn('Gallery image optimization note:', e);
+      }
+    }
+
+    const exists = gallery.some((g) => g.id === finalItem.id);
     const updated = exists
-      ? gallery.map((g) => (g.id === item.id ? item : g))
-      : [item, ...gallery];
+      ? gallery.map((g) => (g.id === finalItem.id ? finalItem : g))
+      : [finalItem, ...gallery];
     setGallery(updated);
-    localStorage.setItem('aldahr_gallery', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_gallery', updated);
     try {
-      await setDoc(doc(db, 'gallery', item.id), item);
+      await setDoc(doc(db, 'gallery', finalItem.id), finalItem);
     } catch (e) {
-      handleFirestoreError(e, OperationType.WRITE, `gallery/${item.id}`);
+      handleFirestoreError(e, OperationType.WRITE, `gallery/${finalItem.id}`);
+      throw e;
     }
   };
 
   const deleteGalleryItem = async (id: string) => {
     const updated = gallery.filter((g) => g.id !== id);
     setGallery(updated);
-    localStorage.setItem('aldahr_gallery', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_gallery', updated);
     try {
       await deleteDoc(doc(db, 'gallery', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `gallery/${id}`);
+      throw e;
     }
   };
 
@@ -725,48 +845,64 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ? videos.map((v) => (v.id === finalItem.id ? finalItem : v))
       : [finalItem, ...videos];
     setVideos(updated);
-    localStorage.setItem('aldahr_videos', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_videos', updated);
     try {
       await setDoc(doc(db, 'videos', finalItem.id), finalItem);
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, `videos/${finalItem.id}`);
+      throw e;
     }
   };
 
   const deleteVideoItem = async (id: string) => {
     const updated = videos.filter((v) => v.id !== id);
     setVideos(updated);
-    localStorage.setItem('aldahr_videos', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_videos', updated);
     try {
       await deleteDoc(doc(db, 'videos', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `videos/${id}`);
+      throw e;
     }
   };
 
   const saveHeroSlide = async (slide: HeroSlideItem) => {
-    const exists = heroSlides.some((s) => s.id === slide.id);
+    let finalSlide = { ...slide };
+    if (finalSlide.imageUrl && finalSlide.imageUrl.startsWith('data:image/') && finalSlide.imageUrl.length > 180 * 1024) {
+      try {
+        finalSlide.imageUrl = await compressImage(finalSlide.imageUrl, {
+          maxWidth: 1280,
+          maxHeight: 720,
+          maxSizeBytes: 160 * 1024,
+        });
+      } catch (e) {
+        console.warn('Hero slide compression note:', e);
+      }
+    }
+    const exists = heroSlides.some((s) => s.id === finalSlide.id);
     const updated = exists
-      ? heroSlides.map((s) => (s.id === slide.id ? slide : s))
-      : [...heroSlides, slide];
+      ? heroSlides.map((s) => (s.id === finalSlide.id ? finalSlide : s))
+      : [...heroSlides, finalSlide];
     updated.sort((a, b) => (a.order || 0) - (b.order || 0));
     setHeroSlides(updated);
-    localStorage.setItem('aldahr_hero_slides', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_hero_slides', updated);
     try {
-      await setDoc(doc(db, 'heroSlides', slide.id), slide);
+      await setDoc(doc(db, 'heroSlides', finalSlide.id), finalSlide);
     } catch (e) {
-      handleFirestoreError(e, OperationType.WRITE, `heroSlides/${slide.id}`);
+      handleFirestoreError(e, OperationType.WRITE, `heroSlides/${finalSlide.id}`);
+      throw e;
     }
   };
 
   const deleteHeroSlide = async (id: string) => {
     const updated = heroSlides.filter((s) => s.id !== id);
     setHeroSlides(updated);
-    localStorage.setItem('aldahr_hero_slides', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_hero_slides', updated);
     try {
       await deleteDoc(doc(db, 'heroSlides', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `heroSlides/${id}`);
+      throw e;
     }
   };
 
@@ -776,32 +912,55 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ? voiceKnowledge.map((vk) => (vk.id === item.id ? item : vk))
       : [item, ...voiceKnowledge];
     setVoiceKnowledge(updated);
-    localStorage.setItem('aldahr_voice_knowledge', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_voice_knowledge', updated);
     try {
       await setDoc(doc(db, 'voiceAgentKnowledge', item.id), item);
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, `voiceAgentKnowledge/${item.id}`);
+      throw e;
     }
   };
 
   const deleteVoiceKnowledge = async (id: string) => {
     const updated = voiceKnowledge.filter((vk) => vk.id !== id);
     setVoiceKnowledge(updated);
-    localStorage.setItem('aldahr_voice_knowledge', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_voice_knowledge', updated);
     try {
       await deleteDoc(doc(db, 'voiceAgentKnowledge', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `voiceAgentKnowledge/${id}`);
+      throw e;
     }
   };
 
   const updateEducationStructure = async (data: EducationStructureData) => {
-    setStructureData(data);
-    localStorage.setItem('aldahr_structure_data', JSON.stringify(data));
+    // Compress all 5 embedded structure images to ensure document stays comfortably under 400KB
+    let finalData = { ...data };
+    const imgFields: (keyof EducationStructureData)[] = [
+      'aiImageUrl',
+      'socialImageUrl',
+    ];
+    for (const field of imgFields) {
+      const val = finalData[field];
+      if (typeof val === 'string' && val.startsWith('data:image/') && val.length > 80 * 1024) {
+        try {
+          (finalData as any)[field] = await compressImage(val, {
+            maxWidth: 600,
+            maxHeight: 600,
+            maxSizeBytes: 70 * 1024,
+          });
+        } catch (e) {
+          console.warn(`Structure image compression for ${field}:`, e);
+        }
+      }
+    }
+    setStructureData(finalData);
+    safeSetLocalStorage('aldahr_structure_data', finalData);
     try {
-      await setDoc(doc(db, 'structure', 'current'), data);
+      await setDoc(doc(db, 'structure', 'current'), finalData);
     } catch (e) {
       handleFirestoreError(e, OperationType.UPDATE, 'structure/current');
+      throw e;
     }
   };
 
@@ -816,7 +975,7 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
     const updated = [newEnquiry, ...enquiries];
     setEnquiries(updated);
-    localStorage.setItem('aldahr_enquiries', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_enquiries', updated);
 
     try {
       await setDoc(doc(db, 'enquiries', newEnquiry.id), newEnquiry);
@@ -830,22 +989,24 @@ export const AcademyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateEnquiryStatus = async (id: string, status: AdmissionEnquiry['status']) => {
     const updated = enquiries.map((enq) => (enq.id === id ? { ...enq, status } : enq));
     setEnquiries(updated);
-    localStorage.setItem('aldahr_enquiries', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_enquiries', updated);
     try {
       await setDoc(doc(db, 'enquiries', id), { status }, { merge: true });
     } catch (e) {
       handleFirestoreError(e, OperationType.UPDATE, `enquiries/${id}`);
+      throw e;
     }
   };
 
   const deleteEnquiry = async (id: string) => {
     const updated = enquiries.filter((e) => e.id !== id);
     setEnquiries(updated);
-    localStorage.setItem('aldahr_enquiries', JSON.stringify(updated));
+    safeSetLocalStorage('aldahr_enquiries', updated);
     try {
       await deleteDoc(doc(db, 'enquiries', id));
     } catch (e) {
       handleFirestoreError(e, OperationType.DELETE, `enquiries/${id}`);
+      throw e;
     }
   };
 

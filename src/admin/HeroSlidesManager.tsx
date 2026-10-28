@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAcademy } from '../context/AcademyContext';
 import { HeroSlideItem } from '../types';
+import { compressImage } from '../utils/imageCompressor';
 import {
   Plus,
   Trash2,
@@ -106,7 +107,7 @@ export const HeroSlidesManager: React.FC<{ showToast: (msg: string) => void }> =
   };
 
   // Image upload handler
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -115,33 +116,19 @@ export const HeroSlidesManager: React.FC<{ showToast: (msg: string) => void }> =
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        const maxDimension = 1600;
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = Math.round((height * maxDimension) / width);
-            width = maxDimension;
-          } else {
-            width = Math.round((width * maxDimension) / height);
-            height = maxDimension;
-          }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.82);
-        setFormData((prev) => ({ ...prev, imageUrl: compressedBase64 }));
-        showToast('Photo successfully select ho gayi!');
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    try {
+      showToast('Photo optimize ki ja rahi hai...');
+      const compressedBase64 = await compressImage(file, {
+        maxWidth: 1280,
+        maxHeight: 720,
+        maxSizeBytes: 160 * 1024,
+      });
+      setFormData((prev) => ({ ...prev, imageUrl: compressedBase64 }));
+      showToast('Photo successfully select aur optimize ho gayi!');
+    } catch (err) {
+      console.error('Slide image error:', err);
+      showToast('Photo process karne mein dikkat aayi.');
+    }
   };
 
   // Quick Unsplash Presets

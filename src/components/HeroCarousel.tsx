@@ -111,10 +111,10 @@ export const HeroCarousel: React.FC = () => {
               <img
                 src={slide.imageUrl}
                 alt={slide.title}
-                className="w-full h-full object-cover object-center filter contrast-105 saturate-110"
+                className="w-full h-full object-cover object-center"
               />
-              {/* Ultra-light, crystal clear Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#020817]/65 via-[#030d29]/20 to-transparent" />
+              {/* Subtle bottom vignette only for text readability, photo is completely clear */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
             </div>
           );
         })}

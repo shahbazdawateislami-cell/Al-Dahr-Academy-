@@ -23,22 +23,16 @@ import {
 import {
   getLocalizedProgram,
   getLocalizedClass,
-  getLocalizedFacility,
 } from '../data/localizedData';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { EducationStructureWheel } from '../components/EducationStructureWheel';
-import { parseVideoUrl } from '../utils/videoUtils';
 import { getMapEmbedUrl, getMapDirectUrl } from '../utils/mapUtils';
-import { VideoModal } from '../components/VideoModal';
-import { VideoMediaItem } from '../types';
 
 export const HomePage: React.FC = () => {
   const {
     settings,
     programs,
     classes,
-    facilities,
-    videos,
     setCurrentPage,
     setIsAdmissionModalOpen,
     setIsFeeCalculatorOpen,
@@ -46,9 +40,6 @@ export const HomePage: React.FC = () => {
     setEnquiryPrefill,
   } = useAcademy();
   const { t, language } = useLanguage();
-
-  // Active video modal state
-  const [activeVideoToPlay, setActiveVideoToPlay] = useState<VideoMediaItem | null>(null);
 
   // Fold / Unfold state for classes (Default folded: only class name + arrow visible)
   const [unfoldedClassIds, setUnfoldedClassIds] = useState<Record<string, boolean>>({});
@@ -62,7 +53,6 @@ export const HomePage: React.FC = () => {
 
   const localizedPrograms = programs.map((p) => getLocalizedProgram(p, language));
   const localizedClasses = classes.map((c) => getLocalizedClass(c, language));
-  const localizedFacilities = facilities.map((f) => getLocalizedFacility(f, language));
 
   const navigateTo = (page: PageRoute) => {
     setCurrentPage(page);
@@ -72,8 +62,6 @@ export const HomePage: React.FC = () => {
   const whatsappHref = `https://wa.me/91${settings.whatsapp}?text=${encodeURIComponent(
     `Assalamu Alaikum, I would like to enquire about admission at ${settings.academyName}, Phulwari Sharif, Patna.`
   )}`;
-
-  const featuredVideos = videos.filter((v) => v.active && v.isFeatured).slice(0, 3);
 
   return (
     <div className="space-y-16 sm:space-y-24">
@@ -354,180 +342,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Facilities Showcase */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider mb-2">
-              {t('home_facilities_badge', 'Campus Environment')}
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
-              {t('sec_facilities_title', 'World-Class Residential & Academic Facilities')}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1">
-              {t('home_facilities_desc', 'A serene, secure environment designed for high academic focus and student wellness.')}
-            </p>
-          </div>
-          <button
-            onClick={() => navigateTo('facilities')}
-            className="text-xs font-bold text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-1 shrink-0"
-          >
-            <span>{t('home_explore_facilities', 'Explore All Facilities')}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {localizedFacilities.slice(0, 4).map((fac) => (
-            <div
-              key={fac.id}
-              className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden group hover:border-sky-400/60 transition duration-300 shadow-lg"
-            >
-              <div className="h-40 overflow-hidden bg-slate-950">
-                <img
-                  src={fac.imageUrl}
-                  alt={fac.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                />
-              </div>
-              <div className="p-4 space-y-2">
-                <h3 className="text-base font-bold text-white font-['Cinzel',serif] group-hover:text-sky-300 transition">
-                  {fac.title}
-                </h3>
-                <p className="text-xs text-slate-300 line-clamp-3">
-                  {fac.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Academy Videos, Shorts & Reels Highlight */}
-      {featuredVideos.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-sky-300 text-xs font-bold uppercase tracking-wider mb-2">
-                {t('home_videos_badge', 'Watch & Discover')}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Cinzel',serif]">
-                {t('home_videos_title', 'Campus Life in Motion: Videos & Shorts')}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-300 mt-1">
-                {t('home_videos_desc', 'Experience the recitations, classroom dynamics, and student interviews.')}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => navigateTo('videos')}
-                className="text-xs font-bold text-sky-400 hover:underline"
-              >
-                {t('home_all_videos', 'All Videos')}
-              </button>
-              <span className="text-slate-600">•</span>
-              <button
-                onClick={() => navigateTo('youtube-shorts')}
-                className="text-xs font-bold text-blue-400 hover:underline"
-              >
-                {t('home_yt_shorts', 'YouTube Shorts')}
-              </button>
-              <span className="text-slate-600">•</span>
-              <button
-                onClick={() => navigateTo('instagram-videos')}
-                className="text-xs font-bold text-teal-400 hover:underline"
-              >
-                {t('home_ig_reels', 'Instagram Reels')}
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredVideos.map((vid) => {
-              const parsed = parseVideoUrl(vid.url, vid.type);
-              const thumb = vid.thumbnail || parsed.thumbnailUrl;
-
-              return (
-                <div
-                  key={vid.id}
-                  onClick={() => setActiveVideoToPlay(vid)}
-                  className="rounded-2xl bg-[#071330] border border-blue-900/60 overflow-hidden flex flex-col justify-between group hover:border-amber-500/80 transition duration-300 shadow-lg cursor-pointer"
-                >
-                  {/* Interactive Video Card Preview & Thumbnail */}
-                  <div className="relative h-60 sm:h-64 bg-slate-950 overflow-hidden group/thumb">
-                    {thumb ? (
-                      <img
-                        src={thumb}
-                        alt={vid.title}
-                        className="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-500"
-                      />
-                    ) : (
-                      <div className={`w-full h-full flex flex-col items-center justify-center p-6 text-center gap-3 ${
-                        vid.type === 'instagram'
-                          ? 'bg-gradient-to-tr from-amber-600 via-pink-600 to-purple-800'
-                          : 'bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900'
-                      }`}>
-                        {vid.type === 'instagram' ? (
-                          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
-                            <Play className="w-10 h-10 text-white fill-white" />
-                          </div>
-                        ) : (
-                          <div className="p-3 rounded-2xl bg-red-600/30 border border-red-500/50">
-                            <Play className="w-10 h-10 text-red-400 fill-red-400" />
-                          </div>
-                        )}
-                        <span className="text-xs font-bold text-white tracking-wide drop-shadow line-clamp-1">
-                          {vid.title}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Glowing Center Play Overlay */}
-                    <div className="absolute inset-0 bg-slate-950/40 group-hover/thumb:bg-slate-950/20 transition-all duration-300 flex items-center justify-center">
-                      <div className="w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-2xl transition transform group-hover/thumb:scale-110">
-                        <Play className="w-6 h-6 ml-1 fill-slate-950" />
-                      </div>
-                    </div>
-
-                    {/* Top Right Platform Badge */}
-                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-slate-950/90 backdrop-blur-md rounded-lg text-[10px] font-extrabold text-amber-400 border border-amber-400/40 uppercase shadow-lg pointer-events-none">
-                      {vid.type === 'youtube' ? 'YouTube' : vid.type === 'shorts' ? '⚡ Shorts' : '📷 Instagram Reel'}
-                    </div>
-                  </div>
-
-                  {/* Card Details */}
-                  <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-sm font-bold text-white line-clamp-2 group-hover:text-amber-400 transition font-['Cinzel',serif]">
-                        {vid.title}
-                      </h3>
-                      <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">
-                        {vid.description}
-                      </p>
-                    </div>
-
-                    <div className="pt-2 flex items-center justify-between border-t border-blue-900/60">
-                      <div className="text-xs font-bold text-amber-400 group-hover:text-amber-300 inline-flex items-center gap-1.5">
-                        <Play className="w-3.5 h-3.5 fill-amber-400" />
-                        <span>Click to Play Video</span>
-                      </div>
-                      <span className="text-[10px] text-sky-300 font-semibold px-2.5 py-0.5 rounded-full bg-blue-950 border border-blue-800/80">
-                        {vid.category || 'Al-Dahr Media'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* Video Modal Player Popup */}
-      <VideoModal
-        video={activeVideoToPlay}
-        onClose={() => setActiveVideoToPlay(null)}
-      />
 
       {/* Location & Quick Contact Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">

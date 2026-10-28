@@ -94,9 +94,14 @@ const ScrollReveal: React.FC<{
 };
 
 export const EducationStructureWheel: React.FC = () => {
-  const { structureData } = useAcademy();
+  const { structureData, setCurrentPage } = useAcademy();
   const { t } = useLanguage();
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  const navigateTo = (page: 'modern-education' | 'islamic-education' | 'curriculum') => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const aiHandImage = structureData?.aiImageUrl || defaultAiHandImage;
   const socialPhoneImage = structureData?.socialImageUrl || defaultSocialPhoneImage;
@@ -261,7 +266,13 @@ export const EducationStructureWheel: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <StatusBadge status={structureData?.modernStatus} defaultStatus="active" />
-                  <GraduationCap className="w-8 h-8 text-sky-300 hidden sm:block opacity-80" />
+                  <button
+                    onClick={() => navigateTo('modern-education')}
+                    className="px-3.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/50 text-sky-200 text-xs font-black flex items-center gap-1.5 transition cursor-pointer active:scale-95"
+                    title="Open Modern Education Page"
+                  >
+                    <span>{t('nav_modern', 'Modern Education Page')} →</span>
+                  </button>
                 </div>
               </div>
             </ScrollReveal>
@@ -318,9 +329,13 @@ export const EducationStructureWheel: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <StatusBadge status={structureData?.islamicStatus} defaultStatus="active" />
-                  <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black">
-                    <span>{t('nav_islamic', 'Islamic Education')}</span>
-                  </div>
+                  <button
+                    onClick={() => navigateTo('islamic-education')}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 text-xs font-black flex items-center gap-1.5 transition cursor-pointer active:scale-95"
+                    title="Open Islamic Education Page"
+                  >
+                    <span>{t('nav_islamic', 'Islamic Education Page')} →</span>
+                  </button>
                 </div>
               </div>
             </ScrollReveal>

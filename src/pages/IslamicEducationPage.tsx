@@ -10,12 +10,26 @@ import {
 import { getLocalizedSubject } from '../data/localizedData';
 
 export const IslamicEducationPage: React.FC = () => {
-  const { subjects, setIsAdmissionModalOpen } = useAcademy();
+  const { subjects, structureData, setIsAdmissionModalOpen } = useAcademy();
   const { t, language } = useLanguage();
 
-  const islamicSubjects = subjects
+  const primaryIslamicSubjects = subjects
     .filter((s) => s.type === 'islamic')
     .map((s) => getLocalizedSubject(s, language));
+
+  // Also map custom Islamic subjects from structureData if defined
+  const structureIslamicSubjects = (structureData?.islamicSubjects || [])
+    .filter((s) => !primaryIslamicSubjects.some((p) => p.title.toLowerCase() === s.title.toLowerCase()))
+    .map((s, idx) => ({
+      id: 'struct-islamic-' + idx,
+      title: s.title,
+      description: s.desc,
+      type: 'islamic' as const,
+      iconName: 'BookOpen',
+      order: 100 + idx,
+    }));
+
+  const islamicSubjects = [...primaryIslamicSubjects, ...structureIslamicSubjects];
 
   const dailyIslamicRoutine = [
     {

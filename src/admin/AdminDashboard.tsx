@@ -16,6 +16,7 @@ import {
   createGoogleFormForAdmissions,
   addStudentToGoogleContacts,
 } from '../services/googleWorkspace';
+import { compressImage } from '../utils/imageCompressor';
 import {
   LayoutDashboard,
   Inbox,
@@ -135,6 +136,19 @@ export const AdminDashboard: React.FC = () => {
   // State for adding/editing a program
   const [editingProgram, setEditingProgram] = useState<ProgramItem | null>(null);
 
+  // State for adding/editing a subject
+  const [editingSubject, setEditingSubject] = useState<SubjectItem | null>(null);
+  const [newSubjTitle, setNewSubjTitle] = useState('');
+  const [newSubjDesc, setNewSubjDesc] = useState('');
+  const [newSubjType, setNewSubjType] = useState<'islamic' | 'modern'>('islamic');
+
+  // State for adding/editing a curriculum item
+  const [editingCurriculum, setEditingCurriculum] = useState<CurriculumItem | null>(null);
+  const [newCurTitle, setNewCurTitle] = useState('');
+  const [newCurDesc, setNewCurDesc] = useState('');
+  const [newCurCategory, setNewCurCategory] = useState<'islamic' | 'modern'>('islamic');
+  const [newCurTopics, setNewCurTopics] = useState('');
+
   // State for adding/editing a facility
   const [editingFacility, setEditingFacility] = useState<FacilityItem | null>(null);
   const facilityFileInputRef = useRef<HTMLInputElement>(null);
@@ -166,46 +180,25 @@ export const AdminDashboard: React.FC = () => {
   const programFileInputRef = useRef<HTMLInputElement>(null);
 
   // Helper to read and optimize selected photo from gallery
-  const processImageFile = (file: File, callback: (base64Url: string) => void) => {
+  const processImageFile = async (file: File, callback: (base64Url: string) => void) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       showToast('Kripya valid photo file select karein (JPG, PNG, WebP)');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        const maxDimension = 1280;
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = Math.round((height * maxDimension) / width);
-            width = maxDimension;
-          } else {
-            width = Math.round((width * maxDimension) / height);
-            height = maxDimension;
-          }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressed = canvas.toDataURL('image/jpeg', 0.82);
-          callback(compressed);
-        } else {
-          callback(event.target?.result as string);
-        }
-        showToast('Photo gallery se successfully select ho gayi!');
-      };
-      img.onerror = () => {
-        showToast('Photo process karne mein error aaya.');
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    try {
+      showToast('Photo optimize ki ja rahi hai...');
+      const compressed = await compressImage(file, {
+        maxWidth: 1080,
+        maxHeight: 1080,
+        maxSizeBytes: 160 * 1024,
+      });
+      callback(compressed);
+      showToast('Photo successfully select aur optimize ho gayi!');
+    } catch (err) {
+      console.error('Photo optimization error:', err);
+      showToast('Photo process karne mein error aaya.');
+    }
   };
 
   // If not logged in, show the Admin Login Portal
@@ -476,6 +469,16 @@ export const AdminDashboard: React.FC = () => {
         >
           <BookOpen className="w-4 h-4" />
           <span>Subjects ({subjects.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('curriculum')}
+          className={`px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+            activeTab === 'curriculum' ? 'bg-amber-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <GraduationCap className="w-4 h-4" />
+          <span>Curriculum ({curriculum.length})</span>
         </button>
 
         <button
@@ -2139,31 +2142,367 @@ export const AdminDashboard: React.FC = () => {
       {/* TAB CONTENT: SUBJECTS */}
       {activeTab === 'subjects' && (
         <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
-          <h2 className="text-2xl font-bold font-['Cinzel',serif] text-white">
-            Subjects Management (Islamic & Modern)
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold font-['Cinzel',serif] text-white">
+                Subjects Management (Islamic & Modern)
+              </h2>
+              <p className="text-xs text-slate-400">
+                Add, edit, or delete Islamic and Modern academic subjects offered at Al-Dahr Academy.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingSubject({
+                  id: 'subj-' + Date.now(),
+                  title: '',
+                  description: '',
+                  type: 'islamic',
+                  iconName: 'BookOpen',
+                  order: subjects.length + 1,
+                });
+              }}
+              className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow transition cursor-pointer active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Naya Subject Add Karein</span>
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {subjects.map((sub) => (
               <div
                 key={sub.id}
-                className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2 text-xs"
+                className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 text-xs flex flex-col justify-between hover:border-slate-700 transition"
               >
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`font-bold uppercase text-[10px] px-2 py-0.5 rounded ${
-                      sub.type === 'islamic'
-                        ? 'bg-amber-500/20 text-amber-400'
-                        : 'bg-sky-500/20 text-sky-400'
-                    }`}
-                  >
-                    {sub.type}
-                  </span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`font-bold uppercase text-[10px] px-2 py-0.5 rounded border ${
+                        sub.type === 'islamic'
+                          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                          : 'bg-sky-500/20 text-sky-400 border-sky-500/30'
+                      }`}
+                    >
+                      {sub.type}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-white text-sm">{sub.title}</h4>
+                  <p className="text-slate-400 leading-relaxed line-clamp-3">{sub.description}</p>
                 </div>
-                <h4 className="font-bold text-white text-sm">{sub.title}</h4>
-                <p className="text-slate-400 line-clamp-2">{sub.description}</p>
+
+                <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingSubject(sub)}
+                    className="flex-1 py-1.5 px-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span>Edit Subject</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (confirm(`"${sub.title}" subject delete karein?`)) {
+                        await deleteSubject(sub.id);
+                        showToast('Subject delete ho gaya');
+                      }
+                    }}
+                    className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition cursor-pointer"
+                    title="Delete Subject"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+
+          {/* Edit / Add Subject Modal */}
+          {editingSubject && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2 text-white font-bold font-['Cinzel',serif] text-base">
+                    <BookOpen className="w-5 h-5 text-amber-400" />
+                    <span>{subjects.some((s) => s.id === editingSubject.id) ? 'Edit Subject' : 'Add New Subject'}</span>
+                  </div>
+                  <button
+                    onClick={() => setEditingSubject(null)}
+                    className="p-1 text-slate-400 hover:text-white rounded-lg"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Subject Title</label>
+                    <input
+                      type="text"
+                      value={editingSubject.title}
+                      onChange={(e) => setEditingSubject({ ...editingSubject, title: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-medium"
+                      placeholder="e.g. Quran Tajweed, Computer Literacy..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Subject Type</label>
+                    <select
+                      value={editingSubject.type}
+                      onChange={(e) => setEditingSubject({ ...editingSubject, type: e.target.value as 'islamic' | 'modern' })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                    >
+                      <option value="islamic">Islamic Studies</option>
+                      <option value="modern">Modern Academic</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Description</label>
+                    <textarea
+                      rows={3}
+                      value={editingSubject.description}
+                      onChange={(e) => setEditingSubject({ ...editingSubject, description: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white leading-relaxed"
+                      placeholder="Subject ki detail aur syllabus highlight..."
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setEditingSubject(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!editingSubject.title.trim()) {
+                        showToast('Title fill karna zaroori hai');
+                        return;
+                      }
+                      await saveSubject(editingSubject);
+                      setEditingSubject(null);
+                      showToast('Subject successfully save ho gaya!');
+                    }}
+                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Save Subject</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB CONTENT: CURRICULUM */}
+      {activeTab === 'curriculum' && (
+        <div className="rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold font-['Cinzel',serif] text-white">
+                Educational Curriculum Pillars Management
+              </h2>
+              <p className="text-xs text-slate-400">
+                Manage high-level pedagogical curriculum pillars, topics, and category breakdowns.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingCurriculum({
+                  id: 'cur-' + Date.now(),
+                  title: '',
+                  category: 'islamic',
+                  description: '',
+                  topics: [],
+                  order: curriculum.length + 1,
+                });
+                setNewCurTopics('');
+              }}
+              className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow transition cursor-pointer active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Naya Curriculum Pillar Add Karein</span>
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {curriculum.map((item) => (
+              <div
+                key={item.id}
+                className="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 text-xs hover:border-slate-700 transition"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`font-bold uppercase text-[10px] px-2 py-0.5 rounded border ${
+                        item.category === 'islamic'
+                          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                          : 'bg-sky-500/20 text-sky-400 border-sky-500/30'
+                      }`}
+                    >
+                      {item.category}
+                    </span>
+                    <h3 className="font-bold text-white text-base font-['Cinzel',serif]">{item.title}</h3>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingCurriculum(item);
+                        setNewCurTopics(item.topics.join(', '));
+                      }}
+                      className="px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg font-semibold flex items-center gap-1 transition"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Edit Pillar</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (confirm(`"${item.title}" curriculum pillar delete karein?`)) {
+                          await deleteCurriculum(item.id);
+                          showToast('Curriculum pillar delete ho gaya');
+                        }
+                      }}
+                      className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition"
+                      title="Delete Pillar"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-slate-300 leading-relaxed">{item.description}</p>
+
+                {item.topics.length > 0 && (
+                  <div className="pt-2 border-t border-slate-850 flex flex-wrap gap-1.5">
+                    {item.topics.map((t, i) => (
+                      <span
+                        key={i}
+                        className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] text-slate-300 flex items-center gap-1"
+                      >
+                        <CheckCircle2 className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span>{t}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Edit / Add Curriculum Modal */}
+          {editingCurriculum && (
+            <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2 text-white font-bold font-['Cinzel',serif] text-base">
+                    <GraduationCap className="w-5 h-5 text-amber-400" />
+                    <span>{curriculum.some((c) => c.id === editingCurriculum.id) ? 'Edit Curriculum Pillar' : 'Add New Curriculum Pillar'}</span>
+                  </div>
+                  <button
+                    onClick={() => setEditingCurriculum(null)}
+                    className="p-1 text-slate-400 hover:text-white rounded-lg"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Pillar Title</label>
+                    <input
+                      type="text"
+                      value={editingCurriculum.title}
+                      onChange={(e) => setEditingCurriculum({ ...editingCurriculum, title: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-medium"
+                      placeholder="e.g. Quranic Sciences & Hifz, Mathematics & Logic..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Category</label>
+                    <select
+                      value={editingCurriculum.category}
+                      onChange={(e) => setEditingCurriculum({ ...editingCurriculum, category: e.target.value as 'islamic' | 'modern' })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white"
+                    >
+                      <option value="islamic">Islamic Pillar</option>
+                      <option value="modern">Modern Academic Pillar</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Description</label>
+                    <textarea
+                      rows={3}
+                      value={editingCurriculum.description}
+                      onChange={(e) => setEditingCurriculum({ ...editingCurriculum, description: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white leading-relaxed"
+                      placeholder="Pillar description..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">Topics (comma separated)</label>
+                    <textarea
+                      rows={2}
+                      value={newCurTopics}
+                      onChange={(e) => setNewCurTopics(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white leading-relaxed"
+                      placeholder="e.g. Tajweed Rules, Noorani Qaida, Daily Masnoon Duas"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Har topic ko comma (,) se alag karein</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setEditingCurriculum(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!editingCurriculum.title.trim()) {
+                        showToast('Title fill karna zaroori hai');
+                        return;
+                      }
+                      const topicsArray = newCurTopics
+                        .split(',')
+                        .map((t) => t.trim())
+                        .filter(Boolean);
+
+                      await saveCurriculum({
+                        ...editingCurriculum,
+                        topics: topicsArray,
+                      });
+                      setEditingCurriculum(null);
+                      showToast('Curriculum pillar successfully save ho gaya!');
+                    }}
+                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>Save Pillar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

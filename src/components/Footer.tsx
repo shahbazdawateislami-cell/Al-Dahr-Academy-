@@ -14,6 +14,7 @@ import {
   Camera,
   CheckCircle2,
 } from 'lucide-react';
+import { compressImage } from '../utils/imageCompressor';
 
 export const Footer: React.FC = () => {
   const { settings, setCurrentPage, setIsAdmissionModalOpen, updateSettings } = useAcademy();
@@ -26,48 +27,28 @@ export const Footer: React.FC = () => {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       showToast('Kripya valid photo ya logo file chunein (PNG, JPG, SVG, WebP)');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = async () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        const maxDimension = 600;
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = Math.round((height * maxDimension) / width);
-            width = maxDimension;
-          } else {
-            width = Math.round((width * maxDimension) / height);
-            height = maxDimension;
-          }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressed = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.9);
-          await updateSettings({ logoUrl: compressed });
-        } else {
-          await updateSettings({ logoUrl: event.target?.result as string });
-        }
-        showToast('Academy Logo Gallery se successfully add ho gaya!');
-      };
-      img.onerror = () => {
-        showToast('Photo process karne mein dikkat aayi.');
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
+    try {
+      showToast('Logo optimize kiya ja raha hai...');
+      const compressed = await compressImage(file, {
+        maxWidth: 400,
+        maxHeight: 400,
+        maxSizeBytes: 60 * 1024,
+      });
+      await updateSettings({ logoUrl: compressed });
+      showToast('Academy Logo successfully update aur cloud par save ho gaya!');
+    } catch (err) {
+      console.error('Logo error:', err);
+      showToast('Photo process karne mein dikkat aayi.');
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const navigateTo = (page: PageRoute) => {

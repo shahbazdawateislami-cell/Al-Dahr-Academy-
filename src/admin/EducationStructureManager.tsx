@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAcademy } from '../context/AcademyContext';
 import { EducationStructureData, EducationSubjectPill } from '../types';
+import { compressImage } from '../utils/imageCompressor';
 import {
   BookOpen,
   GraduationCap,
@@ -37,46 +38,34 @@ export const EducationStructureManager: React.FC<EducationStructureManagerProps>
   };
 
   const handleSave = async () => {
-    await updateEducationStructure(formData);
-    notifyToast('Education Structure successfully updated & published live!');
+    try {
+      notifyToast('Education Structure live database par update ho raha hai...');
+      await updateEducationStructure(formData);
+      notifyToast('Education Structure successfully updated & published live!');
+    } catch (e: any) {
+      notifyToast('Save karne mein error aaya: ' + (e?.message || 'Database error'));
+    }
   };
 
-  const processImageFile = (file: File, callback: (base64Url: string) => void) => {
+  const processImageFile = async (file: File, callback: (base64Url: string) => void) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       notifyToast('Please select a valid image file (JPG, PNG, WebP)');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let { width, height } = img;
-        const maxDimension = 1280;
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = Math.round((height * maxDimension) / width);
-            width = maxDimension;
-          } else {
-            width = Math.round((width * maxDimension) / height);
-            height = maxDimension;
-          }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          callback(canvas.toDataURL('image/jpeg', 0.85));
-        } else {
-          callback(event.target?.result as string);
-        }
-        notifyToast('Image uploaded successfully from device gallery!');
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    try {
+      notifyToast('Image optimize ho rahi hai...');
+      const compressed = await compressImage(file, {
+        maxWidth: 600,
+        maxHeight: 600,
+        maxSizeBytes: 70 * 1024,
+      });
+      callback(compressed);
+      notifyToast('Image successfully processed and optimized for cloud database!');
+    } catch (err) {
+      console.error('Structure image error:', err);
+      notifyToast('Image process karne mein error aaya.');
+    }
   };
 
   // Helper mutators for Modern subjects
